@@ -1,4 +1,4 @@
-# Cardiovascular Disease Detection Mobile App
+# Heartify - Cardiovascular Disease Detection Mobile App
 
 This repository contains the **Mobile Application** component of a university capstone project aimed at early detection of cardiovascular disease (CVD). The app allows users to **register**, **log in**, **verify their identity**, and most importantly, **submit personal health metrics** to a backend API, which then uses a machine learning model to predict the likelihood of cardiovascular disease.
 
@@ -46,7 +46,7 @@ This app is designed to interact with a Flask-based REST API server that:
 - Loads a `.keras` model trained on cardiovascular data
 - Returns prediction results
 
-👉 Flask API Repository: [https://github.com/votranphi/flask-cardiovascular-disease](https://github.com/votranphi/flask-cardiovascular-disease)
+👉 Flask API Repository: [https://github.com/votranphi/flask-cardiovascular-disease](https://github.com/votranphi/heartify-api)
 
 ## 📚 Academic Context
 
