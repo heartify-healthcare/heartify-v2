@@ -46,7 +46,7 @@ This app is designed to interact with a Flask-based REST API server that:
 - Loads a `.keras` model trained on cardiovascular data
 - Returns prediction results
 
-👉 Flask API Repository: [https://github.com/votranphi/flask-cardiovascular-disease](https://github.com/votranphi/heartify-api)
+👉 Flask API Repository: [https://github.com/votranphi/heartify-api](https://github.com/votranphi/heartify-api)
 
 ## 📚 Academic Context
 
