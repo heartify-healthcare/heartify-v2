@@ -31,8 +31,8 @@ This repository contains the **Mobile Application** component of a university ca
 ### Running the App Locally
 
 ```bash
-git clone https://github.com/votranphi/react-native-cardiovascular-disease
-cd react-native-cardiovascular-disease
+git clone https://github.com/votranphi/heartify
+cd heartify
 npm install
 npx expo start
 ```
