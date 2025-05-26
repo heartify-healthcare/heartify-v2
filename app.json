@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-cardiovascular-disease",
-    "slug": "react-native-cardiovascular-disease",
+    "name": "heartify",
+    "slug": "heartify",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
