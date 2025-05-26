@@ -51,8 +51,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
-            <Text style={styles.appName}>Cardiovascular Disease Prediction</Text>
-            <Text style={styles.slogan}>Your Heart, Your Future.</Text>
+            <Text style={styles.appName}>Heartify</Text>
+            <Text style={styles.appDescription}>A Mobile Application for Cardiovascular Disease Prediction</Text>
+            <Text style={styles.slogan}>"Your Heart, Your Future"</Text>
             
             <View style={styles.formContainer}>
               <Text style={styles.title}>Login</Text>

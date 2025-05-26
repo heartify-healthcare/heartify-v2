@@ -47,7 +47,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
-            <Text style={styles.appName}>Cardiovascular Disease Prediction</Text>
+            <Text style={styles.appName}>Heartify</Text>
             
             <View style={styles.formContainer}>
               <Text style={styles.title}>Forgot Password</Text>

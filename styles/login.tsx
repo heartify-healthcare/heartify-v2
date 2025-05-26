@@ -29,11 +29,17 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: height * 0.01,
   },
+  appDescription: {
+    fontSize: width * 0.04,
+    color: '#7f8c8d',
+    textAlign: 'center',
+  },
   slogan: {
     fontSize: width * 0.04,
     color: '#7f8c8d',
     textAlign: 'center',
     marginBottom: height * 0.05,
+    fontWeight: "900"
   },
   formContainer: {
     width: '100%',
