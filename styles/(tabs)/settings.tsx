@@ -20,7 +20,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#e74c3c',
     marginBottom: height * 0.01,
     textAlign: 'center',
   },
