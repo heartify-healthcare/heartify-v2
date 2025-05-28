@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert
 } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { styles } from '@/styles/(tabs)/settings';
 
@@ -27,6 +28,8 @@ interface UserData {
 }
 
 const SettingsScreen: React.FC = () => {
+  const router = useRouter();
+
   // Mock user data - simulate data from backend
   const mockUserData: UserData = {
     email: "songokupkj@gmail.com",
@@ -110,11 +113,12 @@ const SettingsScreen: React.FC = () => {
     // TODO: Navigate to /change-password route
     // In a real app, you would use navigation like:
     // navigation.navigate('ChangePassword');
-    Alert.alert(
-      'Change Password',
-      'This would navigate to the change password screen.\n\nRoute: /change-password',
-      [{ text: 'OK' }]
-    );
+    // Alert.alert(
+    //   'Change Password',
+    //   'This would navigate to the change password screen.\n\nRoute: /change-password',
+    //   [{ text: 'OK' }]
+    // );
+    router.push("/change-password");
   };
 
   const getVerificationStatus = () => {

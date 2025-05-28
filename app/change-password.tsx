@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { 
   View, 
@@ -14,6 +15,8 @@ import {
 const { width, height } = Dimensions.get('window');
 
 const ChangePasswordScreen: React.FC = () => {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -59,7 +62,8 @@ const ChangePasswordScreen: React.FC = () => {
 
   const handleCancel = () => {
     // TODO: Navigate back to settings
-    Alert.alert('Cancel', 'This would navigate back to settings');
+    // Alert.alert('Cancel', 'This would navigate back to settings');
+    router.push("/(tabs)/settings");
   };
 
   return (
@@ -152,7 +156,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#e74c3c',
     marginBottom: height * 0.01,
     textAlign: 'center',
   },
