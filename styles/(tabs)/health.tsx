@@ -120,6 +120,68 @@ export const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
+  // New styles for date picker
+  datePickerModal: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: width * 0.05,
+    width: width * 0.9,
+    maxHeight: height * 0.7,
+  },
+  datePickerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: height * 0.03,
+  },
+  datePickerColumn: {
+    flex: 1,
+    marginHorizontal: width * 0.01,
+  },
+  datePickerLabel: {
+    fontSize: width * 0.035,
+    fontWeight: 'bold',
+    color: '#34495e',
+    textAlign: 'center',
+    marginBottom: height * 0.01,
+  },
+  datePickerScroll: {
+    maxHeight: height * 0.25,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+  },
+  datePickerOption: {
+    padding: width * 0.025,
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ecf0f1',
+  },
+  selectedDateOption: {
+    backgroundColor: '#e74c3c',
+  },
+  datePickerOptionText: {
+    fontSize: width * 0.035,
+    color: '#2c3e50',
+  },
+  selectedDateOptionText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  datePickerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  confirmButton: {
+    backgroundColor: '#e74c3c',
+    borderRadius: 8,
+    padding: width * 0.035,
+    flex: 0.45,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: 'white',
+    fontSize: width * 0.04,
+    fontWeight: 'bold',
+  },
   buttonContainer: {
     marginTop: height * 0.02,
   },
