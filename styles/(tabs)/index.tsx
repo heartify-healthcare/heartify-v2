@@ -67,6 +67,13 @@ export const styles = StyleSheet.create({
     color: '#7f8c8d',
     marginTop: 2,
   },
+  // New style for timestamp in collapsed header
+  cardTimestamp: {
+    fontSize: width * 0.032,
+    color: '#8e44ad',
+    marginTop: 4,
+    fontWeight: '500',
+  },
   predictionBadge: {
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.005,

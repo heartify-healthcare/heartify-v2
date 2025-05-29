@@ -29,6 +29,7 @@ interface PredictionData {
   slope: number;
   thalach: number;
   trestbps: number;
+  create_at: string; // Added timestamp field
 }
 
 const sampleData: PredictionData[] = [
@@ -47,7 +48,8 @@ const sampleData: PredictionData[] = [
     sex: 0,
     slope: 1,
     thalach: 120,
-    trestbps: 120
+    trestbps: 120,
+    create_at: "2025-05-29 14:32:45.123456"
   },
   {
     id: 3,
@@ -64,7 +66,8 @@ const sampleData: PredictionData[] = [
     sex: 1,
     slope: 2,
     thalach: 140,
-    trestbps: 150
+    trestbps: 150,
+    create_at: "2025-05-28 09:15:30.987654"
   }
 ];
 
@@ -95,7 +98,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const expandedHeight = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 450], // Increased from 400 to 450 to accommodate all content
+    outputRange: [0, 450], // Back to original height since timestamp is now in header
   });
 
   const formatSex = (sex: number): string => {
@@ -104,6 +107,27 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const formatProbability = (prob: number): string => {
     return `${(prob * 100).toFixed(2)}%`;
+  };
+
+  const formatTimestamp = (timestamp: string): string => {
+    try {
+      // Parse the timestamp string
+      const date = new Date(timestamp.replace(' ', 'T'));
+      
+      // Format as "May 29, 2025 - 14:32"
+      const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      };
+      
+      return date.toLocaleDateString('en-US', options).replace(',', ' -');
+    } catch (error) {
+      return timestamp; // Fallback to original string if parsing fails
+    }
   };
 
   const getPredictionColor = (prediction: string): string => {
@@ -118,6 +142,8 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
           <View style={styles.headerLeft}>
             <Text style={styles.cardId}>ID: {data.id}</Text>
             <Text style={styles.cardUserId}>User ID: {data.user_id}</Text>
+            {/* Added timestamp to collapsed header */}
+            <Text style={styles.cardTimestamp}>{formatTimestamp(data.create_at)}</Text>
           </View>
           <View style={styles.headerRight}>
             <View style={[styles.predictionBadge, { backgroundColor: getPredictionColor(data.prediction) }]}>
