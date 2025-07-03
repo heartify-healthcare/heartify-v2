@@ -17,19 +17,15 @@ interface PredictionData {
   id: number;
   user_id: number;
   age: number;
-  chol: number;
   cp: number;
   exang: number;
-  fbs: number;
-  oldpeak: number;
   prediction: string;
   probability: number;
   restecg: number;
   sex: number;
-  slope: number;
   thalach: number;
   trestbps: number;
-  create_at: string; // Added timestamp field
+  create_at: string;
 }
 
 const sampleData: PredictionData[] = [
@@ -37,16 +33,12 @@ const sampleData: PredictionData[] = [
     id: 2,
     user_id: 1,
     age: 18,
-    chol: 284,
     cp: 2,
     exang: 0,
-    fbs: 0,
-    oldpeak: 0.0,
     prediction: "NEGATIVE",
     probability: 0.03538578748703003,
     restecg: 0,
     sex: 0,
-    slope: 1,
     thalach: 120,
     trestbps: 120,
     create_at: "2025-05-29 14:32:45.123456"
@@ -55,16 +47,12 @@ const sampleData: PredictionData[] = [
     id: 3,
     user_id: 2,
     age: 55,
-    chol: 210,
     cp: 1,
     exang: 1,
-    fbs: 1,
-    oldpeak: 1.8,
     prediction: "POSITIVE",
     probability: 0.847283,
     restecg: 2,
     sex: 1,
-    slope: 2,
     thalach: 140,
     trestbps: 150,
     create_at: "2025-05-28 09:15:30.987654"
@@ -98,7 +86,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const expandedHeight = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 450], // Back to original height since timestamp is now in header
+    outputRange: [0, 320], // Reduced height since we removed 4 fields
   });
 
   const formatSex = (sex: number): string => {
@@ -142,7 +130,6 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
           <View style={styles.headerLeft}>
             <Text style={styles.cardId}>ID: {data.id}</Text>
             <Text style={styles.cardUserId}>User ID: {data.user_id}</Text>
-            {/* Added timestamp to collapsed header */}
             <Text style={styles.cardTimestamp}>{formatTimestamp(data.create_at)}</Text>
           </View>
           <View style={styles.headerRight}>
@@ -171,11 +158,6 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
             </View>
             
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Cholesterol:</Text>
-              <Text style={styles.detailValue}>{data.chol}</Text>
-            </View>
-            
-            <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Chest Pain (CP):</Text>
               <Text style={styles.detailValue}>{data.cp}</Text>
             </View>
@@ -183,11 +165,6 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Resting BP:</Text>
               <Text style={styles.detailValue}>{data.trestbps}</Text>
-            </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Fasting Blood Sugar:</Text>
-              <Text style={styles.detailValue}>{data.fbs}</Text>
             </View>
             
             <View style={styles.detailRow}>
@@ -203,16 +180,6 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Exercise Angina:</Text>
               <Text style={styles.detailValue}>{data.exang}</Text>
-            </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Oldpeak:</Text>
-              <Text style={styles.detailValue}>{data.oldpeak}</Text>
-            </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Slope:</Text>
-              <Text style={styles.detailValue}>{data.slope}</Text>
             </View>
             
             <View style={styles.separator} />
