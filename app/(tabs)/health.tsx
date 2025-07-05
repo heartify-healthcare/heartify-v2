@@ -51,6 +51,31 @@ const sexOptions: DropdownOption[] = [
   { label: "Female", value: 0 }
 ];
 
+// Helper function to convert GMT date string to YYYY-MM-DD format
+const convertGMTToYYYYMMDD = (gmtDateString: string): string => {
+  if (!gmtDateString) return '';
+  
+  try {
+    const date = new Date(gmtDateString);
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', gmtDateString);
+      return '';
+    }
+    
+    // Format to YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    console.error('Error converting date:', error, gmtDateString);
+    return '';
+  }
+};
+
 interface DropdownProps {
   options: DropdownOption[];
   selectedValue: number | undefined;
@@ -394,9 +419,12 @@ const HealthScreen: React.FC = () => {
       const data = await makeAuthenticatedRequest('/users/profile');
       setUserData(data);
       
+      // Convert GMT date to YYYY-MM-DD format
+      const convertedDob = convertGMTToYYYYMMDD(data.dob);
+      
       // Update form data with fetched data
       const newFormData = {
-        dob: data.dob || '',
+        dob: convertedDob,
         cp: data.cp,
         exang: data.exang,
         sex: data.sex,
@@ -407,7 +435,7 @@ const HealthScreen: React.FC = () => {
       setOriginalData(newFormData);
       
       // If no health data exists, start in editing mode
-      const hasHealthData = data.dob !== null && data.dob !== undefined && 
+      const hasHealthData = convertedDob !== '' && 
                            data.cp !== null && data.cp !== undefined && 
                            data.exang !== null && data.exang !== undefined && 
                            data.sex !== null && data.sex !== undefined && 
@@ -577,7 +605,7 @@ const HealthScreen: React.FC = () => {
     );
   }
 
-  const hasHealthData = userData.dob !== null && userData.dob !== undefined && 
+  const hasHealthData = formData.dob !== '' && 
                        userData.cp !== null && userData.cp !== undefined && 
                        userData.exang !== null && userData.exang !== undefined && 
                        userData.sex !== null && userData.sex !== undefined && 
