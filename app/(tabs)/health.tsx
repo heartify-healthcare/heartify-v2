@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   Modal,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from '@/styles/(tabs)/health';
 
@@ -19,7 +21,8 @@ interface UserData {
   phonenumber: string;
   role: string;
   username: string;
-  dob?: string; // Changed from age to dob
+  created_at: string;
+  dob?: string;
   cp?: number;
   exang?: number;
   sex?: number;
@@ -47,6 +50,31 @@ const sexOptions: DropdownOption[] = [
   { label: "Male", value: 1 },
   { label: "Female", value: 0 }
 ];
+
+// Helper function to convert GMT date string to YYYY-MM-DD format
+const convertGMTToYYYYMMDD = (gmtDateString: string): string => {
+  if (!gmtDateString) return '';
+  
+  try {
+    const date = new Date(gmtDateString);
+    
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', gmtDateString);
+      return '';
+    }
+    
+    // Format to YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    console.error('Error converting date:', error, gmtDateString);
+    return '';
+  }
+};
 
 interface DropdownProps {
   options: DropdownOption[];
@@ -137,7 +165,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
   const [tempMonth, setTempMonth] = useState<number>(1);
   const [tempYear, setTempYear] = useState<number>(new Date().getFullYear());
 
-  // Initialize temp values when modal opens
   React.useEffect(() => {
     if (selectedDate && isVisible) {
       const [year, month, day] = selectedDate.split('-').map(Number);
@@ -145,7 +172,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
       setTempMonth(month);
       setTempDay(day);
     } else if (isVisible && !selectedDate) {
-      // Set default to a reasonable birth year (e.g., 30 years ago)
       const currentYear = new Date().getFullYear();
       setTempYear(currentYear - 30);
       setTempMonth(1);
@@ -236,7 +262,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
             <Text style={styles.modalTitle}>Select Date of Birth</Text>
             
             <View style={styles.datePickerContainer}>
-              {/* Year Picker */}
               <View style={styles.datePickerColumn}>
                 <Text style={styles.datePickerLabel}>Year</Text>
                 <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
@@ -260,7 +285,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
                 </ScrollView>
               </View>
 
-              {/* Month Picker */}
               <View style={styles.datePickerColumn}>
                 <Text style={styles.datePickerLabel}>Month</Text>
                 <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
@@ -284,7 +308,6 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
                 </ScrollView>
               </View>
 
-              {/* Day Picker */}
               <View style={styles.datePickerColumn}>
                 <Text style={styles.datePickerLabel}>Day</Text>
                 <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
@@ -325,45 +348,135 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
 };
 
 const HealthScreen: React.FC = () => {
-  // Mock existing user data - simulate data from backend
-  const mockUserData: UserData = {
-    email: "songokupkj@gmail.com",
-    id: 1,
-    is_verified: true,
-    phonenumber: "0865942420",
-    role: "user",
-    username: "songokupkj",
-    dob: "1974-05-15", // Changed from age to dob
-    cp: 1,
-    exang: 1,
-    sex: 1,
-    trestbps: 120
-  };
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  // Check if health data exists
-  const hasHealthData = mockUserData.dob !== undefined && 
-                       mockUserData.cp !== undefined && 
-                       mockUserData.exang !== undefined && 
-                       mockUserData.sex !== undefined && 
-                       mockUserData.trestbps !== undefined;
-
-  // State management
-  const [isEditing, setIsEditing] = useState(!hasHealthData);
   const [formData, setFormData] = useState({
-    dob: mockUserData.dob || '', // Changed from age to dob
-    cp: mockUserData.cp,
-    exang: mockUserData.exang,
-    sex: mockUserData.sex,
-    trestbps: mockUserData.trestbps?.toString() || ''
+    dob: '',
+    cp: undefined as number | undefined,
+    exang: undefined as number | undefined,
+    sex: undefined as number | undefined,
+    trestbps: ''
   });
 
   const [originalData, setOriginalData] = useState({
-    dob: mockUserData.dob || '', // Changed from age to dob
-    cp: mockUserData.cp,
-    exang: mockUserData.exang,
-    sex: mockUserData.sex,
-    trestbps: mockUserData.trestbps?.toString() || ''
+    dob: '',
+    cp: undefined as number | undefined,
+    exang: undefined as number | undefined,
+    sex: undefined as number | undefined,
+    trestbps: ''
   });
+
+  const BASE_URL = 'http://192.168.1.20:5000';
+
+  // Function to get auth token
+  const getAuthToken = async (): Promise<string | null> => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      return token;
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      return null;
+    }
+  };
+
+  // Function to make authenticated API calls
+  const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+    const token = await getAuthToken();
+    
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  };
+
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const data = await makeAuthenticatedRequest('/users/profile');
+      setUserData(data);
+      
+      // Convert GMT date to YYYY-MM-DD format
+      const convertedDob = convertGMTToYYYYMMDD(data.dob);
+      
+      // Update form data with fetched data
+      const newFormData = {
+        dob: convertedDob,
+        cp: data.cp,
+        exang: data.exang,
+        sex: data.sex,
+        trestbps: data.trestbps?.toString() || ''
+      };
+      
+      setFormData(newFormData);
+      setOriginalData(newFormData);
+      
+      // If no health data exists, start in editing mode
+      const hasHealthData = convertedDob !== '' && 
+                           data.cp !== null && data.cp !== undefined && 
+                           data.exang !== null && data.exang !== undefined && 
+                           data.sex !== null && data.sex !== undefined && 
+                           data.trestbps !== null && data.trestbps !== undefined;
+      
+      if (!hasHealthData) {
+        setIsEditing(true);
+      }
+      
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update user health data
+  const updateUserHealth = async (healthData: any) => {
+    try {
+      setSaving(true);
+      
+      const data = await makeAuthenticatedRequest('/users/profile/health', {
+        method: 'PATCH',
+        body: JSON.stringify(healthData),
+      });
+      
+      setUserData(data);
+      return data;
+    } catch (err) {
+      console.error('Error updating user health:', err);
+      throw err;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Load user data on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -396,7 +509,7 @@ const HealthScreen: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Validate required fields
     if (!formData.dob || !formData.trestbps || 
         formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
@@ -418,21 +531,85 @@ const HealthScreen: React.FC = () => {
       return;
     }
 
-    // Simulate API call
-    Alert.alert(
-      'Success', 
-      hasHealthData ? 'Health data updated successfully!' : 'Health data submitted successfully!',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setIsEditing(false);
-            setOriginalData({ ...formData });
+    try {
+      // Prepare data for API
+      const healthData = {
+        dob: formData.dob,
+        cp: formData.cp,
+        exang: formData.exang,
+        sex: formData.sex,
+        trestbps: trestbps
+      };
+
+      await updateUserHealth(healthData);
+      
+      Alert.alert(
+        'Success', 
+        userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setIsEditing(false);
+              setOriginalData({ ...formData });
+            }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (err) {
+      Alert.alert(
+        'Error', 
+        err instanceof Error ? err.message : 'Failed to save health data'
+      );
+    }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text style={{ marginTop: 16, fontSize: 16, color: '#7f8c8d' }}>Loading health data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 16, color: '#e74c3c', textAlign: 'center', marginBottom: 16 }}>
+            {error}
+          </Text>
+          <TouchableOpacity 
+            style={[styles.button, { backgroundColor: '#3498db' }]} 
+            onPress={fetchUserProfile}
+          >
+            <Text style={styles.buttonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 16, color: '#7f8c8d' }}>No user data available</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const hasHealthData = formData.dob !== '' && 
+                       userData.cp !== null && userData.cp !== undefined && 
+                       userData.exang !== null && userData.exang !== undefined && 
+                       userData.sex !== null && userData.sex !== undefined && 
+                       userData.trestbps !== null && userData.trestbps !== undefined;
 
   const isFormDisabled = hasHealthData && !isEditing;
 
@@ -517,14 +694,26 @@ const HealthScreen: React.FC = () => {
                 </TouchableOpacity>
               ) : (
                 <>
-                  <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                    <Text style={styles.buttonText}>
-                      {hasHealthData ? 'Update' : 'Submit'}
-                    </Text>
+                  <TouchableOpacity 
+                    style={[styles.button, saving && { opacity: 0.7 }]} 
+                    onPress={handleSubmit}
+                    disabled={saving}
+                  >
+                    {saving ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.buttonText}>
+                        {hasHealthData ? 'Update' : 'Submit'}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                   
                   {hasHealthData && (
-                    <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                    <TouchableOpacity 
+                      style={[styles.cancelButton, saving && { opacity: 0.7 }]} 
+                      onPress={handleCancel}
+                      disabled={saving}
+                    >
                       <Text style={styles.cancelButtonText}>Cancel</Text>
                     </TouchableOpacity>
                   )}
