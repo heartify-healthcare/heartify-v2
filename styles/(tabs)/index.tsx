@@ -27,27 +27,6 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: height * 0.03,
   },
-  headerActions: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: height * 0.02,
-  },
-  refreshButton: {
-    backgroundColor: '#e74c3c',
-    paddingHorizontal: width * 0.05,
-    paddingVertical: height * 0.01,
-    borderRadius: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  refreshButtonText: {
-    color: 'white',
-    fontSize: width * 0.035,
-    fontWeight: 'bold',
-  },
   scrollView: {
     flex: 1,
   },

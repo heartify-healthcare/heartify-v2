@@ -306,16 +306,6 @@ const PredictionsScreen: React.FC = () => {
           View your cardiovascular health predictions and risk assessments
         </Text>
         
-        {!loading && !error && predictions.length > 0 && (
-          <View style={styles.headerActions}>
-            <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
-              <Text style={styles.refreshButtonText}>
-                {refreshing ? 'Refreshing...' : 'Refresh'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        )}
-        
         {renderContent()}
       </View>
     </SafeAreaView>
