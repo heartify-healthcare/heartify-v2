@@ -564,6 +564,39 @@ const HealthScreen: React.FC = () => {
     }
   };
 
+  // Handle prediction confirmation
+  const handlePredict = () => {
+    // Check if all health data is available
+    if (!formData.dob || !formData.trestbps || 
+        formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
+      Alert.alert(
+        'Incomplete Health Data', 
+        'Please complete all health information fields before making a prediction.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Show confirmation alert
+    Alert.alert(
+      'Make Prediction',
+      'Do you want to make a cardiovascular health prediction based on your current health information?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => {
+            // TODO: Implement prediction API call
+            Alert.alert('Prediction', 'Prediction functionality will be implemented here.');
+          },
+        },
+      ]
+    );
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -721,6 +754,15 @@ const HealthScreen: React.FC = () => {
               )}
             </View>
           </View>
+
+          {/* Prediction Section */}
+          {hasHealthData && !isEditing && (
+            <View style={styles.predictionContainer}>
+              <TouchableOpacity style={styles.predictButton} onPress={handlePredict}>
+                <Text style={styles.predictButtonText}>Make Prediction</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

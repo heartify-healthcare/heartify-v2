@@ -208,4 +208,31 @@ export const styles = StyleSheet.create({
     fontSize: width * 0.045,
     fontWeight: 'bold',
   },
+  // New styles for prediction section
+  predictionContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: width * 0.05,
+    marginTop: height * 0.02,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    alignItems: 'center',
+  },
+  predictButton: {
+    backgroundColor: '#e74c3c',
+    borderRadius: 5,
+    padding: width * 0.035,
+    alignItems: 'center',
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#c0392b',
+  },
+  predictButtonText: {
+    color: 'white',
+    fontSize: width * 0.045,
+    fontWeight: 'bold',
+  },
 });
