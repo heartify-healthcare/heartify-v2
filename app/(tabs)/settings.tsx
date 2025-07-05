@@ -121,6 +121,35 @@ const SettingsScreen: React.FC = () => {
     router.push("/change-password");
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: () => {
+            // TODO: Implement logout API call here
+            // This is where you would:
+            // 1. Call logout API endpoint
+            // 2. Clear stored tokens/user data
+            // 3. Navigate to login screen
+            
+            console.log('Logout function called - implement API call here');
+            
+            // Placeholder for future implementation
+            Alert.alert('Logout', 'Logout functionality will be implemented here');
+          },
+        },
+      ]
+    );
+  };
+
   const getVerificationStatus = () => {
     return mockUserData.is_verified ? 'Verified' : 'Not Verified';
   };
@@ -246,6 +275,13 @@ const SettingsScreen: React.FC = () => {
               <Text style={styles.infoLabel}>Last Login:</Text>
               <Text style={styles.infoValue}>{Date.now()}</Text>
             </View>
+          </View>
+
+          {/* Logout Section */}
+          <View style={styles.logoutContainer}>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
