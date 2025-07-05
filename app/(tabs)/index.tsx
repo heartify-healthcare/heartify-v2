@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -6,8 +6,11 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  Animated
+  Animated,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from '@/styles/(tabs)/index';
 
@@ -25,43 +28,14 @@ interface PredictionData {
   sex: number;
   thalach: number;
   trestbps: number;
-  create_at: string;
+  created_at: string;
 }
-
-const sampleData: PredictionData[] = [
-  {
-    id: 2,
-    user_id: 1,
-    age: 18,
-    cp: 2,
-    exang: 0,
-    prediction: "NEGATIVE",
-    probability: 0.03538578748703003,
-    restecg: 0,
-    sex: 0,
-    thalach: 120,
-    trestbps: 120,
-    create_at: "2025-05-29 14:32:45.123456"
-  },
-  {
-    id: 3,
-    user_id: 2,
-    age: 55,
-    cp: 1,
-    exang: 1,
-    prediction: "POSITIVE",
-    probability: 0.847283,
-    restecg: 2,
-    sex: 1,
-    thalach: 140,
-    trestbps: 150,
-    create_at: "2025-05-28 09:15:30.987654"
-  }
-];
 
 interface PredictionCardProps {
   data: PredictionData;
 }
+
+const API_BASE_URL = 'http://192.168.1.20:5000';
 
 const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -86,7 +60,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const expandedHeight = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 320], // Reduced height since we removed 4 fields
+    outputRange: [0, 320],
   });
 
   const formatSex = (sex: number): string => {
@@ -99,10 +73,8 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const formatTimestamp = (timestamp: string): string => {
     try {
-      // Parse the timestamp string
-      const date = new Date(timestamp.replace(' ', 'T'));
+      const date = new Date(timestamp);
       
-      // Format as "May 29, 2025 - 14:32"
       const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'short',
@@ -114,7 +86,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
       
       return date.toLocaleDateString('en-US', options).replace(',', ' -');
     } catch (error) {
-      return timestamp; // Fallback to original string if parsing fails
+      return timestamp;
     }
   };
 
@@ -130,7 +102,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
           <View style={styles.headerLeft}>
             <Text style={styles.cardId}>ID: {data.id}</Text>
             <Text style={styles.cardUserId}>User ID: {data.user_id}</Text>
-            <Text style={styles.cardTimestamp}>{formatTimestamp(data.create_at)}</Text>
+            <Text style={styles.cardTimestamp}>{formatTimestamp(data.created_at)}</Text>
           </View>
           <View style={styles.headerRight}>
             <View style={[styles.predictionBadge, { backgroundColor: getPredictionColor(data.prediction) }]}>
@@ -203,6 +175,129 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 };
 
 const PredictionsScreen: React.FC = () => {
+  const [predictions, setPredictions] = useState<PredictionData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPredictions = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+
+      // Get auth token from AsyncStorage
+      const token = await AsyncStorage.getItem('access_token');
+      
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/predictions`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed. Please log in again.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied');
+        } else {
+          throw new Error(`Server error: ${response.status}`);
+        }
+      }
+
+      const data = await response.json();
+      setPredictions(data);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch predictions';
+      setError(errorMessage);
+      console.error('Error fetching predictions:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPredictions();
+  }, []);
+
+  const handleRefresh = () => {
+    fetchPredictions(true);
+  };
+
+  const handleRetry = () => {
+    fetchPredictions();
+  };
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyState}>
+      <Text style={styles.emptyStateTitle}>No Predictions Yet</Text>
+      <Text style={styles.emptyStateDescription}>
+        You haven't made any heart disease predictions yet. 
+        Start by making your first prediction!
+      </Text>
+    </View>
+  );
+
+  const renderErrorState = () => (
+    <View style={styles.errorState}>
+      <Text style={styles.errorTitle}>Unable to Load Predictions</Text>
+      <Text style={styles.errorDescription}>{error}</Text>
+      <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderLoadingState = () => (
+    <View style={styles.loadingState}>
+      <ActivityIndicator size="large" color="#e74c3c" />
+      <Text style={styles.loadingText}>Loading predictions...</Text>
+    </View>
+  );
+
+  const renderContent = () => {
+    if (loading) {
+      return renderLoadingState();
+    }
+
+    if (error) {
+      return renderErrorState();
+    }
+
+    if (predictions.length === 0) {
+      return renderEmptyState();
+    }
+
+    return (
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={['#e74c3c']}
+            tintColor="#e74c3c"
+          />
+        }
+      >
+        {predictions.map((prediction) => (
+          <PredictionCard key={prediction.id} data={prediction} />
+        ))}
+      </ScrollView>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -211,11 +306,17 @@ const PredictionsScreen: React.FC = () => {
           View your cardiovascular health predictions and risk assessments
         </Text>
         
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {sampleData.map((prediction) => (
-            <PredictionCard key={prediction.id} data={prediction} />
-          ))}
-        </ScrollView>
+        {!loading && !error && predictions.length > 0 && (
+          <View style={styles.headerActions}>
+            <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+              <Text style={styles.refreshButtonText}>
+                {refreshing ? 'Refreshing...' : 'Refresh'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        
+        {renderContent()}
       </View>
     </SafeAreaView>
   );
