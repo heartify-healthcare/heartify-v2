@@ -90,4 +90,26 @@ export const styles = StyleSheet.create({
     color: '#3498db',
     fontWeight: 'bold',
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ecf0f1',
+    borderRadius: 5,
+    paddingRight: 10,
+  },
+  passwordInput: {
+    flex: 1,
+    padding: width * 0.03,
+    fontSize: width * 0.04,
+    backgroundColor: 'transparent',
+  },
+  eyeButton: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  eyeIcon: {
+    fontSize: 18,
+    color: '#7f8c8d',
+  },
 });

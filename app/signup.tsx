@@ -28,12 +28,22 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation function (placeholder)
   const handleLogin = (): void => {
     // Navigate to login screen
     router.push("/login");
+  };
+
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(!showPassword);
+  };
+
+  const toggleConfirmPasswordVisibility = (): void => {
+    setShowConfirmPassword(!showConfirmPassword);
   };
 
   const handleSignUp = async (): Promise<void> => {
@@ -167,26 +177,48 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Password *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Create a password (min 6 characters)"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  editable={!isLoading}
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Create a password (min 6 characters)"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    editable={!isLoading}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={togglePasswordVisibility}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.eyeIcon}>
+                      {showPassword ? '👁️' : '👁️‍🗨️'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Confirm Password *</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Confirm your password"
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry
-                  editable={!isLoading}
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showConfirmPassword}
+                    editable={!isLoading}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={toggleConfirmPasswordVisibility}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.eyeIcon}>
+                      {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               
               <TouchableOpacity 

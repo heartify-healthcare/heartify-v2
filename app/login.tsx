@@ -26,6 +26,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation functions (placeholders)
@@ -37,6 +38,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleSignUp = (): void => {
     // Navigate to sign up screen
     router.push("/signup");
+  };
+
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(!showPassword);
   };
 
   const handleLogin = async (): Promise<void> => {
@@ -143,14 +148,25 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Password</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                  editable={!isLoading}
-                />
+                <View style={styles.passwordContainer}>
+                  <TextInput
+                    style={styles.passwordInput}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    editable={!isLoading}
+                  />
+                  <TouchableOpacity
+                    style={styles.eyeButton}
+                    onPress={togglePasswordVisibility}
+                    disabled={isLoading}
+                  >
+                    <Text style={styles.eyeIcon}>
+                      {showPassword ? '👁️' : '👁️‍🗨️'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               
               <TouchableOpacity 
