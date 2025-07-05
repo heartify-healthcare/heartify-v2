@@ -21,6 +21,13 @@ const ChangePasswordScreen: React.FC = () => {
     confirmPassword: ''
   });
 
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  // Single toggle function for all password fields
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(!showPassword);
+  };
+
   const handleSubmit = () => {
     // Validation
     if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
@@ -77,40 +84,70 @@ const ChangePasswordScreen: React.FC = () => {
             {/* Current Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Current Password *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.currentPassword}
-                onChangeText={(text) => setFormData({ ...formData, currentPassword: text })}
-                placeholder="Enter current password"
-                secureTextEntry
-                placeholderTextColor="#bdc3c7"
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={formData.currentPassword}
+                  onChangeText={(text) => setFormData({ ...formData, currentPassword: text })}
+                  placeholder="Enter current password"
+                  secureTextEntry={!showPassword}
+                  placeholderTextColor="#bdc3c7"
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={togglePasswordVisibility}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* New Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>New Password *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.newPassword}
-                onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
-                placeholder="Enter new password (min 8 characters)"
-                secureTextEntry
-                placeholderTextColor="#bdc3c7"
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={formData.newPassword}
+                  onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
+                  placeholder="Enter new password (min 8 characters)"
+                  secureTextEntry={!showPassword}
+                  placeholderTextColor="#bdc3c7"
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={togglePasswordVisibility}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Confirm New Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Confirm New Password *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.confirmPassword}
-                onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
-                placeholder="Confirm new password"
-                secureTextEntry
-                placeholderTextColor="#bdc3c7"
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={formData.confirmPassword}
+                  onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+                  placeholder="Confirm new password"
+                  secureTextEntry={!showPassword}
+                  placeholderTextColor="#bdc3c7"
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={togglePasswordVisibility}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Password Requirements */}
