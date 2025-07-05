@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -27,7 +27,64 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const router = useRouter();
+
+  // Check for existing authentication on component mount
+  useEffect(() => {
+    checkExistingAuth();
+  }, []);
+
+  const checkExistingAuth = async (): Promise<void> => {
+    try {
+      setIsCheckingAuth(true);
+      
+      // Get stored authentication data
+      const authData = await AsyncStorage.multiGet([
+        'access_token',
+        'token_type',
+        'user_data'
+      ]);
+      
+      const accessToken = authData[0][1];
+      const tokenType = authData[1][1];
+      const userData = authData[2][1];
+      
+      // Check if all required auth data exists
+      if (accessToken && tokenType && userData) {
+        try {
+          // Optional: Verify token is still valid by making a test API call
+          const response = await fetch('http://192.168.1.20:5000/auth/verify-token', {
+            method: 'GET',
+            headers: {
+              'Authorization': `${tokenType} ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (response.ok) {
+            // Token is valid, redirect to main app
+            router.replace('/(tabs)');
+            return;
+          } else {
+            // Token is invalid, clear stored data
+            await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
+          }
+        } catch (verifyError) {
+          console.log('Token verification failed, proceeding with login:', verifyError);
+          // If verification fails due to network issues, still allow auto-login
+          // Comment out the next two lines if you want to be strict about token verification
+          router.replace('/(tabs)');
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking existing auth:', error);
+      // If there's an error, just proceed to show login form
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
 
   // Navigation functions (placeholders)
   const handleForgotPassword = (): void => {
@@ -115,6 +172,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       setIsLoading(false);
     }
   };
+
+  // Show loading screen while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={styles.appName}>Heartify</Text>
+          <Text style={[styles.appDescription, { marginTop: 20 }]}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
