@@ -1,8 +1,7 @@
-import { 
+import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-
 const { width, height } = Dimensions.get('window');
 
 export const styles = StyleSheet.create({
@@ -10,29 +9,28 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  keyboardAvoidingView: {
+  scrollView: {
     flex: 1,
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
   },
   contentContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     padding: width * 0.05,
+    paddingBottom: height * 0.05,
   },
-  appName: {
+  title: {
     fontSize: width * 0.06,
     fontWeight: 'bold',
     color: '#e74c3c',
+    marginBottom: height * 0.01,
     textAlign: 'center',
-    marginBottom: height * 0.05,
+  },
+  description: {
+    fontSize: width * 0.04,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    marginBottom: height * 0.03,
+    lineHeight: width * 0.05,
   },
   formContainer: {
-    width: '100%',
-    maxWidth: 400,
     backgroundColor: 'white',
     borderRadius: 10,
     padding: width * 0.05,
@@ -42,13 +40,6 @@ export const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-  title: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: height * 0.03,
-    textAlign: 'center',
-  },
   inputContainer: {
     marginBottom: height * 0.02,
   },
@@ -56,38 +47,56 @@ export const styles = StyleSheet.create({
     fontSize: width * 0.035,
     color: '#34495e',
     marginBottom: 5,
+    fontWeight: '500',
   },
   input: {
     backgroundColor: '#ecf0f1',
     borderRadius: 5,
     padding: width * 0.03,
     fontSize: width * 0.04,
+    color: '#2c3e50',
+  },
+  requirementsContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 5,
+    padding: width * 0.03,
+    marginBottom: height * 0.02,
+  },
+  requirementsTitle: {
+    fontSize: width * 0.035,
+    fontWeight: 'bold',
+    color: '#34495e',
+    marginBottom: height * 0.01,
+  },
+  requirementText: {
+    fontSize: width * 0.03,
+    color: '#7f8c8d',
+    marginBottom: 2,
+  },
+  buttonContainer: {
+    marginTop: height * 0.02,
   },
   button: {
     backgroundColor: '#e74c3c',
     borderRadius: 5,
     padding: width * 0.035,
     alignItems: 'center',
-    marginBottom: height * 0.02,
-    marginTop: height * 0.01,
+    marginBottom: height * 0.015,
   },
   buttonText: {
     color: 'white',
     fontSize: width * 0.045,
     fontWeight: 'bold',
   },
-  loginContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  cancelButton: {
+    backgroundColor: '#95a5a6',
+    borderRadius: 5,
+    padding: width * 0.035,
     alignItems: 'center',
   },
-  loginText: {
-    fontSize: width * 0.035,
-    color: '#7f8c8d',
-  },
-  loginLink: {
-    fontSize: width * 0.035,
-    color: '#3498db',
+  cancelButtonText: {
+    color: 'white',
+    fontSize: width * 0.045,
     fontWeight: 'bold',
   },
   passwordContainer: {

@@ -67,6 +67,12 @@ export const styles = StyleSheet.create({
     color: '#7f8c8d',
     marginTop: 2,
   },
+  cardTimestamp: {
+    fontSize: width * 0.032,
+    color: '#8e44ad',
+    marginTop: 4,
+    fontWeight: '500',
+  },
   predictionBadge: {
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.005,
@@ -137,6 +143,77 @@ export const styles = StyleSheet.create({
   probabilityValue: {
     fontSize: width * 0.04,
     color: '#3498db',
+    fontWeight: 'bold',
+  },
+  // Loading state styles
+  loadingState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: height * 0.1,
+  },
+  loadingText: {
+    fontSize: width * 0.04,
+    color: '#7f8c8d',
+    marginTop: height * 0.02,
+  },
+  // Empty state styles
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: height * 0.1,
+    paddingHorizontal: width * 0.1,
+  },
+  emptyStateTitle: {
+    fontSize: width * 0.05,
+    fontWeight: 'bold',
+    color: '#34495e',
+    marginBottom: height * 0.02,
+    textAlign: 'center',
+  },
+  emptyStateDescription: {
+    fontSize: width * 0.04,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    lineHeight: width * 0.06,
+  },
+  // Error state styles
+  errorState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: height * 0.1,
+    paddingHorizontal: width * 0.1,
+  },
+  errorTitle: {
+    fontSize: width * 0.05,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+    marginBottom: height * 0.02,
+    textAlign: 'center',
+  },
+  errorDescription: {
+    fontSize: width * 0.04,
+    color: '#7f8c8d',
+    textAlign: 'center',
+    lineHeight: width * 0.06,
+    marginBottom: height * 0.03,
+  },
+  retryButton: {
+    backgroundColor: '#e74c3c',
+    paddingHorizontal: width * 0.08,
+    paddingVertical: height * 0.015,
+    borderRadius: 25,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontSize: width * 0.04,
     fontWeight: 'bold',
   },
 });

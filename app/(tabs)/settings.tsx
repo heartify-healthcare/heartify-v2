@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -6,8 +6,11 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from '@/styles/(tabs)/settings';
 
@@ -15,49 +18,166 @@ interface UserData {
   email: string;
   id: number;
   is_verified: boolean;
-  phonenumber: string;
+  phonenumber: string | null;
   role: string;
   username: string;
-  age: number;
-  cp: number;
-  exang: number;
-  sex: number;
-  trestbps: number;
-  create_at: string;
+  created_at: string;
+  dob: string | null;
+  cp: number | null;
+  exang: number | null;
+  sex: number | null;
+  trestbps: number | null;
 }
 
+const API_BASE_URL = 'http://192.168.1.20:5000';
+
 const SettingsScreen: React.FC = () => {
-  // Mock user data - simulate data from backend
-  const mockUserData: UserData = {
-    email: "songokupkj@gmail.com",
-    id: 1,
-    is_verified: true,
-    phonenumber: "0865942420",
-    role: "user",
-    username: "songokupkj",
-    age: 50,
-    cp: 1,
-    exang: 1,
-    sex: 1,
-    trestbps: 120,
-    create_at: "2025-05-27 19:44:48.565008"
-  };
+  const router = useRouter();
 
   // State management
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    username: mockUserData.username,
-    email: mockUserData.email,
-    phonenumber: mockUserData.phonenumber,
-    role: mockUserData.role
+    username: '',
+    email: '',
+    phonenumber: '',
+    role: ''
   });
 
   const [originalData, setOriginalData] = useState({
-    username: mockUserData.username,
-    email: mockUserData.email,
-    phonenumber: mockUserData.phonenumber,
-    role: mockUserData.role
+    username: '',
+    email: '',
+    phonenumber: '',
+    role: ''
   });
+
+  // Get authorization headers
+  const getAuthHeaders = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem('access_token');
+      const tokenType = await AsyncStorage.getItem('token_type');
+      
+      if (!accessToken || !tokenType) {
+        throw new Error('No authentication token found');
+      }
+
+      return {
+        'Authorization': `${tokenType} ${accessToken}`,
+        'Content-Type': 'application/json',
+      };
+    } catch (error) {
+      console.error('Error getting auth headers:', error);
+      throw error;
+    }
+  };
+
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      setIsLoading(true);
+      const headers = await getAuthHeaders();
+      
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: 'GET',
+        headers,
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          Alert.alert('Session Expired', 'Please login again');
+          await handleLogout();
+          return;
+        }
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setUserData(data);
+      
+      // Update form data with fetched user data
+      const newFormData = {
+        username: data.username || '',
+        email: data.email || '',
+        phonenumber: data.phonenumber || '',
+        role: data.role || ''
+      };
+      
+      setFormData(newFormData);
+      setOriginalData(newFormData);
+      
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      Alert.alert('Error', 'Failed to load user profile. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Update user profile
+  const updateUserProfile = async () => {
+    try {
+      setIsSaving(true);
+      const headers = await getAuthHeaders();
+      
+      // Prepare update data (only send changed fields)
+      const updateData: any = {};
+      if (formData.username !== originalData.username) updateData.username = formData.username;
+      if (formData.email !== originalData.email) updateData.email = formData.email;
+      if (formData.phonenumber !== originalData.phonenumber) updateData.phonenumber = formData.phonenumber;
+      
+      // If no changes, just exit editing mode
+      if (Object.keys(updateData).length === 0) {
+        setIsEditing(false);
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const updatedUser = await response.json();
+      setUserData(updatedUser);
+      setOriginalData({ ...formData });
+      setIsEditing(false);
+      
+      Alert.alert('Success', 'Profile updated successfully!');
+      
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      // Clear stored data
+      await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
+      
+      // Navigate to login screen
+      router.replace('/login');
+      
+    } catch (error) {
+      console.error('Error during logout:', error);
+      Alert.alert('Error', 'Failed to logout properly');
+    }
+  };
+
+  // Load user data on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -69,10 +189,10 @@ const SettingsScreen: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     // Basic validation
-    if (!formData.username.trim() || !formData.email.trim() || !formData.phonenumber.trim()) {
-      Alert.alert('Error', 'Please fill in all required fields');
+    if (!formData.username.trim() || !formData.email.trim()) {
+      Alert.alert('Error', 'Username and email are required');
       return;
     }
 
@@ -83,47 +203,87 @@ const SettingsScreen: React.FC = () => {
       return;
     }
 
-    // Phone number validation (basic)
-    const phoneRegex = /^[0-9]{10,15}$/;
-    if (!phoneRegex.test(formData.phonenumber.replace(/\s/g, ''))) {
-      Alert.alert('Error', 'Please enter a valid phone number');
-      return;
+    // Phone number validation (if provided)
+    if (formData.phonenumber && formData.phonenumber.trim()) {
+      const phoneRegex = /^[0-9]{10,15}$/;
+      if (!phoneRegex.test(formData.phonenumber.replace(/\s/g, ''))) {
+        Alert.alert('Error', 'Please enter a valid phone number');
+        return;
+      }
     }
 
-    // Simulate API call
+    await updateUserProfile();
+  };
+
+  const handleChangePassword = () => {
+    router.push("/change-password");
+  };
+
+  const confirmLogout = () => {
     Alert.alert(
-      'Success', 
-      'Profile updated successfully!',
+      'Logout',
+      'Are you sure you want to logout?',
       [
         {
-          text: 'OK',
-          onPress: () => {
-            setIsEditing(false);
-            setOriginalData({ ...formData });
-          }
-        }
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          style: 'destructive',
+          onPress: handleLogout,
+        },
       ]
     );
   };
 
-  const handleChangePassword = () => {
-    // TODO: Navigate to /change-password route
-    // In a real app, you would use navigation like:
-    // navigation.navigate('ChangePassword');
-    Alert.alert(
-      'Change Password',
-      'This would navigate to the change password screen.\n\nRoute: /change-password',
-      [{ text: 'OK' }]
-    );
-  };
-
   const getVerificationStatus = () => {
-    return mockUserData.is_verified ? 'Verified' : 'Not Verified';
+    return userData?.is_verified ? 'Verified' : 'Not Verified';
   };
 
   const getVerificationColor = () => {
-    return mockUserData.is_verified ? '#27ae60' : '#e74c3c';
+    return userData?.is_verified ? '#27ae60' : '#e74c3c';
   };
+
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text style={{ marginTop: 10, color: '#7f8c8d' }}>Loading profile...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ color: '#e74c3c', fontSize: 16 }}>Failed to load user data</Text>
+          <TouchableOpacity 
+            style={[styles.button, { marginTop: 20 }]} 
+            onPress={fetchUserProfile}
+          >
+            <Text style={styles.buttonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -168,7 +328,7 @@ const SettingsScreen: React.FC = () => {
 
             {/* Phone Number */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Phone Number *</Text>
+              <Text style={styles.inputLabel}>Phone Number</Text>
               <TextInput
                 style={[styles.input, !isEditing && styles.disabledInput]}
                 value={formData.phonenumber}
@@ -212,11 +372,23 @@ const SettingsScreen: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                    <Text style={styles.buttonText}>Save Changes</Text>
+                  <TouchableOpacity 
+                    style={[styles.button, isSaving && { opacity: 0.7 }]} 
+                    onPress={handleSubmit}
+                    disabled={isSaving}
+                  >
+                    {isSaving ? (
+                      <ActivityIndicator size="small" color="#ffffff" />
+                    ) : (
+                      <Text style={styles.buttonText}>Save Changes</Text>
+                    )}
                   </TouchableOpacity>
                   
-                  <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                  <TouchableOpacity 
+                    style={[styles.cancelButton, isSaving && { opacity: 0.7 }]} 
+                    onPress={handleCancel}
+                    disabled={isSaving}
+                  >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                   </TouchableOpacity>
                 </>
@@ -230,18 +402,25 @@ const SettingsScreen: React.FC = () => {
             
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>User ID:</Text>
-              <Text style={styles.infoValue}>{mockUserData.id}</Text>
+              <Text style={styles.infoValue}>{userData.id}</Text>
             </View>
             
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Member Since:</Text>
-              <Text style={styles.infoValue}>{mockUserData.create_at}</Text>
+              <Text style={styles.infoValue}>{formatDate(userData.created_at)}</Text>
             </View>
             
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Last Login:</Text>
-              <Text style={styles.infoValue}>{Date.now()}</Text>
+              <Text style={styles.infoValue}>Current Session</Text>
             </View>
+          </View>
+
+          {/* Logout Section */}
+          <View style={styles.logoutContainer}>
+            <TouchableOpacity style={styles.logoutButton} onPress={confirmLogout}>
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>

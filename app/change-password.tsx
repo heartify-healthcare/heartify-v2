@@ -1,34 +1,105 @@
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { 
   View, 
   Text, 
   SafeAreaView,
-  StyleSheet,
-  Dimensions,
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const { width, height } = Dimensions.get('window');
+import { styles } from '@/styles/change-password';
+
+const BASE_URL = 'http://192.168.1.20:5000';
 
 const ChangePasswordScreen: React.FC = () => {
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
 
-  const handleSubmit = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // Single toggle function for all password fields
+  const togglePasswordVisibility = (): void => {
+    setShowPassword(!showPassword);
+  };
+
+  const changePassword = async () => {
+    try {
+      setIsLoading(true);
+
+      // Get stored authentication token
+      const token = await AsyncStorage.getItem('access_token');
+      if (!token) {
+        Alert.alert('Error', 'Authentication token not found. Please login again.');
+        return;
+      }
+
+      const response = await fetch(`${BASE_URL}/users/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          current_password: formData.currentPassword,
+          new_password: formData.newPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Success - password changed
+        Alert.alert(
+          'Success', 
+          'Password changed successfully!',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Clear form and navigate back
+                setFormData({
+                  currentPassword: '',
+                  newPassword: '',
+                  confirmPassword: ''
+                });
+                router.push("/(tabs)/settings");
+              }
+            }
+          ]
+        );
+      } else {
+        // Handle API error responses
+        const errorMessage = data.error || 'Failed to change password. Please try again.';
+        Alert.alert('Error', errorMessage);
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
     // Validation
     if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
-    if (formData.newPassword.length < 8) {
-      Alert.alert('Error', 'New password must be at least 8 characters long');
+    if (formData.newPassword.length < 6) {
+      Alert.alert('Error', 'New password must be at least 6 characters long');
       return;
     }
 
@@ -37,29 +108,12 @@ const ChangePasswordScreen: React.FC = () => {
       return;
     }
 
-    // Simulate API call
-    Alert.alert(
-      'Success', 
-      'Password changed successfully!',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            // TODO: Navigate back to settings
-            setFormData({
-              currentPassword: '',
-              newPassword: '',
-              confirmPassword: ''
-            });
-          }
-        }
-      ]
-    );
+    // Call API
+    await changePassword();
   };
 
   const handleCancel = () => {
-    // TODO: Navigate back to settings
-    Alert.alert('Cancel', 'This would navigate back to settings');
+    router.push("/(tabs)/settings");
   };
 
   return (
@@ -75,46 +129,82 @@ const ChangePasswordScreen: React.FC = () => {
             {/* Current Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Current Password *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.currentPassword}
-                onChangeText={(text) => setFormData({ ...formData, currentPassword: text })}
-                placeholder="Enter current password"
-                secureTextEntry
-                placeholderTextColor="#bdc3c7"
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={formData.currentPassword}
+                  onChangeText={(text) => setFormData({ ...formData, currentPassword: text })}
+                  placeholder="Enter current password"
+                  secureTextEntry={!showPassword}
+                  placeholderTextColor="#bdc3c7"
+                  editable={!isLoading}
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={togglePasswordVisibility}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* New Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>New Password *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.newPassword}
-                onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
-                placeholder="Enter new password (min 8 characters)"
-                secureTextEntry
-                placeholderTextColor="#bdc3c7"
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={formData.newPassword}
+                  onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
+                  placeholder="Enter new password (min 6 characters)"
+                  secureTextEntry={!showPassword}
+                  placeholderTextColor="#bdc3c7"
+                  editable={!isLoading}
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={togglePasswordVisibility}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Confirm New Password */}
             <View style={styles.inputContainer}>
               <Text style={styles.inputLabel}>Confirm New Password *</Text>
-              <TextInput
-                style={styles.input}
-                value={formData.confirmPassword}
-                onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
-                placeholder="Confirm new password"
-                secureTextEntry
-                placeholderTextColor="#bdc3c7"
-              />
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  value={formData.confirmPassword}
+                  onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
+                  placeholder="Confirm new password"
+                  secureTextEntry={!showPassword}
+                  placeholderTextColor="#bdc3c7"
+                  editable={!isLoading}
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={togglePasswordVisibility}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.eyeIcon}>
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
 
             {/* Password Requirements */}
             <View style={styles.requirementsContainer}>
               <Text style={styles.requirementsTitle}>Password Requirements:</Text>
-              <Text style={styles.requirementText}>• At least 8 characters long</Text>
+              <Text style={styles.requirementText}>• At least 6 characters long</Text>
               <Text style={styles.requirementText}>• Mix of uppercase and lowercase letters</Text>
               <Text style={styles.requirementText}>• At least one number</Text>
               <Text style={styles.requirementText}>• At least one special character</Text>
@@ -122,11 +212,26 @@ const ChangePasswordScreen: React.FC = () => {
 
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Change Password</Text>
+              <TouchableOpacity 
+                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+                onPress={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <ActivityIndicator color="#fff" size="small" style={{ marginRight: 8 }} />
+                    <Text style={styles.buttonText}>Changing Password...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.buttonText}>Change Password</Text>
+                )}
               </TouchableOpacity>
               
-              <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+              <TouchableOpacity 
+                style={[styles.cancelButton, isLoading && { opacity: 0.6 }]} 
+                onPress={handleCancel}
+                disabled={isLoading}
+              >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
             </View>
@@ -136,102 +241,5 @@ const ChangePasswordScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: width * 0.05,
-    paddingBottom: height * 0.05,
-  },
-  title: {
-    fontSize: width * 0.06,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: height * 0.01,
-    textAlign: 'center',
-  },
-  description: {
-    fontSize: width * 0.04,
-    color: '#7f8c8d',
-    textAlign: 'center',
-    marginBottom: height * 0.03,
-    lineHeight: width * 0.05,
-  },
-  formContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: width * 0.05,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  inputContainer: {
-    marginBottom: height * 0.02,
-  },
-  inputLabel: {
-    fontSize: width * 0.035,
-    color: '#34495e',
-    marginBottom: 5,
-    fontWeight: '500',
-  },
-  input: {
-    backgroundColor: '#ecf0f1',
-    borderRadius: 5,
-    padding: width * 0.03,
-    fontSize: width * 0.04,
-    color: '#2c3e50',
-  },
-  requirementsContainer: {
-    backgroundColor: '#f8f9fa',
-    borderRadius: 5,
-    padding: width * 0.03,
-    marginBottom: height * 0.02,
-  },
-  requirementsTitle: {
-    fontSize: width * 0.035,
-    fontWeight: 'bold',
-    color: '#34495e',
-    marginBottom: height * 0.01,
-  },
-  requirementText: {
-    fontSize: width * 0.03,
-    color: '#7f8c8d',
-    marginBottom: 2,
-  },
-  buttonContainer: {
-    marginTop: height * 0.02,
-  },
-  button: {
-    backgroundColor: '#e74c3c',
-    borderRadius: 5,
-    padding: width * 0.035,
-    alignItems: 'center',
-    marginBottom: height * 0.015,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: width * 0.045,
-    fontWeight: 'bold',
-  },
-  cancelButton: {
-    backgroundColor: '#95a5a6',
-    borderRadius: 5,
-    padding: width * 0.035,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: 'white',
-    fontSize: width * 0.045,
-    fontWeight: 'bold',
-  },
-});
 
 export default ChangePasswordScreen;

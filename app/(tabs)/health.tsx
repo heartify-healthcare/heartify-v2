@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
   Modal,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from '@/styles/(tabs)/health';
 
@@ -19,7 +21,8 @@ interface UserData {
   phonenumber: string;
   role: string;
   username: string;
-  age?: number;
+  created_at: string;
+  dob?: string;
   cp?: number;
   exang?: number;
   sex?: number;
@@ -48,6 +51,31 @@ const sexOptions: DropdownOption[] = [
   { label: "Female", value: 0 }
 ];
 
+// Helper function to convert GMT date string to YYYY-MM-DD format
+const convertGMTToYYYYMMDD = (gmtDateString: string): string => {
+  if (!gmtDateString) return '';
+
+  try {
+    const date = new Date(gmtDateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', gmtDateString);
+      return '';
+    }
+
+    // Format to YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  } catch (error) {
+    console.error('Error converting date:', error, gmtDateString);
+    return '';
+  }
+};
+
 interface DropdownProps {
   options: DropdownOption[];
   selectedValue: number | undefined;
@@ -56,12 +84,12 @@ interface DropdownProps {
   disabled?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ 
-  options, 
-  selectedValue, 
-  onSelect, 
-  placeholder, 
-  disabled = false 
+const Dropdown: React.FC<DropdownProps> = ({
+  options,
+  selectedValue,
+  onSelect,
+  placeholder,
+  disabled = false
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -74,13 +102,13 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <>
-      <TouchableOpacity 
-        style={[styles.dropdownButton, disabled && styles.disabledInput]} 
+      <TouchableOpacity
+        style={[styles.dropdownButton, disabled && styles.disabledInput]}
         onPress={() => !disabled && setIsVisible(true)}
         disabled={disabled}
       >
         <Text style={[
-          styles.dropdownText, 
+          styles.dropdownText,
           !selectedOption && styles.placeholderText,
           disabled && styles.disabledText
         ]}>
@@ -95,8 +123,8 @@ const Dropdown: React.FC<DropdownProps> = ({
         animationType="fade"
         onRequestClose={() => setIsVisible(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
           onPress={() => setIsVisible(false)}
         >
           <View style={styles.modalContent}>
@@ -125,46 +153,331 @@ const Dropdown: React.FC<DropdownProps> = ({
   );
 };
 
-const HealthScreen: React.FC = () => {
-  // Mock existing user data - simulate data from backend
-  const mockUserData: UserData = {
-    email: "songokupkj@gmail.com",
-    id: 1,
-    is_verified: true,
-    phonenumber: "0865942420",
-    role: "user",
-    username: "songokupkj",
-    age: 50,
-    cp: 1,
-    exang: 1,
-    sex: 1,
-    trestbps: 120
+interface DatePickerProps {
+  selectedDate: string;
+  onDateSelect: (date: string) => void;
+  disabled?: boolean;
+}
+
+const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, disabled = false }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [tempDay, setTempDay] = useState<number>(1);
+  const [tempMonth, setTempMonth] = useState<number>(1);
+  const [tempYear, setTempYear] = useState<number>(new Date().getFullYear());
+
+  React.useEffect(() => {
+    if (selectedDate && isVisible) {
+      const [year, month, day] = selectedDate.split('-').map(Number);
+      setTempYear(year);
+      setTempMonth(month);
+      setTempDay(day);
+    } else if (isVisible && !selectedDate) {
+      const currentYear = new Date().getFullYear();
+      setTempYear(currentYear - 30);
+      setTempMonth(1);
+      setTempDay(1);
+    }
+  }, [isVisible, selectedDate]);
+
+  const formatDisplayDate = (dateString: string): string => {
+    if (!dateString) return '';
+    try {
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
   };
 
-  // Check if health data exists
-  const hasHealthData = mockUserData.age !== undefined && 
-                       mockUserData.cp !== undefined && 
-                       mockUserData.exang !== undefined && 
-                       mockUserData.sex !== undefined && 
-                       mockUserData.trestbps !== undefined;
+  const getDaysInMonth = (month: number, year: number): number => {
+    return new Date(year, month, 0).getDate();
+  };
 
-  // State management
-  const [isEditing, setIsEditing] = useState(!hasHealthData);
+  const generateYears = (): number[] => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = currentYear - 100; year <= currentYear - 10; year++) {
+      years.push(year);
+    }
+    return years.reverse();
+  };
+
+  const generateMonths = (): { label: string; value: number }[] => {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months.map((month, index) => ({ label: month, value: index + 1 }));
+  };
+
+  const generateDays = (): number[] => {
+    const daysInMonth = getDaysInMonth(tempMonth, tempYear);
+    const days = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(day);
+    }
+    return days;
+  };
+
+  const handleConfirm = () => {
+    const formattedDate = `${tempYear}-${tempMonth.toString().padStart(2, '0')}-${tempDay.toString().padStart(2, '0')}`;
+    onDateSelect(formattedDate);
+    setIsVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsVisible(false);
+  };
+
+  return (
+    <>
+      <TouchableOpacity
+        style={[styles.dropdownButton, disabled && styles.disabledInput]}
+        onPress={() => !disabled && setIsVisible(true)}
+        disabled={disabled}
+      >
+        <Text style={[
+          styles.dropdownText,
+          !selectedDate && styles.placeholderText,
+          disabled && styles.disabledText
+        ]}>
+          {selectedDate ? formatDisplayDate(selectedDate) : 'Select date of birth'}
+        </Text>
+        <Text style={[styles.dropdownArrow, disabled && styles.disabledText]}>📅</Text>
+      </TouchableOpacity>
+
+      <Modal
+        visible={isVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={handleCancel}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.datePickerModal}>
+            <Text style={styles.modalTitle}>Select Date of Birth</Text>
+
+            <View style={styles.datePickerContainer}>
+              <View style={styles.datePickerColumn}>
+                <Text style={styles.datePickerLabel}>Year</Text>
+                <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
+                  {generateYears().map((year) => (
+                    <TouchableOpacity
+                      key={year}
+                      style={[
+                        styles.datePickerOption,
+                        tempYear === year && styles.selectedDateOption
+                      ]}
+                      onPress={() => setTempYear(year)}
+                    >
+                      <Text style={[
+                        styles.datePickerOptionText,
+                        tempYear === year && styles.selectedDateOptionText
+                      ]}>
+                        {year}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={styles.datePickerColumn}>
+                <Text style={styles.datePickerLabel}>Month</Text>
+                <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
+                  {generateMonths().map((month) => (
+                    <TouchableOpacity
+                      key={month.value}
+                      style={[
+                        styles.datePickerOption,
+                        tempMonth === month.value && styles.selectedDateOption
+                      ]}
+                      onPress={() => setTempMonth(month.value)}
+                    >
+                      <Text style={[
+                        styles.datePickerOptionText,
+                        tempMonth === month.value && styles.selectedDateOptionText
+                      ]}>
+                        {month.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+
+              <View style={styles.datePickerColumn}>
+                <Text style={styles.datePickerLabel}>Day</Text>
+                <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
+                  {generateDays().map((day) => (
+                    <TouchableOpacity
+                      key={day}
+                      style={[
+                        styles.datePickerOption,
+                        tempDay === day && styles.selectedDateOption
+                      ]}
+                      onPress={() => setTempDay(day)}
+                    >
+                      <Text style={[
+                        styles.datePickerOptionText,
+                        tempDay === day && styles.selectedDateOptionText
+                      ]}>
+                        {day}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </View>
+
+            <View style={styles.datePickerButtons}>
+              <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
+                <Text style={styles.confirmButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
+  );
+};
+
+const HealthScreen: React.FC = () => {
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+
   const [formData, setFormData] = useState({
-    age: mockUserData.age?.toString() || '',
-    cp: mockUserData.cp,
-    exang: mockUserData.exang,
-    sex: mockUserData.sex,
-    trestbps: mockUserData.trestbps?.toString() || ''
+    dob: '',
+    cp: undefined as number | undefined,
+    exang: undefined as number | undefined,
+    sex: undefined as number | undefined,
+    trestbps: ''
   });
 
   const [originalData, setOriginalData] = useState({
-    age: mockUserData.age?.toString() || '',
-    cp: mockUserData.cp,
-    exang: mockUserData.exang,
-    sex: mockUserData.sex,
-    trestbps: mockUserData.trestbps?.toString() || ''
+    dob: '',
+    cp: undefined as number | undefined,
+    exang: undefined as number | undefined,
+    sex: undefined as number | undefined,
+    trestbps: ''
   });
+
+  const BASE_URL = 'http://192.168.1.20:5000';
+  const ESP32_URL = 'http://192.168.1.13';
+
+  // Function to get auth token
+  const getAuthToken = async (): Promise<string | null> => {
+    try {
+      const token = await AsyncStorage.getItem('access_token');
+      return token;
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      return null;
+    }
+  };
+
+  // Function to make authenticated API calls
+  const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
+    const token = await getAuthToken();
+
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  };
+
+  // Fetch user profile data
+  const fetchUserProfile = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const data = await makeAuthenticatedRequest('/users/profile');
+      setUserData(data);
+
+      // Convert GMT date to YYYY-MM-DD format
+      const convertedDob = convertGMTToYYYYMMDD(data.dob);
+
+      // Update form data with fetched data
+      const newFormData = {
+        dob: convertedDob,
+        cp: data.cp,
+        exang: data.exang,
+        sex: data.sex,
+        trestbps: data.trestbps?.toString() || ''
+      };
+
+      setFormData(newFormData);
+      setOriginalData(newFormData);
+
+      // If no health data exists, start in editing mode
+      const hasHealthData = convertedDob !== '' &&
+        data.cp !== null && data.cp !== undefined &&
+        data.exang !== null && data.exang !== undefined &&
+        data.sex !== null && data.sex !== undefined &&
+        data.trestbps !== null && data.trestbps !== undefined;
+
+      if (!hasHealthData) {
+        setIsEditing(true);
+      }
+
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load user data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Update user health data
+  const updateUserHealth = async (healthData: any) => {
+    try {
+      setSaving(true);
+
+      const data = await makeAuthenticatedRequest('/users/profile/health', {
+        method: 'PATCH',
+        body: JSON.stringify(healthData),
+      });
+
+      setUserData(data);
+      return data;
+    } catch (err) {
+      console.error('Error updating user health:', err);
+      throw err;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Load user data on component mount
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -176,43 +489,251 @@ const HealthScreen: React.FC = () => {
     setIsEditing(false);
   };
 
-  const handleSubmit = () => {
+  const validateAge = (dob: string): boolean => {
+    if (!dob) return false;
+
+    try {
+      const [year, month, day] = dob.split('-').map(Number);
+      const birthDate = new Date(year, month - 1, day);
+      const today = new Date();
+
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age >= 10 && age <= 100;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.age || !formData.trestbps || 
-        formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
+    if (!formData.dob || !formData.trestbps ||
+      formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
 
-    // Validate numeric inputs
-    const age = parseInt(formData.age);
-    const trestbps = parseInt(formData.trestbps);
-
-    if (isNaN(age) || age < 1 || age > 120) {
-      Alert.alert('Error', 'Please enter a valid age (1-120)');
+    // Validate date of birth
+    if (!validateAge(formData.dob)) {
+      Alert.alert('Error', 'Please enter a valid date of birth (age must be between 10-100 years)');
       return;
     }
+
+    // Validate numeric inputs
+    const trestbps = parseInt(formData.trestbps);
 
     if (isNaN(trestbps) || trestbps < 50 || trestbps > 300) {
       Alert.alert('Error', 'Please enter a valid blood pressure (50-300 mm Hg)');
       return;
     }
 
-    // Simulate API call
+    try {
+      // Prepare data for API
+      const healthData = {
+        dob: formData.dob,
+        cp: formData.cp,
+        exang: formData.exang,
+        sex: formData.sex,
+        trestbps: trestbps
+      };
+
+      await updateUserHealth(healthData);
+
+      Alert.alert(
+        'Success',
+        userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setIsEditing(false);
+              setOriginalData({ ...formData });
+            }
+          }
+        ]
+      );
+    } catch (err) {
+      Alert.alert(
+        'Error',
+        err instanceof Error ? err.message : 'Failed to save health data'
+      );
+    }
+  };
+
+  const calculateAge = (dob: string): number => {
+    if (!dob) return 0;
+
+    try {
+      const [year, month, day] = dob.split('-').map(Number);
+      const birthDate = new Date(year, month - 1, day);
+      const today = new Date();
+
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age;
+    } catch (error) {
+      console.error('Error calculating age:', error);
+      return 0;
+    }
+  };
+
+  // Handle prediction confirmation
+  const handlePredict = async () => {
+    // Check if all health data is available
+    if (!formData.dob || !formData.trestbps ||
+      formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
+      Alert.alert(
+        'Incomplete Health Data',
+        'Please complete all health information fields before making a prediction.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Show confirmation alert
     Alert.alert(
-      'Success', 
-      hasHealthData ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+      'Make Prediction',
+      'Do you want to make a cardiovascular health prediction based on your current health information?',
       [
         {
-          text: 'OK',
-          onPress: () => {
-            setIsEditing(false);
-            setOriginalData({ ...formData });
-          }
-        }
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: async () => {
+            try {
+              // Show loading state
+              setSaving(true);
+
+              // Calculate age from date of birth
+              const age = calculateAge(formData.dob);
+
+              if (age <= 0) {
+                Alert.alert('Error', 'Invalid date of birth');
+                setSaving(false);
+                return;
+              }
+
+              // Prepare data for ESP32
+              const predictionData = {
+                age: age,
+                sex: formData.sex,
+                cp: formData.cp,
+                trestbps: parseInt(formData.trestbps),
+                exang: formData.exang,
+                access_token: await AsyncStorage.getItem('access_token'),
+              };
+
+              // Send data to ESP32
+              const response = await fetch(`${ESP32_URL}/submit`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(predictionData)
+              });
+
+              if (!response.ok) {
+                throw new Error(`ESP32 request failed: ${response.status} ${response.statusText}`);
+              }
+
+              // Handle the response from ESP32
+              if (response.ok) {
+                Alert.alert(
+                  'Prediction Successful',
+                  `Your cardiovascular health prediction has been completed.\n\nPlease return to Predictions tab and refresh to see more details.`,
+                  [{ text: 'OK' }]
+                );
+              } else {
+                Alert.alert(
+                  'Prediction Failed',
+                  'The prediction could not be completed. Please try again.',
+                  [{ text: 'OK' }]
+                );
+              }
+
+            } catch (error) {
+              console.error('Prediction error:', error);
+
+              let errorMessage = 'Failed to make prediction. ';
+
+              if (error instanceof Error) {
+                if (error.message.includes('Network request failed') || error.message.includes('timeout')) {
+                  errorMessage += 'Please check your connection to the ESP32 device.';
+                } else {
+                  errorMessage += error.message;
+                }
+              } else {
+                errorMessage += 'Unknown error occurred.';
+              }
+
+              Alert.alert('Prediction Error', errorMessage, [{ text: 'OK' }]);
+            } finally {
+              setSaving(false);
+            }
+          },
+        },
       ]
     );
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color="#3498db" />
+          <Text style={{ marginTop: 16, fontSize: 16, color: '#7f8c8d' }}>Loading health data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 16, color: '#e74c3c', textAlign: 'center', marginBottom: 16 }}>
+            {error}
+          </Text>
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: '#3498db' }]}
+            onPress={fetchUserProfile}
+          >
+            <Text style={styles.buttonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 16, color: '#7f8c8d' }}>No user data available</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const hasHealthData = formData.dob !== '' &&
+    userData.cp !== null && userData.cp !== undefined &&
+    userData.exang !== null && userData.exang !== undefined &&
+    userData.sex !== null && userData.sex !== undefined &&
+    userData.trestbps !== null && userData.trestbps !== undefined;
 
   const isFormDisabled = hasHealthData && !isEditing;
 
@@ -222,24 +743,20 @@ const HealthScreen: React.FC = () => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Health Information</Text>
           <Text style={styles.description}>
-            {hasHealthData 
-              ? 'Review and update your health information' 
+            {hasHealthData
+              ? 'Review and update your health information'
               : 'Please provide your health information for cardiovascular risk assessment'
             }
           </Text>
 
           <View style={styles.formContainer}>
-            {/* Age Input */}
+            {/* Date of Birth Picker */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Age (years) *</Text>
-              <TextInput
-                style={[styles.input, isFormDisabled && styles.disabledInput]}
-                value={formData.age}
-                onChangeText={(text) => setFormData({ ...formData, age: text })}
-                placeholder="Enter your age"
-                keyboardType="numeric"
-                editable={!isFormDisabled}
-                placeholderTextColor="#bdc3c7"
+              <Text style={styles.inputLabel}>Date of Birth *</Text>
+              <DatePicker
+                selectedDate={formData.dob}
+                onDateSelect={(date) => setFormData({ ...formData, dob: date })}
+                disabled={isFormDisabled}
               />
             </View>
 
@@ -301,14 +818,26 @@ const HealthScreen: React.FC = () => {
                 </TouchableOpacity>
               ) : (
                 <>
-                  <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                    <Text style={styles.buttonText}>
-                      {hasHealthData ? 'Update' : 'Submit'}
-                    </Text>
+                  <TouchableOpacity
+                    style={[styles.button, saving && { opacity: 0.7 }]}
+                    onPress={handleSubmit}
+                    disabled={saving}
+                  >
+                    {saving ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={styles.buttonText}>
+                        {hasHealthData ? 'Update' : 'Submit'}
+                      </Text>
+                    )}
                   </TouchableOpacity>
-                  
+
                   {hasHealthData && (
-                    <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+                    <TouchableOpacity
+                      style={[styles.cancelButton, saving && { opacity: 0.7 }]}
+                      onPress={handleCancel}
+                      disabled={saving}
+                    >
                       <Text style={styles.cancelButtonText}>Cancel</Text>
                     </TouchableOpacity>
                   )}
@@ -316,6 +845,15 @@ const HealthScreen: React.FC = () => {
               )}
             </View>
           </View>
+
+          {/* Prediction Section */}
+          {hasHealthData && !isEditing && (
+            <View style={styles.predictionContainer}>
+              <TouchableOpacity style={styles.predictButton} onPress={handlePredict}>
+                <Text style={styles.predictButtonText}>Make Prediction</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
   SafeAreaView,
   Dimensions,
   ScrollView,
   TouchableOpacity,
-  Animated
+  Animated,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from '@/styles/(tabs)/index';
 
@@ -17,60 +20,22 @@ interface PredictionData {
   id: number;
   user_id: number;
   age: number;
-  chol: number;
   cp: number;
   exang: number;
-  fbs: number;
-  oldpeak: number;
   prediction: string;
   probability: number;
   restecg: number;
   sex: number;
-  slope: number;
   thalach: number;
   trestbps: number;
+  created_at: string;
 }
-
-const sampleData: PredictionData[] = [
-  {
-    id: 2,
-    user_id: 1,
-    age: 18,
-    chol: 284,
-    cp: 2,
-    exang: 0,
-    fbs: 0,
-    oldpeak: 0.0,
-    prediction: "NEGATIVE",
-    probability: 0.03538578748703003,
-    restecg: 0,
-    sex: 0,
-    slope: 1,
-    thalach: 120,
-    trestbps: 120
-  },
-  {
-    id: 3,
-    user_id: 2,
-    age: 55,
-    chol: 210,
-    cp: 1,
-    exang: 1,
-    fbs: 1,
-    oldpeak: 1.8,
-    prediction: "POSITIVE",
-    probability: 0.847283,
-    restecg: 2,
-    sex: 1,
-    slope: 2,
-    thalach: 140,
-    trestbps: 150
-  }
-];
 
 interface PredictionCardProps {
   data: PredictionData;
 }
+
+const API_BASE_URL = 'http://192.168.1.20:5000';
 
 const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -78,13 +43,13 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     Animated.timing(animation, {
       toValue,
       duration: 300,
       useNativeDriver: false,
     }).start();
-    
+
     setIsExpanded(!isExpanded);
   };
 
@@ -95,7 +60,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const expandedHeight = animation.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 450], // Increased from 400 to 450 to accommodate all content
+    outputRange: [0, 320],
   });
 
   const formatSex = (sex: number): string => {
@@ -104,6 +69,25 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const formatProbability = (prob: number): string => {
     return `${(prob * 100).toFixed(2)}%`;
+  };
+
+  const formatTimestamp = (timestamp: string): string => {
+    try {
+      const date = new Date(timestamp);
+
+      const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      };
+
+      return date.toLocaleDateString('en-US', options).replace(',', ' -');
+    } catch (error) {
+      return timestamp;
+    }
   };
 
   const getPredictionColor = (prediction: string): string => {
@@ -118,6 +102,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
           <View style={styles.headerLeft}>
             <Text style={styles.cardId}>ID: {data.id}</Text>
             <Text style={styles.cardUserId}>User ID: {data.user_id}</Text>
+            <Text style={styles.cardTimestamp}>{formatTimestamp(data.created_at)}</Text>
           </View>
           <View style={styles.headerRight}>
             <View style={[styles.predictionBadge, { backgroundColor: getPredictionColor(data.prediction) }]}>
@@ -138,66 +123,46 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
               <Text style={styles.detailLabel}>Age:</Text>
               <Text style={styles.detailValue}>{data.age}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Sex:</Text>
               <Text style={styles.detailValue}>{formatSex(data.sex)}</Text>
             </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Cholesterol:</Text>
-              <Text style={styles.detailValue}>{data.chol}</Text>
-            </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Chest Pain (CP):</Text>
               <Text style={styles.detailValue}>{data.cp}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Resting BP:</Text>
               <Text style={styles.detailValue}>{data.trestbps}</Text>
             </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Fasting Blood Sugar:</Text>
-              <Text style={styles.detailValue}>{data.fbs}</Text>
-            </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Rest ECG:</Text>
               <Text style={styles.detailValue}>{data.restecg}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Max Heart Rate:</Text>
               <Text style={styles.detailValue}>{data.thalach}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Exercise Angina:</Text>
               <Text style={styles.detailValue}>{data.exang}</Text>
             </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Oldpeak:</Text>
-              <Text style={styles.detailValue}>{data.oldpeak}</Text>
-            </View>
-            
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Slope:</Text>
-              <Text style={styles.detailValue}>{data.slope}</Text>
-            </View>
-            
+
             <View style={styles.separator} />
-            
+
             <View style={styles.predictionRow}>
               <Text style={styles.predictionLabel}>Prediction:</Text>
               <Text style={[styles.predictionValue, { color: getPredictionColor(data.prediction) }]}>
                 {data.prediction}
               </Text>
             </View>
-            
+
             <View style={styles.predictionRow}>
               <Text style={styles.predictionLabel}>Probability:</Text>
               <Text style={styles.probabilityValue}>{formatProbability(data.probability)}</Text>
@@ -210,6 +175,133 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 };
 
 const PredictionsScreen: React.FC = () => {
+  const [predictions, setPredictions] = useState<PredictionData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchPredictions = async (isRefresh = false) => {
+    try {
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      setError(null);
+
+      // Get auth token from AsyncStorage
+      const token = await AsyncStorage.getItem('access_token');
+
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/predictions`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication failed. Please log in again.');
+        } else if (response.status === 403) {
+          throw new Error('Access denied');
+        } else {
+          throw new Error(`Server error: ${response.status}`);
+        }
+      }
+
+      const data = await response.json();
+
+      // Sort predictions by ID in descending order (newest first)
+      const sortedData = data.sort((a: PredictionData, b: PredictionData) => b.id - a.id);
+
+      setPredictions(sortedData);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch predictions';
+      setError(errorMessage);
+      console.error('Error fetching predictions:', err);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPredictions();
+  }, []);
+
+  const handleRefresh = () => {
+    fetchPredictions(true);
+  };
+
+  const handleRetry = () => {
+    fetchPredictions();
+  };
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyState}>
+      <Text style={styles.emptyStateTitle}>No Predictions Yet</Text>
+      <Text style={styles.emptyStateDescription}>
+        You haven't made any heart disease predictions yet.
+        Start by making your first prediction!
+      </Text>
+    </View>
+  );
+
+  const renderErrorState = () => (
+    <View style={styles.errorState}>
+      <Text style={styles.errorTitle}>Unable to Load Predictions</Text>
+      <Text style={styles.errorDescription}>{error}</Text>
+      <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderLoadingState = () => (
+    <View style={styles.loadingState}>
+      <ActivityIndicator size="large" color="#e74c3c" />
+      <Text style={styles.loadingText}>Loading predictions...</Text>
+    </View>
+  );
+
+  const renderContent = () => {
+    if (loading) {
+      return renderLoadingState();
+    }
+
+    if (error) {
+      return renderErrorState();
+    }
+
+    if (predictions.length === 0) {
+      return renderEmptyState();
+    }
+
+    return (
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={['#e74c3c']}
+            tintColor="#e74c3c"
+          />
+        }
+      >
+        {predictions.map((prediction) => (
+          <PredictionCard key={prediction.id} data={prediction} />
+        ))}
+      </ScrollView>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -217,12 +309,8 @@ const PredictionsScreen: React.FC = () => {
         <Text style={styles.description}>
           View your cardiovascular health predictions and risk assessments
         </Text>
-        
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          {sampleData.map((prediction) => (
-            <PredictionCard key={prediction.id} data={prediction} />
-          ))}
-        </ScrollView>
+
+        {renderContent()}
       </View>
     </SafeAreaView>
   );

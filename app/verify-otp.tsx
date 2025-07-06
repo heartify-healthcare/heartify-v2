@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   View, 
@@ -8,7 +8,8 @@ import {
   SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 
 import { styles } from '@/styles/verify-otp';
@@ -23,9 +24,15 @@ interface VerifyOtpScreenProps {
 const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   // State for the 6 OTP digits
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isResending, setIsResending] = useState<boolean>(false);
   
   // Create refs for each input field
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  
+  // Get email from navigation params
+  const params = useLocalSearchParams();
+  const email = params.email as string;
   
   // Initialize the refs array
   useEffect(() => {
@@ -60,16 +67,116 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   };
 
   // Verify OTP function
-  const handleVerifyOtp = () => {
+  const handleVerifyOtp = async () => {
     const otpString = otp.join('');
-    // Implement OTP verification logic here
-    console.log('Verifying OTP:', otpString);
+    
+    // Validate OTP
+    if (otpString.length !== 6) {
+      Alert.alert('Error', 'Please enter a complete 6-digit OTP');
+      return;
+    }
+
+    if (!email) {
+      Alert.alert('Error', 'Email not found. Please go back and try again.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Prepare request payload
+      const payload = {
+        email: email,
+        otp_code: otpString
+      };
+
+      // Make API call to verify endpoint
+      const response = await fetch('http://192.168.1.20:5000/auth/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Verification successful
+        Alert.alert(
+          'Success', 
+          data.message || 'Account verified successfully!',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Navigate to login screen
+                router.push('/login');
+              }
+            }
+          ]
+        );
+      } else {
+        // Verification failed
+        const errorMessage = data.error || 'OTP verification failed. Please try again.';
+        Alert.alert('Error', errorMessage);
+        
+        // Clear OTP inputs on error
+        setOtp(Array(6).fill(''));
+        inputRefs.current[0]?.focus();
+      }
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Resend OTP function
-  const handleResendOtp = () => {
-    // Implement resend OTP logic here
-    console.log('Resending OTP');
+  const handleResendOtp = async () => {
+    if (!email) {
+      Alert.alert('Error', 'Email not found. Please go back and try again.');
+      return;
+    }
+
+    setIsResending(true);
+
+    try {
+      // Prepare request payload
+      const payload = {
+        email: email
+      };
+
+      // Make API call to request-verify endpoint
+      const response = await fetch('http://your-api-url.com/auth/request-verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Resend successful
+        Alert.alert('Success', data.message || 'OTP has been resent to your email');
+        
+        // Clear current OTP inputs
+        setOtp(Array(6).fill(''));
+        inputRefs.current[0]?.focus();
+      } else {
+        // Resend failed
+        const errorMessage = data.error || 'Failed to resend OTP. Please try again.';
+        Alert.alert('Error', errorMessage);
+      }
+    } catch (error) {
+      console.error('OTP resend error:', error);
+      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -89,7 +196,7 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
               <Text style={styles.title}>Verify OTP</Text>
               
               <Text style={styles.description}>
-                Please enter the 6-digit OTP sent to your email to continue.
+                Please enter the 6-digit OTP sent to {email ? email : 'your email'} to continue.
               </Text>
               
               <View style={styles.otpContainer}>
@@ -107,17 +214,27 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                     maxLength={1}
                     selectTextOnFocus
                     autoCapitalize="none"
+                    editable={!isLoading}
                   />
                 ))}
               </View>
               
-              <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
-                <Text style={styles.buttonText}>Verify OTP</Text>
+              <TouchableOpacity 
+                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+                onPress={handleVerifyOtp}
+                disabled={isLoading}
+              >
+                <Text style={styles.buttonText}>
+                  {isLoading ? 'Verifying...' : 'Verify OTP'}
+                </Text>
               </TouchableOpacity>
               
-              <TouchableOpacity onPress={handleResendOtp}>
-                <Text style={styles.resendText}>
-                  Didn't receive the code? Resend OTP
+              <TouchableOpacity 
+                onPress={handleResendOtp}
+                disabled={isResending || isLoading}
+              >
+                <Text style={[styles.resendText, (isResending || isLoading) && { opacity: 0.6 }]}>
+                  {isResending ? 'Resending...' : "Didn't receive the code? Resend OTP"}
                 </Text>
               </TouchableOpacity>
             </View>
