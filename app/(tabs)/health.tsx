@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
+import {
+  View,
+  Text,
   SafeAreaView,
   ScrollView,
   TouchableOpacity,
@@ -54,21 +54,21 @@ const sexOptions: DropdownOption[] = [
 // Helper function to convert GMT date string to YYYY-MM-DD format
 const convertGMTToYYYYMMDD = (gmtDateString: string): string => {
   if (!gmtDateString) return '';
-  
+
   try {
     const date = new Date(gmtDateString);
-    
+
     // Check if the date is valid
     if (isNaN(date.getTime())) {
       console.warn('Invalid date string:', gmtDateString);
       return '';
     }
-    
+
     // Format to YYYY-MM-DD
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    
+
     return `${year}-${month}-${day}`;
   } catch (error) {
     console.error('Error converting date:', error, gmtDateString);
@@ -84,12 +84,12 @@ interface DropdownProps {
   disabled?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ 
-  options, 
-  selectedValue, 
-  onSelect, 
-  placeholder, 
-  disabled = false 
+const Dropdown: React.FC<DropdownProps> = ({
+  options,
+  selectedValue,
+  onSelect,
+  placeholder,
+  disabled = false
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -102,13 +102,13 @@ const Dropdown: React.FC<DropdownProps> = ({
 
   return (
     <>
-      <TouchableOpacity 
-        style={[styles.dropdownButton, disabled && styles.disabledInput]} 
+      <TouchableOpacity
+        style={[styles.dropdownButton, disabled && styles.disabledInput]}
         onPress={() => !disabled && setIsVisible(true)}
         disabled={disabled}
       >
         <Text style={[
-          styles.dropdownText, 
+          styles.dropdownText,
           !selectedOption && styles.placeholderText,
           disabled && styles.disabledText
         ]}>
@@ -123,8 +123,8 @@ const Dropdown: React.FC<DropdownProps> = ({
         animationType="fade"
         onRequestClose={() => setIsVisible(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
+        <TouchableOpacity
+          style={styles.modalOverlay}
           onPress={() => setIsVisible(false)}
         >
           <View style={styles.modalContent}>
@@ -236,13 +236,13 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
 
   return (
     <>
-      <TouchableOpacity 
-        style={[styles.dropdownButton, disabled && styles.disabledInput]} 
+      <TouchableOpacity
+        style={[styles.dropdownButton, disabled && styles.disabledInput]}
         onPress={() => !disabled && setIsVisible(true)}
         disabled={disabled}
       >
         <Text style={[
-          styles.dropdownText, 
+          styles.dropdownText,
           !selectedDate && styles.placeholderText,
           disabled && styles.disabledText
         ]}>
@@ -260,7 +260,7 @@ const DatePicker: React.FC<DatePickerProps> = ({ selectedDate, onDateSelect, dis
         <View style={styles.modalOverlay}>
           <View style={styles.datePickerModal}>
             <Text style={styles.modalTitle}>Select Date of Birth</Text>
-            
+
             <View style={styles.datePickerContainer}>
               <View style={styles.datePickerColumn}>
                 <Text style={styles.datePickerLabel}>Year</Text>
@@ -371,6 +371,7 @@ const HealthScreen: React.FC = () => {
   });
 
   const BASE_URL = 'http://192.168.1.20:5000';
+  const ESP32_URL = 'http://192.168.1.13';
 
   // Function to get auth token
   const getAuthToken = async (): Promise<string | null> => {
@@ -386,7 +387,7 @@ const HealthScreen: React.FC = () => {
   // Function to make authenticated API calls
   const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
     const token = await getAuthToken();
-    
+
     if (!token) {
       throw new Error('No authentication token found');
     }
@@ -415,13 +416,13 @@ const HealthScreen: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const data = await makeAuthenticatedRequest('/users/profile');
       setUserData(data);
-      
+
       // Convert GMT date to YYYY-MM-DD format
       const convertedDob = convertGMTToYYYYMMDD(data.dob);
-      
+
       // Update form data with fetched data
       const newFormData = {
         dob: convertedDob,
@@ -430,21 +431,21 @@ const HealthScreen: React.FC = () => {
         sex: data.sex,
         trestbps: data.trestbps?.toString() || ''
       };
-      
+
       setFormData(newFormData);
       setOriginalData(newFormData);
-      
+
       // If no health data exists, start in editing mode
-      const hasHealthData = convertedDob !== '' && 
-                           data.cp !== null && data.cp !== undefined && 
-                           data.exang !== null && data.exang !== undefined && 
-                           data.sex !== null && data.sex !== undefined && 
-                           data.trestbps !== null && data.trestbps !== undefined;
-      
+      const hasHealthData = convertedDob !== '' &&
+        data.cp !== null && data.cp !== undefined &&
+        data.exang !== null && data.exang !== undefined &&
+        data.sex !== null && data.sex !== undefined &&
+        data.trestbps !== null && data.trestbps !== undefined;
+
       if (!hasHealthData) {
         setIsEditing(true);
       }
-      
+
     } catch (err) {
       console.error('Error fetching user profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to load user data');
@@ -457,12 +458,12 @@ const HealthScreen: React.FC = () => {
   const updateUserHealth = async (healthData: any) => {
     try {
       setSaving(true);
-      
+
       const data = await makeAuthenticatedRequest('/users/profile/health', {
         method: 'PATCH',
         body: JSON.stringify(healthData),
       });
-      
+
       setUserData(data);
       return data;
     } catch (err) {
@@ -490,19 +491,19 @@ const HealthScreen: React.FC = () => {
 
   const validateAge = (dob: string): boolean => {
     if (!dob) return false;
-    
+
     try {
       const [year, month, day] = dob.split('-').map(Number);
       const birthDate = new Date(year, month - 1, day);
       const today = new Date();
-      
+
       let age = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-      
+
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
         age--;
       }
-      
+
       return age >= 10 && age <= 100;
     } catch {
       return false;
@@ -511,8 +512,8 @@ const HealthScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     // Validate required fields
-    if (!formData.dob || !formData.trestbps || 
-        formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
+    if (!formData.dob || !formData.trestbps ||
+      formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
@@ -542,9 +543,9 @@ const HealthScreen: React.FC = () => {
       };
 
       await updateUserHealth(healthData);
-      
+
       Alert.alert(
-        'Success', 
+        'Success',
         userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
         [
           {
@@ -558,19 +559,41 @@ const HealthScreen: React.FC = () => {
       );
     } catch (err) {
       Alert.alert(
-        'Error', 
+        'Error',
         err instanceof Error ? err.message : 'Failed to save health data'
       );
     }
   };
 
+  const calculateAge = (dob: string): number => {
+    if (!dob) return 0;
+
+    try {
+      const [year, month, day] = dob.split('-').map(Number);
+      const birthDate = new Date(year, month - 1, day);
+      const today = new Date();
+
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      return age;
+    } catch (error) {
+      console.error('Error calculating age:', error);
+      return 0;
+    }
+  };
+
   // Handle prediction confirmation
-  const handlePredict = () => {
+  const handlePredict = async () => {
     // Check if all health data is available
-    if (!formData.dob || !formData.trestbps || 
-        formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
+    if (!formData.dob || !formData.trestbps ||
+      formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
       Alert.alert(
-        'Incomplete Health Data', 
+        'Incomplete Health Data',
         'Please complete all health information fields before making a prediction.',
         [{ text: 'OK' }]
       );
@@ -588,9 +611,83 @@ const HealthScreen: React.FC = () => {
         },
         {
           text: 'Yes',
-          onPress: () => {
-            // TODO: Implement prediction API call
-            Alert.alert('Prediction', 'Prediction functionality will be implemented here.');
+          onPress: async () => {
+            try {
+              // Show loading state
+              setSaving(true);
+
+              // Calculate age from date of birth
+              const age = calculateAge(formData.dob);
+
+              if (age <= 0) {
+                Alert.alert('Error', 'Invalid date of birth');
+                setSaving(false);
+                return;
+              }
+
+              // Prepare data for ESP32
+              const predictionData = {
+                age: age,
+                sex: formData.sex,
+                cp: formData.cp,
+                trestbps: parseInt(formData.trestbps),
+                exang: formData.exang,
+                access_token: await AsyncStorage.getItem('access_token'),
+              };
+
+              console.log('Sending prediction data to ESP32:', predictionData);
+
+              // Send data to ESP32
+              const response = await fetch(`${ESP32_URL}/submit`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(predictionData)
+              });
+
+              if (!response.ok) {
+                throw new Error(`ESP32 request failed: ${response.status} ${response.statusText}`);
+              }
+
+              // const result = await response.json();
+              const responseText = await response.text();
+              console.log('ESP32 response:', responseText);
+
+              // Handle the response from ESP32
+              if (response.ok) {
+                Alert.alert(
+                  'Prediction Successful',
+                  `Your cardiovascular health prediction has been completed.\n\nPlease return to Predictions tab and refresh to see more details.`,
+                  [{ text: 'OK' }]
+                );
+              } else {
+                Alert.alert(
+                  'Prediction Failed',
+                  'The prediction could not be completed. Please try again.',
+                  [{ text: 'OK' }]
+                );
+              }
+
+            } catch (error) {
+              console.error('Prediction error:', error);
+
+              let errorMessage = 'Failed to make prediction. ';
+
+              if (error instanceof Error) {
+                if (error.message.includes('Network request failed') || error.message.includes('timeout')) {
+                  errorMessage += 'Please check your connection to the ESP32 device.';
+                } else {
+                  errorMessage += error.message;
+                }
+              } else {
+                errorMessage += 'Unknown error occurred.';
+              }
+
+              Alert.alert('Prediction Error', errorMessage, [{ text: 'OK' }]);
+            } finally {
+              setSaving(false);
+            }
           },
         },
       ]
@@ -617,8 +714,8 @@ const HealthScreen: React.FC = () => {
           <Text style={{ fontSize: 16, color: '#e74c3c', textAlign: 'center', marginBottom: 16 }}>
             {error}
           </Text>
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: '#3498db' }]} 
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: '#3498db' }]}
             onPress={fetchUserProfile}
           >
             <Text style={styles.buttonText}>Retry</Text>
@@ -638,11 +735,11 @@ const HealthScreen: React.FC = () => {
     );
   }
 
-  const hasHealthData = formData.dob !== '' && 
-                       userData.cp !== null && userData.cp !== undefined && 
-                       userData.exang !== null && userData.exang !== undefined && 
-                       userData.sex !== null && userData.sex !== undefined && 
-                       userData.trestbps !== null && userData.trestbps !== undefined;
+  const hasHealthData = formData.dob !== '' &&
+    userData.cp !== null && userData.cp !== undefined &&
+    userData.exang !== null && userData.exang !== undefined &&
+    userData.sex !== null && userData.sex !== undefined &&
+    userData.trestbps !== null && userData.trestbps !== undefined;
 
   const isFormDisabled = hasHealthData && !isEditing;
 
@@ -652,8 +749,8 @@ const HealthScreen: React.FC = () => {
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Health Information</Text>
           <Text style={styles.description}>
-            {hasHealthData 
-              ? 'Review and update your health information' 
+            {hasHealthData
+              ? 'Review and update your health information'
               : 'Please provide your health information for cardiovascular risk assessment'
             }
           </Text>
@@ -727,8 +824,8 @@ const HealthScreen: React.FC = () => {
                 </TouchableOpacity>
               ) : (
                 <>
-                  <TouchableOpacity 
-                    style={[styles.button, saving && { opacity: 0.7 }]} 
+                  <TouchableOpacity
+                    style={[styles.button, saving && { opacity: 0.7 }]}
                     onPress={handleSubmit}
                     disabled={saving}
                   >
@@ -740,10 +837,10 @@ const HealthScreen: React.FC = () => {
                       </Text>
                     )}
                   </TouchableOpacity>
-                  
+
                   {hasHealthData && (
-                    <TouchableOpacity 
-                      style={[styles.cancelButton, saving && { opacity: 0.7 }]} 
+                    <TouchableOpacity
+                      style={[styles.cancelButton, saving && { opacity: 0.7 }]}
                       onPress={handleCancel}
                       disabled={saving}
                     >
