@@ -635,8 +635,6 @@ const HealthScreen: React.FC = () => {
                 access_token: await AsyncStorage.getItem('access_token'),
               };
 
-              console.log('Sending prediction data to ESP32:', predictionData);
-
               // Send data to ESP32
               const response = await fetch(`${ESP32_URL}/submit`, {
                 method: 'POST',
@@ -649,10 +647,6 @@ const HealthScreen: React.FC = () => {
               if (!response.ok) {
                 throw new Error(`ESP32 request failed: ${response.status} ${response.statusText}`);
               }
-
-              // const result = await response.json();
-              const responseText = await response.text();
-              console.log('ESP32 response:', responseText);
 
               // Handle the response from ESP32
               if (response.ok) {

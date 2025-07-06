@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
+import {
+  View,
+  Text,
   SafeAreaView,
   Dimensions,
   ScrollView,
@@ -43,13 +43,13 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
 
   const toggleExpanded = () => {
     const toValue = isExpanded ? 0 : 1;
-    
+
     Animated.timing(animation, {
       toValue,
       duration: 300,
       useNativeDriver: false,
     }).start();
-    
+
     setIsExpanded(!isExpanded);
   };
 
@@ -74,7 +74,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
   const formatTimestamp = (timestamp: string): string => {
     try {
       const date = new Date(timestamp);
-      
+
       const options: Intl.DateTimeFormatOptions = {
         year: 'numeric',
         month: 'short',
@@ -83,7 +83,7 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
         minute: '2-digit',
         hour12: false
       };
-      
+
       return date.toLocaleDateString('en-US', options).replace(',', ' -');
     } catch (error) {
       return timestamp;
@@ -123,46 +123,46 @@ const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
               <Text style={styles.detailLabel}>Age:</Text>
               <Text style={styles.detailValue}>{data.age}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Sex:</Text>
               <Text style={styles.detailValue}>{formatSex(data.sex)}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Chest Pain (CP):</Text>
               <Text style={styles.detailValue}>{data.cp}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Resting BP:</Text>
               <Text style={styles.detailValue}>{data.trestbps}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Rest ECG:</Text>
               <Text style={styles.detailValue}>{data.restecg}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Max Heart Rate:</Text>
               <Text style={styles.detailValue}>{data.thalach}</Text>
             </View>
-            
+
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Exercise Angina:</Text>
               <Text style={styles.detailValue}>{data.exang}</Text>
             </View>
-            
+
             <View style={styles.separator} />
-            
+
             <View style={styles.predictionRow}>
               <Text style={styles.predictionLabel}>Prediction:</Text>
               <Text style={[styles.predictionValue, { color: getPredictionColor(data.prediction) }]}>
                 {data.prediction}
               </Text>
             </View>
-            
+
             <View style={styles.predictionRow}>
               <Text style={styles.predictionLabel}>Probability:</Text>
               <Text style={styles.probabilityValue}>{formatProbability(data.probability)}</Text>
@@ -191,7 +191,7 @@ const PredictionsScreen: React.FC = () => {
 
       // Get auth token from AsyncStorage
       const token = await AsyncStorage.getItem('access_token');
-      
+
       if (!token) {
         throw new Error('No authentication token found');
       }
@@ -215,7 +215,11 @@ const PredictionsScreen: React.FC = () => {
       }
 
       const data = await response.json();
-      setPredictions(data);
+
+      // Sort predictions by ID in descending order (newest first)
+      const sortedData = data.sort((a: PredictionData, b: PredictionData) => b.id - a.id);
+
+      setPredictions(sortedData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch predictions';
       setError(errorMessage);
@@ -242,7 +246,7 @@ const PredictionsScreen: React.FC = () => {
     <View style={styles.emptyState}>
       <Text style={styles.emptyStateTitle}>No Predictions Yet</Text>
       <Text style={styles.emptyStateDescription}>
-        You haven't made any heart disease predictions yet. 
+        You haven't made any heart disease predictions yet.
         Start by making your first prediction!
       </Text>
     </View>
@@ -279,8 +283,8 @@ const PredictionsScreen: React.FC = () => {
     }
 
     return (
-      <ScrollView 
-        style={styles.scrollView} 
+      <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -305,7 +309,7 @@ const PredictionsScreen: React.FC = () => {
         <Text style={styles.description}>
           View your cardiovascular health predictions and risk assessments
         </Text>
-        
+
         {renderContent()}
       </View>
     </SafeAreaView>

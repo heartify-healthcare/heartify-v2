@@ -71,9 +71,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
           }
         } catch (verifyError) {
-          console.log('Token verification failed, proceeding with login:', verifyError);
-          // If verification fails due to network issues, still allow auto-login
-          // Comment out the next two lines if you want to be strict about token verification
           router.replace('/(tabs)');
           return;
         }
