@@ -5,8 +5,6 @@ This repository contains the **Mobile Application** component of a university ca
 ## 🛠️ Technologies Used
 
 - **Expo + React Native** — for fast, cross-platform mobile development.
-- **NativeWind** — TailwindCSS styling for React Native.
-- **NativeCN (shadcn/ui)** — UI component library for clean and accessible designs.
 - **Flask Backend API** — receives health data and returns predictions based on a CNN+LSTM model trained on cardiovascular datasets.
 
 ## 📱 Features
