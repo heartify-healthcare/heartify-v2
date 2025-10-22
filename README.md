@@ -59,4 +59,4 @@ This mobile application was developed as part of a university **capstone project
 
 ## 📄 License
 
-This project is for academic purposes and not intended for production or medical use. Licensing may apply depending on institutional policy.
+This project is available under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0) license.
