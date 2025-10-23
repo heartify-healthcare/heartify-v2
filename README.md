@@ -29,8 +29,8 @@ This repository contains the **Mobile Application** component of a university ca
 ### Running the App Locally
 
 ```bash
-git clone https://github.com/votranphi/heartify
-cd heartify
+git clone https://github.com/votranphi/heartify-v2
+cd heartify-v2
 npm install
 npx expo start
 ```
@@ -41,10 +41,10 @@ Scan the QR code using the **Expo Go app** on your mobile device or use an Andro
 
 This app is designed to interact with a Flask-based REST API server that:
 - Receives health metrics in JSON format
-- Loads a `.keras` model trained on cardiovascular data
-- Returns prediction results
+- Communicate with Deep Learning Model for heart disease prediction and Large Languague Model for explanation.
+- Returns results
 
-👉 Flask API Repository: [https://github.com/votranphi/heartify-api](https://github.com/votranphi/heartify-api)
+👉 Spring Boot API Repository: [https://github.com/votranphi/heartify-api-v2](https://github.com/votranphi/heartify-api-v2)
 
 ## 📚 Academic Context
 
