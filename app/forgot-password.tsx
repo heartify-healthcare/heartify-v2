@@ -52,47 +52,29 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://192.168.1.20:5000/auth/recover-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          email: email.trim(),
-          phone_number: phoneNumber.trim(),
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Success - show success message
-        Alert.alert(
-          'Success',
-          'Password has been reset. Please check your email for the new password.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Navigate to login after a short delay
-                setTimeout(() => {
-                  router.push("/login");
-                }, 1000);
-              },
+      // PUT YOUR API CALLING TO RESET PASSWORD CODE HERE
+      
+      // Example: Simulate success for testing
+      Alert.alert(
+        'Success',
+        'Password has been reset. Please check your email for the new password.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate to login after a short delay
+              setTimeout(() => {
+                router.push("/login");
+              }, 1000);
             },
-          ]
-        );
-        
-        // Clear form fields
-        setUsername('');
-        setEmail('');
-        setPhoneNumber('');
-      } else {
-        // Error - show specific error message from backend
-        const errorMessage = data.error || 'An error occurred. Please try again.';
-        Alert.alert('Error', errorMessage);
-      }
+          },
+        ]
+      );
+      
+      // Clear form fields
+      setUsername('');
+      setEmail('');
+      setPhoneNumber('');
     } catch (error) {
       console.error('Password reset error:', error);
       Alert.alert(

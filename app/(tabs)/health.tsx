@@ -370,9 +370,6 @@ const HealthScreen: React.FC = () => {
     trestbps: ''
   });
 
-  const BASE_URL = 'http://192.168.1.20:5000';
-  const ESP32_URL = 'http://192.168.1.13';
-
   // Function to get auth token
   const getAuthToken = async (): Promise<string | null> => {
     try {
@@ -384,67 +381,19 @@ const HealthScreen: React.FC = () => {
     }
   };
 
-  // Function to make authenticated API calls
-  const makeAuthenticatedRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const token = await getAuthToken();
-
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-
-    const headers = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`,
-      ...options.headers,
-    };
-
-    const response = await fetch(`${BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-    }
-
-    return response.json();
-  };
-
   // Fetch user profile data
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const data = await makeAuthenticatedRequest('/users/profile');
-      setUserData(data);
-
-      // Convert GMT date to YYYY-MM-DD format
-      const convertedDob = convertGMTToYYYYMMDD(data.dob);
-
-      // Update form data with fetched data
-      const newFormData = {
-        dob: convertedDob,
-        cp: data.cp,
-        exang: data.exang,
-        sex: data.sex,
-        trestbps: data.trestbps?.toString() || ''
-      };
-
-      setFormData(newFormData);
-      setOriginalData(newFormData);
-
-      // If no health data exists, start in editing mode
-      const hasHealthData = convertedDob !== '' &&
-        data.cp !== null && data.cp !== undefined &&
-        data.exang !== null && data.exang !== undefined &&
-        data.sex !== null && data.sex !== undefined &&
-        data.trestbps !== null && data.trestbps !== undefined;
-
-      if (!hasHealthData) {
-        setIsEditing(true);
-      }
+      // PUT YOUR API CALLING TO FETCH USER PROFILE CODE HERE
+      // After fetching data, update the state:
+      // setUserData(data);
+      // const convertedDob = convertGMTToYYYYMMDD(data.dob);
+      // setFormData({ dob: convertedDob, cp: data.cp, exang: data.exang, sex: data.sex, trestbps: data.trestbps?.toString() || '' });
+      // setOriginalData(newFormData);
+      // Check if health data exists and set isEditing accordingly
 
     } catch (err) {
       console.error('Error fetching user profile:', err);
@@ -459,13 +408,11 @@ const HealthScreen: React.FC = () => {
     try {
       setSaving(true);
 
-      const data = await makeAuthenticatedRequest('/users/profile/health', {
-        method: 'PATCH',
-        body: JSON.stringify(healthData),
-      });
+      // PUT YOUR API CALLING TO UPDATE USER HEALTH CODE HERE
+      // After updating data, update the state:
+      // setUserData(data);
+      // return data;
 
-      setUserData(data);
-      return data;
     } catch (err) {
       console.error('Error updating user health:', err);
       throw err;
@@ -625,43 +572,9 @@ const HealthScreen: React.FC = () => {
                 return;
               }
 
-              // Prepare data for ESP32
-              const predictionData = {
-                age: age,
-                sex: formData.sex,
-                cp: formData.cp,
-                trestbps: parseInt(formData.trestbps),
-                exang: formData.exang,
-                access_token: await AsyncStorage.getItem('access_token'),
-              };
-
-              // Send data to ESP32
-              const response = await fetch(`${ESP32_URL}/submit`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(predictionData)
-              });
-
-              if (!response.ok) {
-                throw new Error(`ESP32 request failed: ${response.status} ${response.statusText}`);
-              }
-
-              // Handle the response from ESP32
-              if (response.ok) {
-                Alert.alert(
-                  'Prediction Successful',
-                  `Your cardiovascular health prediction has been completed.\n\nPlease return to Predictions tab and refresh to see more details.`,
-                  [{ text: 'OK' }]
-                );
-              } else {
-                Alert.alert(
-                  'Prediction Failed',
-                  'The prediction could not be completed. Please try again.',
-                  [{ text: 'OK' }]
-                );
-              }
+              // PUT YOUR API CALLING TO MAKE PREDICTION (ESP32) CODE HERE
+              // Prepare prediction data with age, sex, cp, trestbps, exang, access_token
+              // Send to ESP32 and handle response
 
             } catch (error) {
               console.error('Prediction error:', error);

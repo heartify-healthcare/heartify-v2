@@ -52,28 +52,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       
       // Check if all required auth data exists
       if (accessToken && tokenType && userData) {
-        try {
-          // Optional: Verify token is still valid by making a test API call
-          const response = await fetch('http://192.168.1.20:5000/auth/verify-token', {
-            method: 'GET',
-            headers: {
-              'Authorization': `${tokenType} ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (response.ok) {
-            // Token is valid, redirect to main app
-            router.replace('/(tabs)');
-            return;
-          } else {
-            // Token is invalid, clear stored data
-            await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
-          }
-        } catch (verifyError) {
-          router.replace('/(tabs)');
-          return;
-        }
+        // PUT YOUR API CALLING TO VERIFY TOKEN CODE HERE
+        
+        // If token is valid, redirect to main app
+        // router.replace('/(tabs)');
       }
     } catch (error) {
       console.error('Error checking existing auth:', error);
@@ -108,60 +90,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        username: username.trim(),
-        password: password
-      };
-
-      // Make API call to login endpoint
-      const response = await fetch('http://192.168.1.20:5000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Login successful
-        const { access_token, token_type, user } = data;
-        
-        try {
-          // Store authentication data
-          await AsyncStorage.multiSet([
-            ['access_token', access_token],
-            ['token_type', token_type],
-            ['user_data', JSON.stringify(user)]
-          ]);
-
-          Alert.alert(
-            'Success', 
-            `Welcome back, ${user.username}!`,
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  // Navigate to main app or dashboard
-                  router.replace('/(tabs)');
-                }
-              }
-            ]
-          );
-        } catch (storageError) {
-          console.error('Error storing authentication data:', storageError);
-          Alert.alert('Warning', 'Login successful but failed to store session data');
-        }
-      } else {
-        // Login failed
-        const errorMessage = data.error || 'Login failed. Please try again.';
-        Alert.alert('Error', errorMessage);
-        
-        // Clear password field on error
-        setPassword('');
-      }
+      // PUT YOUR API CALLING TO LOGIN CODE HERE
+      
+      // On successful login, store authentication data and navigate
+      // await AsyncStorage.multiSet([
+      //   ['access_token', access_token],
+      //   ['token_type', token_type],
+      //   ['user_data', JSON.stringify(user)]
+      // ]);
+      // router.replace('/(tabs)');
+      
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');

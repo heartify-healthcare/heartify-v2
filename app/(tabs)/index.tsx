@@ -35,8 +35,6 @@ interface PredictionCardProps {
   data: PredictionData;
 }
 
-const API_BASE_URL = 'http://192.168.1.20:5000';
-
 const PredictionCard: React.FC<PredictionCardProps> = ({ data }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [animation] = useState(new Animated.Value(0));
@@ -189,37 +187,11 @@ const PredictionsScreen: React.FC = () => {
       }
       setError(null);
 
-      // Get auth token from AsyncStorage
-      const token = await AsyncStorage.getItem('access_token');
-
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch(`${API_BASE_URL}/predictions`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Authentication failed. Please log in again.');
-        } else if (response.status === 403) {
-          throw new Error('Access denied');
-        } else {
-          throw new Error(`Server error: ${response.status}`);
-        }
-      }
-
-      const data = await response.json();
-
+      // PUT YOUR API CALLING TO FETCH PREDICTIONS CODE HERE
+      // After fetching data:
       // Sort predictions by ID in descending order (newest first)
-      const sortedData = data.sort((a: PredictionData, b: PredictionData) => b.id - a.id);
+      // setPredictions(sortedData);
 
-      setPredictions(sortedData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch predictions';
       setError(errorMessage);
