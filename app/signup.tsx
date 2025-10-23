@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -68,13 +68,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
 
     try {
       // PUT YOUR API CALLING TO REGISTER CODE HERE
-      
+
       // On successful registration, navigate to OTP verification screen
       // router.push({
       //   pathname: '/verify-otp',
       //   params: { email: email.trim().toLowerCase() }
       // });
-      
+
     } catch (error) {
       console.error('Registration error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
@@ -89,16 +89,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
             <Text style={styles.appName}>Heartify</Text>
-            
+
             <View style={styles.formContainer}>
               <Text style={styles.title}>Sign Up</Text>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Username *</Text>
                 <TextInput
@@ -110,7 +110,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   editable={!isLoading}
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Email *</Text>
                 <TextInput
@@ -123,7 +123,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   editable={!isLoading}
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Phone Number</Text>
                 <TextInput
@@ -135,7 +135,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   editable={!isLoading}
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Password *</Text>
                 <View style={styles.passwordContainer}>
@@ -158,7 +158,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Confirm Password *</Text>
                 <View style={styles.passwordContainer}>
@@ -181,9 +181,9 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              
-              <TouchableOpacity 
-                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+
+              <TouchableOpacity
+                style={[styles.button, isLoading && { opacity: 0.6 }]}
                 onPress={handleSignUp}
                 disabled={isLoading}
               >
@@ -191,7 +191,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   {isLoading ? 'Signing Up...' : 'Sign Up'}
                 </Text>
               </TouchableOpacity>
-              
+
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>Already have an account? </Text>
                 <TouchableOpacity onPress={handleLogin} disabled={isLoading}>

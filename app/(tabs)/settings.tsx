@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
+import {
+  View,
   Text,
   ScrollView,
   TouchableOpacity,
@@ -56,7 +56,7 @@ const SettingsScreen: React.FC = () => {
     try {
       const accessToken = await AsyncStorage.getItem('access_token');
       const tokenType = await AsyncStorage.getItem('token_type');
-      
+
       if (!accessToken || !tokenType) {
         throw new Error('No authentication token found');
       }
@@ -75,13 +75,13 @@ const SettingsScreen: React.FC = () => {
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
-      
+
       // PUT YOUR API CALLING TO FETCH USER PROFILE CODE HERE
       // After fetching data:
       // setUserData(data);
       // setFormData({ username: data.username || '', email: data.email || '', phonenumber: data.phonenumber || '', role: data.role || '' });
       // setOriginalData(newFormData);
-      
+
     } catch (error) {
       console.error('Error fetching user profile:', error);
       Alert.alert('Error', 'Failed to load user profile. Please try again.');
@@ -94,13 +94,13 @@ const SettingsScreen: React.FC = () => {
   const updateUserProfile = async () => {
     try {
       setIsSaving(true);
-      
+
       // Prepare update data (only send changed fields)
       const updateData: any = {};
       if (formData.username !== originalData.username) updateData.username = formData.username;
       if (formData.email !== originalData.email) updateData.email = formData.email;
       if (formData.phonenumber !== originalData.phonenumber) updateData.phonenumber = formData.phonenumber;
-      
+
       // If no changes, just exit editing mode
       if (Object.keys(updateData).length === 0) {
         setIsEditing(false);
@@ -112,7 +112,7 @@ const SettingsScreen: React.FC = () => {
       // setUserData(updatedUser);
       // setOriginalData({ ...formData });
       // setIsEditing(false);
-      
+
     } catch (error) {
       console.error('Error updating profile:', error);
       Alert.alert('Error', error instanceof Error ? error.message : 'Failed to update profile');
@@ -126,10 +126,10 @@ const SettingsScreen: React.FC = () => {
     try {
       // Clear stored data
       await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
-      
+
       // Navigate to login screen
       router.replace('/login');
-      
+
     } catch (error) {
       console.error('Error during logout:', error);
       Alert.alert('Error', 'Failed to logout properly');
@@ -236,8 +236,8 @@ const SettingsScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
           <Text style={{ color: '#e74c3c', fontSize: 16 }}>Failed to load user data</Text>
-          <TouchableOpacity 
-            style={[styles.button, { marginTop: 20 }]} 
+          <TouchableOpacity
+            style={[styles.button, { marginTop: 20 }]}
             onPress={fetchUserProfile}
           >
             <Text style={styles.buttonText}>Retry</Text>
@@ -327,15 +327,15 @@ const SettingsScreen: React.FC = () => {
                   <TouchableOpacity style={styles.button} onPress={handleEdit}>
                     <Text style={styles.buttonText}>Edit Profile</Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity style={styles.secondaryButton} onPress={handleChangePassword}>
                     <Text style={styles.secondaryButtonText}>Change Password</Text>
                   </TouchableOpacity>
                 </>
               ) : (
                 <>
-                  <TouchableOpacity 
-                    style={[styles.button, isSaving && { opacity: 0.7 }]} 
+                  <TouchableOpacity
+                    style={[styles.button, isSaving && { opacity: 0.7 }]}
                     onPress={handleSubmit}
                     disabled={isSaving}
                   >
@@ -345,9 +345,9 @@ const SettingsScreen: React.FC = () => {
                       <Text style={styles.buttonText}>Save Changes</Text>
                     )}
                   </TouchableOpacity>
-                  
-                  <TouchableOpacity 
-                    style={[styles.cancelButton, isSaving && { opacity: 0.7 }]} 
+
+                  <TouchableOpacity
+                    style={[styles.cancelButton, isSaving && { opacity: 0.7 }]}
                     onPress={handleCancel}
                     disabled={isSaving}
                   >
@@ -361,17 +361,17 @@ const SettingsScreen: React.FC = () => {
           {/* Account Information Section */}
           <View style={styles.infoContainer}>
             <Text style={styles.sectionTitle}>Account Information</Text>
-            
+
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>User ID:</Text>
               <Text style={styles.infoValue}>{userData.id}</Text>
             </View>
-            
+
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Member Since:</Text>
               <Text style={styles.infoValue}>{formatDate(userData.created_at)}</Text>
             </View>
-            
+
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Last Login:</Text>
               <Text style={styles.infoValue}>Current Session</Text>

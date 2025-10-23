@@ -1,8 +1,8 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
+import {
+  View,
+  Text,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -38,7 +38,7 @@ const ChangePasswordScreen: React.FC = () => {
 
       // Success - password changed
       Alert.alert(
-        'Success', 
+        'Success',
         'Password changed successfully!',
         [
           {
@@ -184,8 +184,8 @@ const ChangePasswordScreen: React.FC = () => {
 
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>
-              <TouchableOpacity 
-                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+              <TouchableOpacity
+                style={[styles.button, isLoading && { opacity: 0.6 }]}
                 onPress={handleSubmit}
                 disabled={isLoading}
               >
@@ -198,9 +198,9 @@ const ChangePasswordScreen: React.FC = () => {
                   <Text style={styles.buttonText}>Change Password</Text>
                 )}
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.cancelButton, isLoading && { opacity: 0.6 }]} 
+
+              <TouchableOpacity
+                style={[styles.cancelButton, isLoading && { opacity: 0.6 }]}
                 onPress={handleCancel}
                 disabled={isLoading}
               >

@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
@@ -53,7 +53,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
 
     try {
       // PUT YOUR API CALLING TO RESET PASSWORD CODE HERE
-      
+
       // Example: Simulate success for testing
       Alert.alert(
         'Success',
@@ -70,7 +70,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
           },
         ]
       );
-      
+
       // Clear form fields
       setUsername('');
       setEmail('');
@@ -92,16 +92,16 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
             <Text style={styles.appName}>Heartify</Text>
-            
+
             <View style={styles.formContainer}>
               <Text style={styles.title}>Forgot Password</Text>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Username</Text>
                 <TextInput
@@ -113,7 +113,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   editable={!isLoading}
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Email</Text>
                 <TextInput
@@ -126,7 +126,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   editable={!isLoading}
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Phone Number</Text>
                 <TextInput
@@ -138,9 +138,9 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   editable={!isLoading}
                 />
               </View>
-              
-              <TouchableOpacity 
-                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+
+              <TouchableOpacity
+                style={[styles.button, isLoading && { opacity: 0.6 }]}
                 onPress={handleResetPassword}
                 disabled={isLoading}
               >
@@ -150,7 +150,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   <Text style={styles.buttonText}>Reset Password</Text>
                 )}
               </TouchableOpacity>
-              
+
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>Remembered password? </Text>
                 <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
