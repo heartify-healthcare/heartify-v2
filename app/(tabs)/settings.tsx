@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   View, 
-  Text, 
-  SafeAreaView,
+  Text,
   ScrollView,
   TouchableOpacity,
   TextInput,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/settings';
 

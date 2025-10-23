@@ -5,12 +5,12 @@ import {
   Text, 
   TextInput, 
   TouchableOpacity, 
-  SafeAreaView,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/signup';
 

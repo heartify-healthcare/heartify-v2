@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { 
   View, 
   Text, 
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   TextInput,
   Alert,
   ActivityIndicator
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/change-password';
 
