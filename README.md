@@ -5,7 +5,7 @@ This repository contains the **Mobile Application** component of a university ca
 ## 🛠️ Technologies Used
 
 - **Expo + React Native** — for fast, cross-platform mobile development.
-- **Flask Backend API** — receives health data and returns predictions based on a CNN+LSTM model trained on cardiovascular datasets.
+- **Spring Boot Backend API** — receives health data and returns results based on a Deep Learning model trained on ECG datasets and a medical Large Language Model.
 
 ## 📱 Features
 
@@ -14,10 +14,10 @@ This repository contains the **Mobile Application** component of a university ca
   - Log in securely
   - Identity verification flow
 - 📊 Health data input:
-  - Users can input various health metrics such as age, blood pressure, cholesterol, etc.
-  - Data is submitted to a secure Flask backend
+  - Users can input various health metrics such as age, blood pressure, cholesterol, ECG signal, etc.
+  - Data is submitted to a secure Spring Boot backend
 - 🩺 Disease prediction:
-  - The backend returns prediction results based on a trained deep learning model
+  - The backend returns prediction results based on a trained Deep Learning model and a medical Large Language Model
   - Users receive immediate feedback on potential cardiovascular risks
 
 ## 🚀 Getting Started
@@ -32,25 +32,35 @@ This repository contains the **Mobile Application** component of a university ca
 git clone https://github.com/votranphi/heartify-v2
 cd heartify-v2
 npm install
-npx expo start
+```
+
+For Android:
+```bash
+npx expo prebuild --clean
+npx expo run:android
+```
+
+For iOS:
+```bash
+npx expo run:ios
 ```
 
 Scan the QR code using the **Expo Go app** on your mobile device or use an Android/iOS emulator.
 
 ## 🔗 Backend Integration
 
-This app is designed to interact with a Flask-based REST API server that:
+This app is designed to interact with a Spring Boot-based REST API server that:
 - Receives health metrics in JSON format
-- Communicate with Deep Learning Model for heart disease prediction and Large Languague Model for explanation.
+- Communicate with Deep Learning model for heart disease prediction and Large Languague Model for explanation.
 - Returns results
 
 👉 Spring Boot API Repository: [https://github.com/votranphi/heartify-api-v2](https://github.com/votranphi/heartify-api-v2)
 
 ## 📚 Academic Context
 
-This mobile application was developed as part of a university **capstone project** (not a graduation thesis), under the topic:
+This mobile application was developed as part of a university **graduation thesis**, under the topic:
 
-> **"Deep learning-based AIoT system for cardiovascular disease prediction: A CNN-LSTM approach."**
+> **"Heart disease risk prediction using ECG signals with deep learning and large language models."**
 
 ## ✍️ Author
 
