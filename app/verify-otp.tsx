@@ -84,47 +84,11 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        email: email,
-        otp_code: otpString
-      };
-
-      // Make API call to verify endpoint
-      const response = await fetch('http://192.168.1.20:5000/auth/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Verification successful
-        Alert.alert(
-          'Success', 
-          data.message || 'Account verified successfully!',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Navigate to login screen
-                router.push('/login');
-              }
-            }
-          ]
-        );
-      } else {
-        // Verification failed
-        const errorMessage = data.error || 'OTP verification failed. Please try again.';
-        Alert.alert('Error', errorMessage);
-        
-        // Clear OTP inputs on error
-        setOtp(Array(6).fill(''));
-        inputRefs.current[0]?.focus();
-      }
+      // PUT YOUR API CALLING TO VERIFY OTP CODE HERE
+      
+      // On successful verification, navigate to login screen
+      // router.push('/login');
+      
     } catch (error) {
       console.error('OTP verification error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
@@ -143,34 +107,12 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     setIsResending(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        email: email
-      };
-
-      // Make API call to request-verify endpoint
-      const response = await fetch('http://your-api-url.com/auth/request-verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Resend successful
-        Alert.alert('Success', data.message || 'OTP has been resent to your email');
-        
-        // Clear current OTP inputs
-        setOtp(Array(6).fill(''));
-        inputRefs.current[0]?.focus();
-      } else {
-        // Resend failed
-        const errorMessage = data.error || 'Failed to resend OTP. Please try again.';
-        Alert.alert('Error', errorMessage);
-      }
+      // PUT YOUR API CALLING TO RESEND OTP CODE HERE
+      
+      // On successful resend, clear OTP inputs
+      // setOtp(Array(6).fill(''));
+      // inputRefs.current[0]?.focus();
+      
     } catch (error) {
       console.error('OTP resend error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');

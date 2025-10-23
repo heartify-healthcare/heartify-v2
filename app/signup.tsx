@@ -67,49 +67,14 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        username: username.trim(),
-        email: email.trim().toLowerCase(),
-        phonenumber: phoneNumber.trim() || null,
-        password: password
-      };
-
-      // Make API call to register endpoint
-      const response = await fetch('http://192.168.1.20:5000/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Registration successful
-        Alert.alert(
-          'Success', 
-          data.message || 'Registration successful! Please check your email for verification code.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Navigate to OTP verification screen
-                // Pass email as parameter for OTP verification
-                router.push({
-                  pathname: '/verify-otp',
-                  params: { email: email.trim().toLowerCase() }
-                });
-              }
-            }
-          ]
-        );
-      } else {
-        // Registration failed
-        const errorMessage = data.error || 'Registration failed. Please try again.';
-        Alert.alert('Error', errorMessage);
-      }
+      // PUT YOUR API CALLING TO REGISTER CODE HERE
+      
+      // On successful registration, navigate to OTP verification screen
+      // router.push({
+      //   pathname: '/verify-otp',
+      //   params: { email: email.trim().toLowerCase() }
+      // });
+      
     } catch (error) {
       console.error('Registration error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');

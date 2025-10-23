@@ -29,8 +29,6 @@ interface UserData {
   trestbps: number | null;
 }
 
-const API_BASE_URL = 'http://192.168.1.20:5000';
-
 const SettingsScreen: React.FC = () => {
   const router = useRouter();
 
@@ -77,35 +75,12 @@ const SettingsScreen: React.FC = () => {
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
-      const headers = await getAuthHeaders();
       
-      const response = await fetch(`${API_BASE_URL}/users/profile`, {
-        method: 'GET',
-        headers,
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          Alert.alert('Session Expired', 'Please login again');
-          await handleLogout();
-          return;
-        }
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setUserData(data);
-      
-      // Update form data with fetched user data
-      const newFormData = {
-        username: data.username || '',
-        email: data.email || '',
-        phonenumber: data.phonenumber || '',
-        role: data.role || ''
-      };
-      
-      setFormData(newFormData);
-      setOriginalData(newFormData);
+      // PUT YOUR API CALLING TO FETCH USER PROFILE CODE HERE
+      // After fetching data:
+      // setUserData(data);
+      // setFormData({ username: data.username || '', email: data.email || '', phonenumber: data.phonenumber || '', role: data.role || '' });
+      // setOriginalData(newFormData);
       
     } catch (error) {
       console.error('Error fetching user profile:', error);
@@ -119,7 +94,6 @@ const SettingsScreen: React.FC = () => {
   const updateUserProfile = async () => {
     try {
       setIsSaving(true);
-      const headers = await getAuthHeaders();
       
       // Prepare update data (only send changed fields)
       const updateData: any = {};
@@ -133,23 +107,11 @@ const SettingsScreen: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/users/profile`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify(updateData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
-
-      const updatedUser = await response.json();
-      setUserData(updatedUser);
-      setOriginalData({ ...formData });
-      setIsEditing(false);
-      
-      Alert.alert('Success', 'Profile updated successfully!');
+      // PUT YOUR API CALLING TO UPDATE USER PROFILE CODE HERE
+      // After updating data:
+      // setUserData(updatedUser);
+      // setOriginalData({ ...formData });
+      // setIsEditing(false);
       
     } catch (error) {
       console.error('Error updating profile:', error);

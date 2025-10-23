@@ -10,11 +10,8 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { styles } from '@/styles/change-password';
-
-const BASE_URL = 'http://192.168.1.20:5000';
 
 const ChangePasswordScreen: React.FC = () => {
   const router = useRouter();
@@ -37,52 +34,27 @@ const ChangePasswordScreen: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // Get stored authentication token
-      const token = await AsyncStorage.getItem('access_token');
-      if (!token) {
-        Alert.alert('Error', 'Authentication token not found. Please login again.');
-        return;
-      }
+      // PUT YOUR API CALLING TO CHANGE PASSWORD CODE HERE
 
-      const response = await fetch(`${BASE_URL}/users/change-password`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          current_password: formData.currentPassword,
-          new_password: formData.newPassword
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Success - password changed
-        Alert.alert(
-          'Success', 
-          'Password changed successfully!',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Clear form and navigate back
-                setFormData({
-                  currentPassword: '',
-                  newPassword: '',
-                  confirmPassword: ''
-                });
-                router.push("/(tabs)/settings");
-              }
+      // Success - password changed
+      Alert.alert(
+        'Success', 
+        'Password changed successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Clear form and navigate back
+              setFormData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+              });
+              router.push("/(tabs)/settings");
             }
-          ]
-        );
-      } else {
-        // Handle API error responses
-        const errorMessage = data.error || 'Failed to change password. Please try again.';
-        Alert.alert('Error', errorMessage);
-      }
+          }
+        ]
+      );
     } catch (error) {
       console.error('Change password error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
