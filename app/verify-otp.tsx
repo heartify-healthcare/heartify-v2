@@ -1,16 +1,16 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView,
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/verify-otp';
 
@@ -26,19 +26,19 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isResending, setIsResending] = useState<boolean>(false);
-  
+
   // Create refs for each input field
   const inputRefs = useRef<Array<TextInput | null>>([]);
-  
+
   // Get email from navigation params
   const params = useLocalSearchParams();
   const email = params.email as string;
-  
+
   // Initialize the refs array
   useEffect(() => {
     inputRefs.current = inputRefs.current.slice(0, 6);
   }, []);
-  
+
   const router = useRouter();
 
   // Handle input change for each OTP digit
@@ -47,11 +47,11 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     if (!/^[0-9]$/.test(value) && value !== '') {
       return;
     }
-    
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
-    
+
     // Auto-focus to next input if a digit was entered
     if (value !== '' && index < 5) {
       inputRefs.current[index + 1]?.focus();
@@ -69,7 +69,7 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   // Verify OTP function
   const handleVerifyOtp = async () => {
     const otpString = otp.join('');
-    
+
     // Validate OTP
     if (otpString.length !== 6) {
       Alert.alert('Error', 'Please enter a complete 6-digit OTP');
@@ -84,47 +84,11 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        email: email,
-        otp_code: otpString
-      };
+      // PUT YOUR API CALLING TO VERIFY OTP CODE HERE
 
-      // Make API call to verify endpoint
-      const response = await fetch('http://192.168.1.20:5000/auth/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
+      // On successful verification, navigate to login screen
+      // router.push('/login');
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Verification successful
-        Alert.alert(
-          'Success', 
-          data.message || 'Account verified successfully!',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                // Navigate to login screen
-                router.push('/login');
-              }
-            }
-          ]
-        );
-      } else {
-        // Verification failed
-        const errorMessage = data.error || 'OTP verification failed. Please try again.';
-        Alert.alert('Error', errorMessage);
-        
-        // Clear OTP inputs on error
-        setOtp(Array(6).fill(''));
-        inputRefs.current[0]?.focus();
-      }
     } catch (error) {
       console.error('OTP verification error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
@@ -143,34 +107,12 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     setIsResending(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        email: email
-      };
+      // PUT YOUR API CALLING TO RESEND OTP CODE HERE
 
-      // Make API call to request-verify endpoint
-      const response = await fetch('http://your-api-url.com/auth/request-verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
+      // On successful resend, clear OTP inputs
+      // setOtp(Array(6).fill(''));
+      // inputRefs.current[0]?.focus();
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Resend successful
-        Alert.alert('Success', data.message || 'OTP has been resent to your email');
-        
-        // Clear current OTP inputs
-        setOtp(Array(6).fill(''));
-        inputRefs.current[0]?.focus();
-      } else {
-        // Resend failed
-        const errorMessage = data.error || 'Failed to resend OTP. Please try again.';
-        Alert.alert('Error', errorMessage);
-      }
     } catch (error) {
       console.error('OTP resend error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
@@ -185,20 +127,20 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
             <Text style={styles.appName}>Heartify</Text>
-            
+
             <View style={styles.formContainer}>
               <Text style={styles.title}>Verify OTP</Text>
-              
+
               <Text style={styles.description}>
                 Please enter the 6-digit OTP sent to {email ? email : 'your email'} to continue.
               </Text>
-              
+
               <View style={styles.otpContainer}>
                 {[0, 1, 2, 3, 4, 5].map((index) => (
                   <TextInput
@@ -218,9 +160,9 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                   />
                 ))}
               </View>
-              
-              <TouchableOpacity 
-                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+
+              <TouchableOpacity
+                style={[styles.button, isLoading && { opacity: 0.6 }]}
                 onPress={handleVerifyOtp}
                 disabled={isLoading}
               >
@@ -228,8 +170,8 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                   {isLoading ? 'Verifying...' : 'Verify OTP'}
                 </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 onPress={handleResendOtp}
                 disabled={isResending || isLoading}
               >

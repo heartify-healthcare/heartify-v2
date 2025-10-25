@@ -1,17 +1,17 @@
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView,
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
   Alert
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/login';
 
@@ -38,42 +38,24 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const checkExistingAuth = async (): Promise<void> => {
     try {
       setIsCheckingAuth(true);
-      
+
       // Get stored authentication data
       const authData = await AsyncStorage.multiGet([
         'access_token',
         'token_type',
         'user_data'
       ]);
-      
+
       const accessToken = authData[0][1];
       const tokenType = authData[1][1];
       const userData = authData[2][1];
-      
+
       // Check if all required auth data exists
       if (accessToken && tokenType && userData) {
-        try {
-          // Optional: Verify token is still valid by making a test API call
-          const response = await fetch('http://192.168.1.20:5000/auth/verify-token', {
-            method: 'GET',
-            headers: {
-              'Authorization': `${tokenType} ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          
-          if (response.ok) {
-            // Token is valid, redirect to main app
-            router.replace('/(tabs)');
-            return;
-          } else {
-            // Token is invalid, clear stored data
-            await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
-          }
-        } catch (verifyError) {
-          router.replace('/(tabs)');
-          return;
-        }
+        // PUT YOUR API CALLING TO VERIFY TOKEN CODE HERE
+
+        // If token is valid, redirect to main app
+        // router.replace('/(tabs)');
       }
     } catch (error) {
       console.error('Error checking existing auth:', error);
@@ -108,60 +90,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // Prepare request payload
-      const payload = {
-        username: username.trim(),
-        password: password
-      };
+      // PUT YOUR API CALLING TO LOGIN CODE HERE
 
-      // Make API call to login endpoint
-      const response = await fetch('http://192.168.1.20:5000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      });
+      // On successful login, store authentication data and navigate
+      // await AsyncStorage.multiSet([
+      //   ['access_token', access_token],
+      //   ['token_type', token_type],
+      //   ['user_data', JSON.stringify(user)]
+      // ]);
+      // router.replace('/(tabs)');
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Login successful
-        const { access_token, token_type, user } = data;
-        
-        try {
-          // Store authentication data
-          await AsyncStorage.multiSet([
-            ['access_token', access_token],
-            ['token_type', token_type],
-            ['user_data', JSON.stringify(user)]
-          ]);
-
-          Alert.alert(
-            'Success', 
-            `Welcome back, ${user.username}!`,
-            [
-              {
-                text: 'OK',
-                onPress: () => {
-                  // Navigate to main app or dashboard
-                  router.replace('/(tabs)');
-                }
-              }
-            ]
-          );
-        } catch (storageError) {
-          console.error('Error storing authentication data:', storageError);
-          Alert.alert('Warning', 'Login successful but failed to store session data');
-        }
-      } else {
-        // Login failed
-        const errorMessage = data.error || 'Login failed. Please try again.';
-        Alert.alert('Error', errorMessage);
-        
-        // Clear password field on error
-        setPassword('');
-      }
     } catch (error) {
       console.error('Login error:', error);
       Alert.alert('Error', 'Network error. Please check your connection and try again.');
@@ -188,7 +126,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
       >
-        <ScrollView 
+        <ScrollView
           contentContainerStyle={styles.scrollContainer}
           keyboardShouldPersistTaps="handled"
         >
@@ -196,10 +134,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <Text style={styles.appName}>Heartify</Text>
             <Text style={styles.appDescription}>A Mobile Application for Cardiovascular Disease Prediction</Text>
             <Text style={styles.slogan}>"Your Heart, Your Future"</Text>
-            
+
             <View style={styles.formContainer}>
               <Text style={styles.title}>Login</Text>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Username</Text>
                 <TextInput
@@ -211,7 +149,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   editable={!isLoading}
                 />
               </View>
-              
+
               <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.passwordContainer}>
@@ -234,8 +172,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   </TouchableOpacity>
                 </View>
               </View>
-              
-              <TouchableOpacity 
+
+              <TouchableOpacity
                 onPress={handleForgotPassword}
                 disabled={isLoading}
               >
@@ -243,9 +181,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   Forgot password?
                 </Text>
               </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[styles.button, isLoading && { opacity: 0.6 }]} 
+
+              <TouchableOpacity
+                style={[styles.button, isLoading && { opacity: 0.6 }]}
                 onPress={handleLogin}
                 disabled={isLoading}
               >
@@ -253,7 +191,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   {isLoading ? 'Logging in...' : 'Login'}
                 </Text>
               </TouchableOpacity>
-              
+
               <View style={styles.signupContainer}>
                 <Text style={styles.signupText}>Don't have an account? </Text>
                 <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
