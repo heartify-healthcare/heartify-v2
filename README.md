@@ -29,7 +29,7 @@ This repository contains the **Mobile Application** component of a university ca
 ### Running the App Locally
 
 ```bash
-git clone https://github.com/votranphi/heartify-v2
+git clone https://github.com/heartify-healthcare/heartify-v2
 cd heartify-v2
 npm install
 ```
@@ -54,7 +54,7 @@ This app is designed to interact with a Spring Boot-based REST API server that:
 - Communicate with Deep Learning model for heart disease prediction and Large Languague Model for explanation.
 - Returns results
 
-👉 Spring Boot API Repository: [https://github.com/votranphi/heartify-api-v2](https://github.com/votranphi/heartify-api-v2)
+👉 Spring Boot API Repository: [https://github.com/heartify-healthcare/heartify-api-v2](https://github.com/heartify-healthcare/heartify-api-v2)
 
 ## 📚 Academic Context
 
