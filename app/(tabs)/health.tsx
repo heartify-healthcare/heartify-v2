@@ -9,7 +9,6 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/health';
@@ -372,13 +371,8 @@ const HealthScreen: React.FC = () => {
 
   // Function to get auth token
   const getAuthToken = async (): Promise<string | null> => {
-    try {
-      const token = await AsyncStorage.getItem('access_token');
-      return token;
-    } catch (error) {
-      console.error('Error getting auth token:', error);
-      return null;
-    }
+    // Mock token for UI demo
+    return 'demo_token';
   };
 
   // Fetch user profile data
@@ -387,37 +381,49 @@ const HealthScreen: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      // PUT YOUR API CALLING TO FETCH USER PROFILE CODE HERE
-      // After fetching data, update the state:
-      // setUserData(data);
-      // const convertedDob = convertGMTToYYYYMMDD(data.dob);
-      // setFormData({ dob: convertedDob, cp: data.cp, exang: data.exang, sex: data.sex, trestbps: data.trestbps?.toString() || '' });
-      // setOriginalData(newFormData);
-      // Check if health data exists and set isEditing accordingly
+      // Simulate fetching user profile data for UI demo
+      await new Promise(resolve => setTimeout(resolve, 800));
 
+      // Mock user data
+      const mockUserData: UserData = {
+        email: 'demo@heartify.com',
+        id: 1,
+        is_verified: true,
+        phonenumber: '1234567890',
+        role: 'user',
+        username: 'demouser',
+        created_at: new Date().toISOString(),
+        dob: '1990-01-15',
+        cp: 2,
+        exang: 0,
+        sex: 1,
+        trestbps: 130
+      };
+
+      setUserData(mockUserData);
+      
+      const convertedDob = convertGMTToYYYYMMDD(mockUserData.dob || '');
+      const newFormData = {
+        dob: convertedDob,
+        cp: mockUserData.cp,
+        exang: mockUserData.exang,
+        sex: mockUserData.sex,
+        trestbps: mockUserData.trestbps?.toString() || ''
+      };
+      
+      setFormData(newFormData);
+      setOriginalData(newFormData);
+
+      // Check if health data exists - if yes, set isEditing to false
+      const hasHealthData = mockUserData.dob && mockUserData.cp !== null && 
+                           mockUserData.exang !== null && mockUserData.sex !== null && 
+                           mockUserData.trestbps !== null;
+      setIsEditing(!hasHealthData);
     } catch (err) {
       console.error('Error fetching user profile:', err);
       setError(err instanceof Error ? err.message : 'Failed to load user data');
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Update user health data
-  const updateUserHealth = async (healthData: any) => {
-    try {
-      setSaving(true);
-
-      // PUT YOUR API CALLING TO UPDATE USER HEALTH CODE HERE
-      // After updating data, update the state:
-      // setUserData(data);
-      // return data;
-
-    } catch (err) {
-      console.error('Error updating user health:', err);
-      throw err;
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -480,20 +486,27 @@ const HealthScreen: React.FC = () => {
     }
 
     try {
-      // Prepare data for API
-      const healthData = {
-        dob: formData.dob,
-        cp: formData.cp,
-        exang: formData.exang,
-        sex: formData.sex,
-        trestbps: trestbps
-      };
+      setSaving(true);
+      
+      // Simulate saving health data for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      await updateUserHealth(healthData);
+      // Update local state
+      if (userData) {
+        const updatedUserData = {
+          ...userData,
+          dob: formData.dob,
+          cp: formData.cp,
+          exang: formData.exang,
+          sex: formData.sex,
+          trestbps: trestbps
+        };
+        setUserData(updatedUserData);
+      }
 
       Alert.alert(
         'Success',
-        userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+        userData?.dob ? 'Health data updated successfully! (UI Demo Mode)' : 'Health data submitted successfully! (UI Demo Mode)',
         [
           {
             text: 'OK',
@@ -507,8 +520,10 @@ const HealthScreen: React.FC = () => {
     } catch (err) {
       Alert.alert(
         'Error',
-        err instanceof Error ? err.message : 'Failed to save health data'
+        'An error occurred while saving health data'
       );
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -572,26 +587,28 @@ const HealthScreen: React.FC = () => {
                 return;
               }
 
-              // PUT YOUR API CALLING TO MAKE PREDICTION (ESP32) CODE HERE
-              // Prepare prediction data with age, sex, cp, trestbps, exang, access_token
-              // Send to ESP32 and handle response
+              // Simulate prediction process for UI demo
+              await new Promise(resolve => setTimeout(resolve, 2000));
 
+              // Mock prediction result
+              const mockPrediction = {
+                prediction: Math.random() > 0.5 ? 'NEGATIVE' : 'POSITIVE',
+                probability: (Math.random() * 0.3 + 0.7).toFixed(2),
+                age: age,
+                sex: formData.sex,
+                cp: formData.cp,
+                trestbps: formData.trestbps,
+                exang: formData.exang
+              };
+
+              Alert.alert(
+                'Prediction Result (UI Demo)',
+                `Result: ${mockPrediction.prediction}\nProbability: ${(parseFloat(mockPrediction.probability) * 100).toFixed(2)}%\n\nThis is a demo prediction. In production, this would connect to your ESP32 device.`,
+                [{ text: 'OK' }]
+              );
             } catch (error) {
               console.error('Prediction error:', error);
-
-              let errorMessage = 'Failed to make prediction. ';
-
-              if (error instanceof Error) {
-                if (error.message.includes('Network request failed') || error.message.includes('timeout')) {
-                  errorMessage += 'Please check your connection to the ESP32 device.';
-                } else {
-                  errorMessage += error.message;
-                }
-              } else {
-                errorMessage += 'Unknown error occurred.';
-              }
-
-              Alert.alert('Prediction Error', errorMessage, [{ text: 'OK' }]);
+              Alert.alert('Prediction Error', 'An error occurred during prediction', [{ text: 'OK' }]);
             } finally {
               setSaving(false);
             }

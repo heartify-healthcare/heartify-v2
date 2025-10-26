@@ -52,35 +52,31 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
     setIsLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO RESET PASSWORD CODE HERE
-
-      // Example: Simulate success for testing
+      // Simulate password reset for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       Alert.alert(
         'Success',
-        'Password has been reset. Please check your email for the new password.',
+        'Password reset request submitted! (UI Demo Mode)',
         [
           {
             text: 'OK',
             onPress: () => {
+              // Clear form fields
+              setUsername('');
+              setEmail('');
+              setPhoneNumber('');
               // Navigate to login after a short delay
               setTimeout(() => {
                 router.push("/login");
-              }, 1000);
+              }, 500);
             },
           },
         ]
       );
-
-      // Clear form fields
-      setUsername('');
-      setEmail('');
-      setPhoneNumber('');
     } catch (error) {
       console.error('Password reset error:', error);
-      Alert.alert(
-        'Network Error',
-        'Unable to connect to the server. Please check your internet connection and try again.'
-      );
+      Alert.alert('Error', 'An error occurred during password reset');
     } finally {
       setIsLoading(false);
     }

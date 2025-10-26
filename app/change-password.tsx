@@ -34,12 +34,13 @@ const ChangePasswordScreen: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // PUT YOUR API CALLING TO CHANGE PASSWORD CODE HERE
+      // Simulate password change for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       // Success - password changed
       Alert.alert(
         'Success',
-        'Password changed successfully!',
+        'Password changed successfully! (UI Demo Mode)',
         [
           {
             text: 'OK',
@@ -57,7 +58,7 @@ const ChangePasswordScreen: React.FC = () => {
       );
     } catch (error) {
       console.error('Change password error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      Alert.alert('Error', 'An error occurred while changing password');
     } finally {
       setIsLoading(false);
     }

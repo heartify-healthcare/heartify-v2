@@ -9,7 +9,6 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/settings';
@@ -53,22 +52,11 @@ const SettingsScreen: React.FC = () => {
 
   // Get authorization headers
   const getAuthHeaders = async () => {
-    try {
-      const accessToken = await AsyncStorage.getItem('access_token');
-      const tokenType = await AsyncStorage.getItem('token_type');
-
-      if (!accessToken || !tokenType) {
-        throw new Error('No authentication token found');
-      }
-
-      return {
-        'Authorization': `${tokenType} ${accessToken}`,
-        'Content-Type': 'application/json',
-      };
-    } catch (error) {
-      console.error('Error getting auth headers:', error);
-      throw error;
-    }
+    // Mock headers for UI demo
+    return {
+      'Authorization': 'Bearer demo_token',
+      'Content-Type': 'application/json',
+    };
   };
 
   // Fetch user profile data
@@ -76,12 +64,34 @@ const SettingsScreen: React.FC = () => {
     try {
       setIsLoading(true);
 
-      // PUT YOUR API CALLING TO FETCH USER PROFILE CODE HERE
-      // After fetching data:
-      // setUserData(data);
-      // setFormData({ username: data.username || '', email: data.email || '', phonenumber: data.phonenumber || '', role: data.role || '' });
-      // setOriginalData(newFormData);
+      // Simulate fetching user profile data for UI demo
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Mock user data
+      const mockUserData: UserData = {
+        email: 'demo@heartify.com',
+        id: 1,
+        is_verified: true,
+        phonenumber: '1234567890',
+        role: 'user',
+        username: 'demouser',
+        created_at: new Date().toISOString(),
+        dob: null,
+        cp: null,
+        exang: null,
+        sex: null,
+        trestbps: null
+      };
 
+      setUserData(mockUserData);
+      const newFormData = {
+        username: mockUserData.username || '',
+        email: mockUserData.email || '',
+        phonenumber: mockUserData.phonenumber || '',
+        role: mockUserData.role || ''
+      };
+      setFormData(newFormData);
+      setOriginalData(newFormData);
     } catch (error) {
       console.error('Error fetching user profile:', error);
       Alert.alert('Error', 'Failed to load user profile. Please try again.');
@@ -107,15 +117,27 @@ const SettingsScreen: React.FC = () => {
         return;
       }
 
-      // PUT YOUR API CALLING TO UPDATE USER PROFILE CODE HERE
-      // After updating data:
-      // setUserData(updatedUser);
-      // setOriginalData({ ...formData });
-      // setIsEditing(false);
+      // Simulate updating user profile for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
+      // Update local state with new data
+      if (userData) {
+        const updatedUser = {
+          ...userData,
+          username: formData.username,
+          email: formData.email,
+          phonenumber: formData.phonenumber
+        };
+        setUserData(updatedUser);
+      }
+      
+      setOriginalData({ ...formData });
+      setIsEditing(false);
+      
+      Alert.alert('Success', 'Profile updated successfully! (UI Demo Mode)');
     } catch (error) {
       console.error('Error updating profile:', error);
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to update profile');
+      Alert.alert('Error', 'An error occurred while updating profile');
     } finally {
       setIsSaving(false);
     }
@@ -124,12 +146,11 @@ const SettingsScreen: React.FC = () => {
   // Handle logout
   const handleLogout = async () => {
     try {
-      // Clear stored data
-      await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
+      // Simulate logout for UI demo
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       // Navigate to login screen
       router.replace('/login');
-
     } catch (error) {
       console.error('Error during logout:', error);
       Alert.alert('Error', 'Failed to logout properly');

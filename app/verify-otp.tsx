@@ -84,14 +84,25 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO VERIFY OTP CODE HERE
-
-      // On successful verification, navigate to login screen
-      // router.push('/login');
-
+      // Simulate OTP verification for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert(
+        'Success',
+        'OTP verified successfully! (UI Demo Mode)',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate to login screen
+              router.push('/login');
+            }
+          }
+        ]
+      );
     } catch (error) {
       console.error('OTP verification error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      Alert.alert('Error', 'An error occurred during OTP verification');
     } finally {
       setIsLoading(false);
     }
@@ -107,15 +118,26 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
     setIsResending(true);
 
     try {
-      // PUT YOUR API CALLING TO RESEND OTP CODE HERE
-
-      // On successful resend, clear OTP inputs
-      // setOtp(Array(6).fill(''));
-      // inputRefs.current[0]?.focus();
-
+      // Simulate OTP resend for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert(
+        'Success',
+        'OTP has been resent to your email! (UI Demo Mode)',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Clear OTP inputs
+              setOtp(Array(6).fill(''));
+              inputRefs.current[0]?.focus();
+            }
+          }
+        ]
+      );
     } catch (error) {
       console.error('OTP resend error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      Alert.alert('Error', 'An error occurred while resending OTP');
     } finally {
       setIsResending(false);
     }

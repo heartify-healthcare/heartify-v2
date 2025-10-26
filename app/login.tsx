@@ -10,7 +10,6 @@ import {
   Platform,
   Alert
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/login';
@@ -38,28 +37,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const checkExistingAuth = async (): Promise<void> => {
     try {
       setIsCheckingAuth(true);
-
-      // Get stored authentication data
-      const authData = await AsyncStorage.multiGet([
-        'access_token',
-        'token_type',
-        'user_data'
-      ]);
-
-      const accessToken = authData[0][1];
-      const tokenType = authData[1][1];
-      const userData = authData[2][1];
-
-      // Check if all required auth data exists
-      if (accessToken && tokenType && userData) {
-        // PUT YOUR API CALLING TO VERIFY TOKEN CODE HERE
-
-        // If token is valid, redirect to main app
-        // router.replace('/(tabs)');
-      }
+      // Simulate checking authentication - just show login form for UI purposes
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error('Error checking existing auth:', error);
-      // If there's an error, just proceed to show login form
     } finally {
       setIsCheckingAuth(false);
     }
@@ -90,19 +71,25 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO LOGIN CODE HERE
-
-      // On successful login, store authentication data and navigate
-      // await AsyncStorage.multiSet([
-      //   ['access_token', access_token],
-      //   ['token_type', token_type],
-      //   ['user_data', JSON.stringify(user)]
-      // ]);
-      // router.replace('/(tabs)');
-
+      // Simulate login process for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert(
+        'Success',
+        'Login successful! (UI Demo Mode)',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate to main app
+              router.replace('/(tabs)');
+            }
+          }
+        ]
+      );
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      Alert.alert('Error', 'An error occurred during login');
     } finally {
       setIsLoading(false);
     }

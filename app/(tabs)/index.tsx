@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/index';
@@ -187,11 +186,58 @@ const PredictionsScreen: React.FC = () => {
       }
       setError(null);
 
-      // PUT YOUR API CALLING TO FETCH PREDICTIONS CODE HERE
-      // After fetching data:
-      // Sort predictions by ID in descending order (newest first)
-      // setPredictions(sortedData);
+      // Simulate fetching predictions data for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
+      // Mock predictions data
+      const mockPredictions: PredictionData[] = [
+        {
+          id: 3,
+          user_id: 1,
+          age: 45,
+          cp: 2,
+          exang: 0,
+          prediction: 'NEGATIVE',
+          probability: 0.85,
+          restecg: 1,
+          sex: 1,
+          thalach: 150,
+          trestbps: 130,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          user_id: 1,
+          age: 55,
+          cp: 3,
+          exang: 1,
+          prediction: 'POSITIVE',
+          probability: 0.72,
+          restecg: 1,
+          sex: 0,
+          thalach: 140,
+          trestbps: 145,
+          created_at: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 1,
+          user_id: 1,
+          age: 50,
+          cp: 1,
+          exang: 0,
+          prediction: 'NEGATIVE',
+          probability: 0.90,
+          restecg: 0,
+          sex: 1,
+          thalach: 160,
+          trestbps: 120,
+          created_at: new Date(Date.now() - 172800000).toISOString()
+        }
+      ];
+
+      // Sort predictions by ID in descending order (newest first)
+      const sortedData = mockPredictions.sort((a, b) => b.id - a.id);
+      setPredictions(sortedData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch predictions';
       setError(errorMessage);

@@ -67,17 +67,25 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
     setIsLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO REGISTER CODE HERE
-
-      // On successful registration, navigate to OTP verification screen
-      // router.push({
-      //   pathname: '/verify-otp',
-      //   params: { email: email.trim().toLowerCase() }
-      // });
-
+      // Simulate registration process for UI demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      Alert.alert(
+        'Success',
+        'Account created successfully! (UI Demo Mode)',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              // Navigate to login screen
+              router.push('/login');
+            }
+          }
+        ]
+      );
     } catch (error) {
       console.error('Registration error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      Alert.alert('Error', 'An error occurred during registration');
     } finally {
       setIsLoading(false);
     }
