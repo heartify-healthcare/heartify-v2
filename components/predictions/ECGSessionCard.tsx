@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { ECGChart } from './ECGChart';
+import { formatDateTime, formatFeatureName, formatProbability } from './utils';
 
 const { width } = Dimensions.get('window');
 
@@ -84,28 +85,6 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
     }
   };
 
-  const formatDate = (dateString: string): string => {
-    try {
-      const date = new Date(dateString);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      
-      return `${year}-${month}-${day} ${hours}:${minutes}`;
-    } catch (error) {
-      return dateString;
-    }
-  };
-
-  const formatFeatureName = (key: string): string => {
-    return key
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
-
   return (
     <View style={styles.sessionCard}>
       {/* Card Header */}
@@ -113,7 +92,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
             <Text style={styles.sessionId}>Session #{index + 1}</Text>
-            <Text style={styles.sessionDate}>{formatDate(session.createdAt)}</Text>
+            <Text style={styles.sessionDate}>{formatDateTime(session.createdAt)}</Text>
           </View>
           <View style={styles.expandButton}>
             <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
@@ -168,7 +147,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
                 <View style={styles.predictionRow}>
                   <Text style={styles.predictionLabel}>Probability:</Text>
                   <Text style={[styles.predictionValue, styles.probabilityValue]}>
-                    {(session.prediction.probability * 100).toFixed(1)}%
+                    {formatProbability(session.prediction.probability)}
                   </Text>
                 </View>
 
@@ -200,7 +179,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
                       Diagnosis: {session.explanation.prompt.diagnosis}
                     </Text>
                     <Text style={styles.promptText}>
-                      Probability: {(session.explanation.prompt.probability * 100).toFixed(1)}%
+                      Probability: {formatProbability(session.explanation.prompt.probability)}
                     </Text>
                     <Text style={styles.promptText}>
                       Features: {JSON.stringify(session.explanation.prompt.features, null, 2)}
