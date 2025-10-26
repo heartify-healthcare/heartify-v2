@@ -5,8 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
-  ActivityIndicator
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -33,8 +32,6 @@ const SettingsScreen: React.FC = () => {
 
   // State management
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
@@ -61,100 +58,68 @@ const SettingsScreen: React.FC = () => {
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
-    try {
-      setIsLoading(true);
+    // Mock user data
+    const mockUserData: UserData = {
+      email: 'demo@heartify.com',
+      id: 1,
+      is_verified: true,
+      phonenumber: '1234567890',
+      role: 'user',
+      username: 'demouser',
+      created_at: new Date().toISOString(),
+      dob: null,
+      cp: null,
+      exang: null,
+      sex: null,
+      trestbps: null
+    };
 
-      // Simulate fetching user profile data for UI demo
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Mock user data
-      const mockUserData: UserData = {
-        email: 'demo@heartify.com',
-        id: 1,
-        is_verified: true,
-        phonenumber: '1234567890',
-        role: 'user',
-        username: 'demouser',
-        created_at: new Date().toISOString(),
-        dob: null,
-        cp: null,
-        exang: null,
-        sex: null,
-        trestbps: null
-      };
-
-      setUserData(mockUserData);
-      const newFormData = {
-        username: mockUserData.username || '',
-        email: mockUserData.email || '',
-        phonenumber: mockUserData.phonenumber || '',
-        role: mockUserData.role || ''
-      };
-      setFormData(newFormData);
-      setOriginalData(newFormData);
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      Alert.alert('Error', 'Failed to load user profile. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    setUserData(mockUserData);
+    const newFormData = {
+      username: mockUserData.username || '',
+      email: mockUserData.email || '',
+      phonenumber: mockUserData.phonenumber || '',
+      role: mockUserData.role || ''
+    };
+    setFormData(newFormData);
+    setOriginalData(newFormData);
   };
 
   // Update user profile
   const updateUserProfile = async () => {
-    try {
-      setIsSaving(true);
+    // Prepare update data (only send changed fields)
+    const updateData: any = {};
+    if (formData.username !== originalData.username) updateData.username = formData.username;
+    if (formData.email !== originalData.email) updateData.email = formData.email;
+    if (formData.phonenumber !== originalData.phonenumber) updateData.phonenumber = formData.phonenumber;
 
-      // Prepare update data (only send changed fields)
-      const updateData: any = {};
-      if (formData.username !== originalData.username) updateData.username = formData.username;
-      if (formData.email !== originalData.email) updateData.email = formData.email;
-      if (formData.phonenumber !== originalData.phonenumber) updateData.phonenumber = formData.phonenumber;
-
-      // If no changes, just exit editing mode
-      if (Object.keys(updateData).length === 0) {
-        setIsEditing(false);
-        return;
-      }
-
-      // Simulate updating user profile for UI demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Update local state with new data
-      if (userData) {
-        const updatedUser = {
-          ...userData,
-          username: formData.username,
-          email: formData.email,
-          phonenumber: formData.phonenumber
-        };
-        setUserData(updatedUser);
-      }
-      
-      setOriginalData({ ...formData });
+    // If no changes, just exit editing mode
+    if (Object.keys(updateData).length === 0) {
       setIsEditing(false);
-      
-      Alert.alert('Success', 'Profile updated successfully! (UI Demo Mode)');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      Alert.alert('Error', 'An error occurred while updating profile');
-    } finally {
-      setIsSaving(false);
+      return;
     }
+
+    // Update local state with new data
+    if (userData) {
+      const updatedUser = {
+        ...userData,
+        username: formData.username,
+        email: formData.email,
+        phonenumber: formData.phonenumber
+      };
+      setUserData(updatedUser);
+    }
+    
+    setOriginalData({ ...formData });
+    setIsEditing(false);
+    
+    Alert.alert('Success', 'Profile updated successfully! (UI Demo Mode)');
   };
 
   // Handle logout
   const handleLogout = async () => {
-    try {
-      // Simulate logout for UI demo
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      // Navigate to login screen
-      router.replace('/login');
-    } catch (error) {
-      console.error('Error during logout:', error);
-      Alert.alert('Error', 'Failed to logout properly');
-    }
+    // Navigate to login screen
+    router.replace('/login');
   };
 
   // Load user data on component mount
@@ -240,17 +205,6 @@ const SettingsScreen: React.FC = () => {
       return dateString;
     }
   };
-
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size="large" color="#3498db" />
-          <Text style={{ marginTop: 10, color: '#7f8c8d' }}>Loading profile...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   if (!userData) {
     return (
@@ -356,21 +310,15 @@ const SettingsScreen: React.FC = () => {
               ) : (
                 <>
                   <TouchableOpacity
-                    style={[styles.button, isSaving && { opacity: 0.7 }]}
+                    style={styles.button}
                     onPress={handleSubmit}
-                    disabled={isSaving}
                   >
-                    {isSaving ? (
-                      <ActivityIndicator size="small" color="#ffffff" />
-                    ) : (
-                      <Text style={styles.buttonText}>Save Changes</Text>
-                    )}
+                    <Text style={styles.buttonText}>Save Changes</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[styles.cancelButton, isSaving && { opacity: 0.7 }]}
+                    style={styles.cancelButton}
                     onPress={handleCancel}
-                    disabled={isSaving}
                   >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                   </TouchableOpacity>

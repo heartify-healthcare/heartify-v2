@@ -24,27 +24,8 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const router = useRouter();
-
-  // Check for existing authentication on component mount
-  useEffect(() => {
-    checkExistingAuth();
-  }, []);
-
-  const checkExistingAuth = async (): Promise<void> => {
-    try {
-      setIsCheckingAuth(true);
-      // Simulate checking authentication - just show login form for UI purposes
-      await new Promise(resolve => setTimeout(resolve, 500));
-    } catch (error) {
-      console.error('Error checking existing auth:', error);
-    } finally {
-      setIsCheckingAuth(false);
-    }
-  };
 
   // Navigation functions (placeholders)
   const handleForgotPassword = (): void => {
@@ -68,44 +49,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      // Simulate login process for UI demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      Alert.alert(
-        'Success',
-        'Login successful! (UI Demo Mode)',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate to main app
-              router.replace('/(tabs)');
-            }
+    // Navigate to main app immediately for UI demo
+    Alert.alert(
+      'Success',
+      'Login successful! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.replace('/(tabs)');
           }
-        ]
-      );
-    } catch (error) {
-      console.error('Login error:', error);
-      Alert.alert('Error', 'An error occurred during login');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Show loading screen while checking authentication
-  if (isCheckingAuth) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={styles.appName}>Heartify</Text>
-          <Text style={[styles.appDescription, { marginTop: 20 }]}>Loading...</Text>
-        </View>
-      </SafeAreaView>
+        }
+      ]
     );
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -133,7 +90,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -146,12 +102,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
-                    editable={!isLoading}
                   />
                   <TouchableOpacity
                     style={styles.eyeButton}
                     onPress={togglePasswordVisibility}
-                    disabled={isLoading}
                   >
                     <Text style={styles.eyeIcon}>
                       {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -162,27 +116,25 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
               <TouchableOpacity
                 onPress={handleForgotPassword}
-                disabled={isLoading}
               >
-                <Text style={[styles.forgotPassword, isLoading && { opacity: 0.6 }]}>
+                <Text style={styles.forgotPassword}>
                   Forgot password?
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleLogin}
-                disabled={isLoading}
               >
                 <Text style={styles.buttonText}>
-                  {isLoading ? 'Logging in...' : 'Login'}
+                  Login
                 </Text>
               </TouchableOpacity>
 
               <View style={styles.signupContainer}>
                 <Text style={styles.signupText}>Don't have an account? </Text>
-                <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
-                  <Text style={[styles.signupLink, isLoading && { opacity: 0.6 }]}>
+                <TouchableOpacity onPress={handleSignUp}>
+                  <Text style={styles.signupLink}>
                     Sign Up
                   </Text>
                 </TouchableOpacity>

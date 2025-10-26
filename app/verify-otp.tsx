@@ -24,8 +24,6 @@ interface VerifyOtpScreenProps {
 const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   // State for the 6 OTP digits
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isResending, setIsResending] = useState<boolean>(false);
 
   // Create refs for each input field
   const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -81,31 +79,19 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      // Simulate OTP verification for UI demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      Alert.alert(
-        'Success',
-        'OTP verified successfully! (UI Demo Mode)',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate to login screen
-              router.push('/login');
-            }
+    // Navigate immediately for UI demo
+    Alert.alert(
+      'Success',
+      'OTP verified successfully! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.push('/login');
           }
-        ]
-      );
-    } catch (error) {
-      console.error('OTP verification error:', error);
-      Alert.alert('Error', 'An error occurred during OTP verification');
-    } finally {
-      setIsLoading(false);
-    }
+        }
+      ]
+    );
   };
 
   // Resend OTP function
@@ -115,32 +101,20 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsResending(true);
-
-    try {
-      // Simulate OTP resend for UI demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      Alert.alert(
-        'Success',
-        'OTP has been resent to your email! (UI Demo Mode)',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Clear OTP inputs
-              setOtp(Array(6).fill(''));
-              inputRefs.current[0]?.focus();
-            }
+    // Show success immediately for UI demo
+    Alert.alert(
+      'Success',
+      'OTP has been resent to your email! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setOtp(Array(6).fill(''));
+            inputRefs.current[0]?.focus();
           }
-        ]
-      );
-    } catch (error) {
-      console.error('OTP resend error:', error);
-      Alert.alert('Error', 'An error occurred while resending OTP');
-    } finally {
-      setIsResending(false);
-    }
+        }
+      ]
+    );
   };
 
   return (
@@ -178,27 +152,24 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                     maxLength={1}
                     selectTextOnFocus
                     autoCapitalize="none"
-                    editable={!isLoading}
                   />
                 ))}
               </View>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleVerifyOtp}
-                disabled={isLoading}
               >
                 <Text style={styles.buttonText}>
-                  {isLoading ? 'Verifying...' : 'Verify OTP'}
+                  Verify OTP
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleResendOtp}
-                disabled={isResending || isLoading}
               >
-                <Text style={[styles.resendText, (isResending || isLoading) && { opacity: 0.6 }]}>
-                  {isResending ? 'Resending...' : "Didn't receive the code? Resend OTP"}
+                <Text style={styles.resendText}>
+                  Didn't receive the code? Resend OTP
                 </Text>
               </TouchableOpacity>
             </View>

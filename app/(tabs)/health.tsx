@@ -5,8 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
-  ActivityIndicator
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -38,10 +37,7 @@ interface UserData {
 
 const HealthScreen: React.FC = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     dob: '',
@@ -67,54 +63,41 @@ const HealthScreen: React.FC = () => {
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    // Mock user data
+    const mockUserData: UserData = {
+      email: 'demo@heartify.com',
+      id: 1,
+      is_verified: true,
+      phonenumber: '1234567890',
+      role: 'user',
+      username: 'demouser',
+      created_at: new Date().toISOString(),
+      dob: '1990-01-15',
+      cp: 2,
+      exang: 0,
+      sex: 1,
+      trestbps: 130
+    };
 
-      // Simulate fetching user profile data for UI demo
-      await new Promise(resolve => setTimeout(resolve, 800));
+    setUserData(mockUserData);
+    
+    const convertedDob = convertGMTToYYYYMMDD(mockUserData.dob || '');
+    const newFormData = {
+      dob: convertedDob,
+      cp: mockUserData.cp,
+      exang: mockUserData.exang,
+      sex: mockUserData.sex,
+      trestbps: mockUserData.trestbps?.toString() || ''
+    };
+    
+    setFormData(newFormData);
+    setOriginalData(newFormData);
 
-      // Mock user data
-      const mockUserData: UserData = {
-        email: 'demo@heartify.com',
-        id: 1,
-        is_verified: true,
-        phonenumber: '1234567890',
-        role: 'user',
-        username: 'demouser',
-        created_at: new Date().toISOString(),
-        dob: '1990-01-15',
-        cp: 2,
-        exang: 0,
-        sex: 1,
-        trestbps: 130
-      };
-
-      setUserData(mockUserData);
-      
-      const convertedDob = convertGMTToYYYYMMDD(mockUserData.dob || '');
-      const newFormData = {
-        dob: convertedDob,
-        cp: mockUserData.cp,
-        exang: mockUserData.exang,
-        sex: mockUserData.sex,
-        trestbps: mockUserData.trestbps?.toString() || ''
-      };
-      
-      setFormData(newFormData);
-      setOriginalData(newFormData);
-
-      // Check if health data exists - if yes, set isEditing to false
-      const hasHealthData = mockUserData.dob && mockUserData.cp !== null && 
-                           mockUserData.exang !== null && mockUserData.sex !== null && 
-                           mockUserData.trestbps !== null;
-      setIsEditing(!hasHealthData);
-    } catch (err) {
-      console.error('Error fetching user profile:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load user data');
-    } finally {
-      setLoading(false);
-    }
+    // Check if health data exists - if yes, set isEditing to false
+    const hasHealthData = mockUserData.dob && mockUserData.cp !== null && 
+                         mockUserData.exang !== null && mockUserData.sex !== null && 
+                         mockUserData.trestbps !== null;
+    setIsEditing(!hasHealthData);
   };
 
   // Load user data on component mount
@@ -154,78 +137,33 @@ const HealthScreen: React.FC = () => {
       return;
     }
 
-    try {
-      setSaving(true);
-      
-      // Simulate saving health data for UI demo
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Update local state
-      if (userData) {
-        const updatedUserData = {
-          ...userData,
-          dob: formData.dob,
-          cp: formData.cp,
-          exang: formData.exang,
-          sex: formData.sex,
-          trestbps: trestbps
-        };
-        setUserData(updatedUserData);
-      }
-
-      Alert.alert(
-        'Success',
-        userData?.dob ? 'Health data updated successfully! (UI Demo Mode)' : 'Health data submitted successfully! (UI Demo Mode)',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setIsEditing(false);
-              setOriginalData({ ...formData });
-            }
-          }
-        ]
-      );
-    } catch (err) {
-      Alert.alert(
-        'Error',
-        'An error occurred while saving health data'
-      );
-    } finally {
-      setSaving(false);
+    // Update local state
+    if (userData) {
+      const updatedUserData = {
+        ...userData,
+        dob: formData.dob,
+        cp: formData.cp,
+        exang: formData.exang,
+        sex: formData.sex,
+        trestbps: trestbps
+      };
+      setUserData(updatedUserData);
     }
+
+    Alert.alert(
+      'Success',
+      userData?.dob ? 'Health data updated successfully! (UI Demo Mode)' : 'Health data submitted successfully! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setIsEditing(false);
+            setOriginalData({ ...formData });
+          }
+        }
+      ]
+    );
   };
-
-  // Loading state
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size="large" color="#3498db" />
-          <Text style={{ marginTop: 16, fontSize: 16, color: '#7f8c8d' }}>Loading health data...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#e74c3c', textAlign: 'center', marginBottom: 16 }}>
-            {error}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: '#3498db' }]}
-            onPress={fetchUserProfile}
-          >
-            <Text style={styles.buttonText}>Retry</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   if (!userData) {
     return (
@@ -327,24 +265,18 @@ const HealthScreen: React.FC = () => {
               ) : (
                 <>
                   <TouchableOpacity
-                    style={[styles.button, saving && { opacity: 0.7 }]}
+                    style={styles.button}
                     onPress={handleSubmit}
-                    disabled={saving}
                   >
-                    {saving ? (
-                      <ActivityIndicator size="small" color="#fff" />
-                    ) : (
-                      <Text style={styles.buttonText}>
-                        {hasHealthData ? 'Update' : 'Submit'}
-                      </Text>
-                    )}
+                    <Text style={styles.buttonText}>
+                      {hasHealthData ? 'Update' : 'Submit'}
+                    </Text>
                   </TouchableOpacity>
 
                   {hasHealthData && (
                     <TouchableOpacity
-                      style={[styles.cancelButton, saving && { opacity: 0.7 }]}
+                      style={styles.cancelButton}
                       onPress={handleCancel}
-                      disabled={saving}
                     >
                       <Text style={styles.cancelButtonText}>Cancel</Text>
                     </TouchableOpacity>
