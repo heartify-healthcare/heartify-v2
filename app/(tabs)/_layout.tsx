@@ -25,6 +25,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="ecg"
+        options={{
+          title: 'ECG',
+          tabBarIcon: ({ color, focused }) => (
+            <Image
+              source={require('../../assets/images/ecg.png')}
+              style={[styles.tabIcon, { tintColor: color }]}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="health"
         options={{
           title: 'Health',
