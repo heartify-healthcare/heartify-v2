@@ -527,97 +527,6 @@ const HealthScreen: React.FC = () => {
     }
   };
 
-  const calculateAge = (dob: string): number => {
-    if (!dob) return 0;
-
-    try {
-      const [year, month, day] = dob.split('-').map(Number);
-      const birthDate = new Date(year, month - 1, day);
-      const today = new Date();
-
-      let age = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        age--;
-      }
-
-      return age;
-    } catch (error) {
-      console.error('Error calculating age:', error);
-      return 0;
-    }
-  };
-
-  // Handle prediction confirmation
-  const handlePredict = async () => {
-    // Check if all health data is available
-    if (!formData.dob || !formData.trestbps ||
-      formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
-      Alert.alert(
-        'Incomplete Health Data',
-        'Please complete all health information fields before making a prediction.',
-        [{ text: 'OK' }]
-      );
-      return;
-    }
-
-    // Show confirmation alert
-    Alert.alert(
-      'Make Prediction',
-      'Do you want to make a cardiovascular health prediction based on your current health information?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: async () => {
-            try {
-              // Show loading state
-              setSaving(true);
-
-              // Calculate age from date of birth
-              const age = calculateAge(formData.dob);
-
-              if (age <= 0) {
-                Alert.alert('Error', 'Invalid date of birth');
-                setSaving(false);
-                return;
-              }
-
-              // Simulate prediction process for UI demo
-              await new Promise(resolve => setTimeout(resolve, 2000));
-
-              // Mock prediction result
-              const mockPrediction = {
-                prediction: Math.random() > 0.5 ? 'NEGATIVE' : 'POSITIVE',
-                probability: (Math.random() * 0.3 + 0.7).toFixed(2),
-                age: age,
-                sex: formData.sex,
-                cp: formData.cp,
-                trestbps: formData.trestbps,
-                exang: formData.exang
-              };
-
-              Alert.alert(
-                'Prediction Result (UI Demo)',
-                `Result: ${mockPrediction.prediction}\nProbability: ${(parseFloat(mockPrediction.probability) * 100).toFixed(2)}%\n\nThis is a demo prediction. In production, this would connect to your ESP32 device.`,
-                [{ text: 'OK' }]
-              );
-            } catch (error) {
-              console.error('Prediction error:', error);
-              Alert.alert('Prediction Error', 'An error occurred during prediction', [{ text: 'OK' }]);
-            } finally {
-              setSaving(false);
-            }
-          },
-        },
-      ]
-    );
-  };
-
   // Loading state
   if (loading) {
     return (
@@ -775,15 +684,6 @@ const HealthScreen: React.FC = () => {
               )}
             </View>
           </View>
-
-          {/* Prediction Section */}
-          {hasHealthData && !isEditing && (
-            <View style={styles.predictionContainer}>
-              <TouchableOpacity style={styles.predictButton} onPress={handlePredict}>
-                <Text style={styles.predictButtonText}>Make Prediction</Text>
-              </TouchableOpacity>
-            </View>
-          )}
         </View>
       </ScrollView>
     </SafeAreaView>
