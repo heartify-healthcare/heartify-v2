@@ -10,9 +10,12 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  contentContainer: {
+  scrollView: {
     flex: 1,
+  },
+  contentContainer: {
     padding: width * 0.05,
+    paddingBottom: height * 0.05,
   },
   title: {
     fontSize: width * 0.06,
@@ -26,194 +29,184 @@ export const styles = StyleSheet.create({
     color: '#7f8c8d',
     textAlign: 'center',
     marginBottom: height * 0.03,
+    lineHeight: width * 0.05,
   },
-  scrollView: {
-    flex: 1,
-  },
-  cardContainer: {
+  // ECG Session Card Styles
+  sessionCard: {
     backgroundColor: 'white',
     borderRadius: 10,
+    padding: width * 0.04,
     marginBottom: height * 0.02,
-    marginHorizontal: width * 0.02,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    overflow: 'hidden',
   },
   cardHeader: {
-    padding: width * 0.04,
-  },
-  headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: height * 0.01,
   },
-  headerLeft: {
+  cardHeaderLeft: {
     flex: 1,
   },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardId: {
-    fontSize: width * 0.04,
+  sessionId: {
+    fontSize: width * 0.045,
     fontWeight: 'bold',
     color: '#2c3e50',
+    marginBottom: 4,
   },
-  cardUserId: {
+  sessionDate: {
     fontSize: width * 0.035,
     color: '#7f8c8d',
-    marginTop: 2,
   },
-  cardTimestamp: {
-    fontSize: width * 0.032,
-    color: '#8e44ad',
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  predictionBadge: {
-    paddingHorizontal: width * 0.03,
-    paddingVertical: height * 0.005,
-    borderRadius: 15,
-    marginRight: width * 0.03,
-  },
-  predictionText: {
-    color: 'white',
-    fontSize: width * 0.03,
-    fontWeight: 'bold',
-  },
-  arrowContainer: {
+  expandButton: {
     padding: width * 0.02,
   },
-  arrow: {
-    fontSize: width * 0.04,
-    color: '#7f8c8d',
+  expandIcon: {
+    fontSize: width * 0.05,
+    color: '#e74c3c',
+    fontWeight: 'bold',
   },
+  // Expanded Content Styles
   expandedContent: {
-    overflow: 'hidden',
+    marginTop: height * 0.02,
+    borderTopWidth: 1,
+    borderTopColor: '#ecf0f1',
+    paddingTop: height * 0.02,
   },
-  detailsContainer: {
-    paddingHorizontal: width * 0.04,
+  sectionContainer: {
+    marginBottom: height * 0.025,
   },
-  detailsGrid: {
-    flex: 1,
+  sectionTitle: {
+    fontSize: width * 0.04,
+    fontWeight: 'bold',
+    color: '#e74c3c',
+    marginBottom: height * 0.015,
   },
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: height * 0.008,
-    borderBottomWidth: 0.5,
-    borderBottomColor: '#ecf0f1',
+  // ECG Recording Styles
+  chartContainer: {
+    marginBottom: height * 0.02,
   },
-  detailLabel: {
+  chartLabel: {
     fontSize: width * 0.035,
+    fontWeight: '600',
     color: '#34495e',
-    fontWeight: '500',
-    flex: 1,
+    marginBottom: height * 0.01,
   },
-  detailValue: {
+  samplingRateContainer: {
+    backgroundColor: '#ecf0f1',
+    borderRadius: 5,
+    padding: width * 0.03,
+    marginTop: height * 0.01,
+  },
+  samplingRateText: {
     fontSize: width * 0.035,
     color: '#2c3e50',
-    fontWeight: 'bold',
-    textAlign: 'right',
   },
-  separator: {
-    height: 1,
-    backgroundColor: '#bdc3c7',
-    marginVertical: height * 0.015,
+  samplingRateValue: {
+    fontWeight: 'bold',
+    color: '#e74c3c',
+  },
+  // Prediction Styles
+  predictionContainer: {
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: width * 0.035,
+    marginBottom: height * 0.015,
   },
   predictionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: height * 0.01,
+    marginBottom: height * 0.01,
   },
   predictionLabel: {
-    fontSize: width * 0.04,
+    fontSize: width * 0.035,
     color: '#34495e',
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   predictionValue: {
-    fontSize: width * 0.04,
+    fontSize: width * 0.035,
+    color: '#2c3e50',
     fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'right',
+  },
+  diagnosisValue: {
+    color: '#27ae60',
+    fontSize: width * 0.038,
   },
   probabilityValue: {
-    fontSize: width * 0.04,
-    color: '#3498db',
-    fontWeight: 'bold',
-  },
-  // Loading state styles
-  loadingState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: height * 0.1,
-  },
-  loadingText: {
-    fontSize: width * 0.04,
-    color: '#7f8c8d',
-    marginTop: height * 0.02,
-  },
-  // Empty state styles
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: height * 0.1,
-    paddingHorizontal: width * 0.1,
-  },
-  emptyStateTitle: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
-    color: '#34495e',
-    marginBottom: height * 0.02,
-    textAlign: 'center',
-  },
-  emptyStateDescription: {
-    fontSize: width * 0.04,
-    color: '#7f8c8d',
-    textAlign: 'center',
-    lineHeight: width * 0.06,
-  },
-  // Error state styles
-  errorState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: height * 0.1,
-    paddingHorizontal: width * 0.1,
-  },
-  errorTitle: {
-    fontSize: width * 0.05,
-    fontWeight: 'bold',
     color: '#e74c3c',
-    marginBottom: height * 0.02,
-    textAlign: 'center',
   },
-  errorDescription: {
+  featuresContainer: {
+    marginTop: height * 0.01,
+  },
+  featuresTitle: {
+    fontSize: width * 0.035,
+    fontWeight: '600',
+    color: '#34495e',
+    marginBottom: height * 0.008,
+  },
+  featureItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: height * 0.005,
+    paddingLeft: width * 0.03,
+  },
+  featureLabel: {
+    fontSize: width * 0.032,
+    color: '#7f8c8d',
+  },
+  featureValue: {
+    fontSize: width * 0.032,
+    color: '#2c3e50',
+    fontWeight: '500',
+  },
+  // Explanation Styles
+  explanationContainer: {
+    backgroundColor: '#fff5f5',
+    borderRadius: 8,
+    padding: width * 0.035,
+  },
+  explanationSection: {
+    marginBottom: height * 0.015,
+  },
+  explanationLabel: {
+    fontSize: width * 0.035,
+    fontWeight: '600',
+    color: '#34495e',
+    marginBottom: height * 0.005,
+  },
+  explanationText: {
+    fontSize: width * 0.033,
+    color: '#2c3e50',
+    lineHeight: width * 0.045,
+  },
+  promptContainer: {
+    backgroundColor: '#ecf0f1',
+    borderRadius: 5,
+    padding: width * 0.025,
+    marginBottom: height * 0.01,
+  },
+  promptText: {
+    fontSize: width * 0.03,
+    color: '#7f8c8d',
+    fontFamily: 'monospace',
+  },
+  // Empty State
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: width * 0.1,
+  },
+  emptyText: {
     fontSize: width * 0.04,
     color: '#7f8c8d',
     textAlign: 'center',
-    lineHeight: width * 0.06,
-    marginBottom: height * 0.03,
-  },
-  retryButton: {
-    backgroundColor: '#e74c3c',
-    paddingHorizontal: width * 0.08,
-    paddingVertical: height * 0.015,
-    borderRadius: 25,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  retryButtonText: {
-    color: 'white',
-    fontSize: width * 0.04,
-    fontWeight: 'bold',
   },
 });

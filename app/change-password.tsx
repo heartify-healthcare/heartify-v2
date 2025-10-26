@@ -6,8 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
-  ActivityIndicator
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -23,7 +22,6 @@ const ChangePasswordScreen: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Single toggle function for all password fields
   const togglePasswordVisibility = (): void => {
@@ -31,36 +29,24 @@ const ChangePasswordScreen: React.FC = () => {
   };
 
   const changePassword = async () => {
-    try {
-      setIsLoading(true);
-
-      // PUT YOUR API CALLING TO CHANGE PASSWORD CODE HERE
-
-      // Success - password changed
-      Alert.alert(
-        'Success',
-        'Password changed successfully!',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Clear form and navigate back
-              setFormData({
-                currentPassword: '',
-                newPassword: '',
-                confirmPassword: ''
-              });
-              router.push("/(tabs)/settings");
-            }
+    // Show success immediately for UI demo
+    Alert.alert(
+      'Success',
+      'Password changed successfully! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setFormData({
+              currentPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            });
+            router.push("/(tabs)/settings");
           }
-        ]
-      );
-    } catch (error) {
-      console.error('Change password error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
-    } finally {
-      setIsLoading(false);
-    }
+        }
+      ]
+    );
   };
 
   const handleSubmit = async () => {
@@ -109,12 +95,10 @@ const ChangePasswordScreen: React.FC = () => {
                   placeholder="Enter current password"
                   secureTextEntry={!showPassword}
                   placeholderTextColor="#bdc3c7"
-                  editable={!isLoading}
                 />
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={togglePasswordVisibility}
-                  disabled={isLoading}
                 >
                   <Text style={styles.eyeIcon}>
                     {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -134,12 +118,10 @@ const ChangePasswordScreen: React.FC = () => {
                   placeholder="Enter new password (min 6 characters)"
                   secureTextEntry={!showPassword}
                   placeholderTextColor="#bdc3c7"
-                  editable={!isLoading}
                 />
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={togglePasswordVisibility}
-                  disabled={isLoading}
                 >
                   <Text style={styles.eyeIcon}>
                     {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -159,12 +141,10 @@ const ChangePasswordScreen: React.FC = () => {
                   placeholder="Confirm new password"
                   secureTextEntry={!showPassword}
                   placeholderTextColor="#bdc3c7"
-                  editable={!isLoading}
                 />
                 <TouchableOpacity
                   style={styles.eyeButton}
                   onPress={togglePasswordVisibility}
-                  disabled={isLoading}
                 >
                   <Text style={styles.eyeIcon}>
                     {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -185,24 +165,15 @@ const ChangePasswordScreen: React.FC = () => {
             {/* Action Buttons */}
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleSubmit}
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <ActivityIndicator color="#fff" size="small" style={{ marginRight: 8 }} />
-                    <Text style={styles.buttonText}>Changing Password...</Text>
-                  </View>
-                ) : (
-                  <Text style={styles.buttonText}>Change Password</Text>
-                )}
+                <Text style={styles.buttonText}>Change Password</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.cancelButton, isLoading && { opacity: 0.6 }]}
+                style={styles.cancelButton}
                 onPress={handleCancel}
-                disabled={isLoading}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>

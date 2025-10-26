@@ -27,7 +27,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
 
@@ -64,23 +63,19 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      // PUT YOUR API CALLING TO REGISTER CODE HERE
-
-      // On successful registration, navigate to OTP verification screen
-      // router.push({
-      //   pathname: '/verify-otp',
-      //   params: { email: email.trim().toLowerCase() }
-      // });
-
-    } catch (error) {
-      console.error('Registration error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    // Navigate to login immediately for UI demo
+    Alert.alert(
+      'Success',
+      'Account created successfully! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            router.push('/login');
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -107,7 +102,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -120,7 +114,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -132,7 +125,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -145,12 +137,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
-                    editable={!isLoading}
                   />
                   <TouchableOpacity
                     style={styles.eyeButton}
                     onPress={togglePasswordVisibility}
-                    disabled={isLoading}
                   >
                     <Text style={styles.eyeIcon}>
                       {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -168,12 +158,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
-                    editable={!isLoading}
                   />
                   <TouchableOpacity
                     style={styles.eyeButton}
                     onPress={togglePasswordVisibility}
-                    disabled={isLoading}
                   >
                     <Text style={styles.eyeIcon}>
                       {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -183,18 +171,17 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </View>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleSignUp}
-                disabled={isLoading}
               >
                 <Text style={styles.buttonText}>
-                  {isLoading ? 'Signing Up...' : 'Sign Up'}
+                  Sign Up
                 </Text>
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>Already have an account? </Text>
-                <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
+                <TouchableOpacity onPress={handleLogin}>
                   <Text style={styles.loginLink}>Log In</Text>
                 </TouchableOpacity>
               </View>

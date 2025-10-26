@@ -8,8 +8,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
-  ActivityIndicator
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -26,7 +25,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation function (placeholder)
@@ -49,41 +47,22 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      // PUT YOUR API CALLING TO RESET PASSWORD CODE HERE
-
-      // Example: Simulate success for testing
-      Alert.alert(
-        'Success',
-        'Password has been reset. Please check your email for the new password.',
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              // Navigate to login after a short delay
-              setTimeout(() => {
-                router.push("/login");
-              }, 1000);
-            },
+    // Navigate immediately for UI demo
+    Alert.alert(
+      'Success',
+      'Password reset request submitted! (UI Demo Mode)',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setUsername('');
+            setEmail('');
+            setPhoneNumber('');
+            router.push("/login");
           },
-        ]
-      );
-
-      // Clear form fields
-      setUsername('');
-      setEmail('');
-      setPhoneNumber('');
-    } catch (error) {
-      console.error('Password reset error:', error);
-      Alert.alert(
-        'Network Error',
-        'Unable to connect to the server. Please check your internet connection and try again.'
-      );
-    } finally {
-      setIsLoading(false);
-    }
+        },
+      ]
+    );
   };
 
   return (
@@ -110,7 +89,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -123,7 +101,6 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -135,25 +112,19 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
-                  editable={!isLoading}
                 />
               </View>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleResetPassword}
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" size="small" />
-                ) : (
-                  <Text style={styles.buttonText}>Reset Password</Text>
-                )}
+                <Text style={styles.buttonText}>Reset Password</Text>
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>Remembered password? </Text>
-                <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
+                <TouchableOpacity onPress={handleLogin}>
                   <Text style={styles.loginLink}>Log In</Text>
                 </TouchableOpacity>
               </View>
