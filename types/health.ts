@@ -1,8 +1,4 @@
 /**
- * Type definitions for Health feature
- */
-
-/**
  * User data interface with health information
  */
 export interface UserData {

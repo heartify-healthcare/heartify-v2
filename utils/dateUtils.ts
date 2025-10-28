@@ -1,8 +1,4 @@
 /**
- * Date utility functions
- */
-
-/**
  * Helper function to convert GMT date string to YYYY-MM-DD format
  */
 export const convertGMTToYYYYMMDD = (gmtDateString: string): string => {

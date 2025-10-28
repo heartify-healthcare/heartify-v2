@@ -1,7 +1,3 @@
-/**
- * Centralized utility functions export
- */
-
 // Date utilities
 export { convertGMTToYYYYMMDD, formatDateTime, formatDate } from './dateUtils';
 

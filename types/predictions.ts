@@ -1,8 +1,3 @@
-/**
- * Type definitions for Predictions feature
- * These types are based on the API responses from z-api-test.md
- */
-
 export interface ECGSignalData {
   signal: number[];
   lead: string;

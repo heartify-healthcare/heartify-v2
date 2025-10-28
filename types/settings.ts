@@ -1,8 +1,4 @@
 /**
- * Type definitions for Settings feature
- */
-
-/**
  * User data interface for settings
  */
 export interface UserData {

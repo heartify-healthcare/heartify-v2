@@ -1,8 +1,4 @@
 /**
- * Validation utility functions
- */
-
-/**
  * Validate age from date of birth
  */
 export const validateAge = (dob: string): boolean => {

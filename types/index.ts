@@ -1,7 +1,3 @@
-/**
- * Centralized type definitions export
- */
-
 // Health types
 export type {
   UserData as HealthUserData,

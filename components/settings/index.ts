@@ -1,1 +1,1 @@
-// TODO: Export Settings components when needed
+// Export Settings components when needed
