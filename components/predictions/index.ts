@@ -1,4 +1,3 @@
-export { ECGChart } from './ECGChart';
 export { ECGSessionCard } from './ECGSessionCard';
 export { mockECGSessions, mockDetailedData } from './mockData';
 export type {
