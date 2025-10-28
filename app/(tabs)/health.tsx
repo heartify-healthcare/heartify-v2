@@ -55,12 +55,6 @@ const HealthScreen: React.FC = () => {
     trestbps: ''
   });
 
-  // Function to get auth token
-  const getAuthToken = async (): Promise<string | null> => {
-    // Mock token for UI demo
-    return 'demo_token';
-  };
-
   // Fetch user profile data
   const fetchUserProfile = async () => {
     // Mock user data

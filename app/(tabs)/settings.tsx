@@ -47,15 +47,6 @@ const SettingsScreen: React.FC = () => {
     role: ''
   });
 
-  // Get authorization headers
-  const getAuthHeaders = async () => {
-    // Mock headers for UI demo
-    return {
-      'Authorization': 'Bearer demo_token',
-      'Content-Type': 'application/json',
-    };
-  };
-
   // Fetch user profile data
   const fetchUserProfile = async () => {
     // Mock user data
