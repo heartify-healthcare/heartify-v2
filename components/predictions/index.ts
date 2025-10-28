@@ -1,5 +1,7 @@
 export { ECGSessionCard } from './ECGSessionCard';
 export { mockECGSessions, mockDetailedData } from './mockData';
+
+// Re-export types from centralized types folder
 export type {
   ECGSignalData,
   ECGRecording,
@@ -9,5 +11,5 @@ export type {
   ExplanationDetails,
   Explanation,
   ECGSession,
-  ECGSessionsResponse
-} from './types';
+  ECGSessionsResponse,
+} from '@/types';

@@ -1,74 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { ECGChart } from '@/components';
 import { formatDateTime, formatFeatureName, formatProbability } from '@/utils';
-
-const { width } = Dimensions.get('window');
-
-interface ECGRecording {
-  id: string;
-  rawData: {
-    signal: number[];
-    lead: string;
-    duration: number;
-  };
-  denoisedData: {
-    signal: number[];
-    lead: string;
-    duration: number;
-  };
-  samplingRate: number;
-  recordedAt: string;
-}
-
-interface Prediction {
-  id: string;
-  modelVersion: number;
-  diagnosis: string;
-  probability: number;
-  features: {
-    [key: string]: number;
-  };
-  createdAt: string;
-}
-
-interface Explanation {
-  id: string;
-  llmModelVersion: number;
-  prompt: {
-    features: {
-      [key: string]: number;
-    };
-    probability: number;
-    diagnosis: string;
-  };
-  explanation: {
-    summary: string;
-    recommendation: string;
-    details: string;
-  };
-  createdAt: string;
-}
-
-interface ECGSession {
-  id: string;
-  userId: string;
-  deviceId: string;
-  ecgId: string;
-  predictionId: string;
-  explanationId: string;
-  createdAt: string;
-  ecgRecording?: ECGRecording | null;
-  prediction?: Prediction | null;
-  explanation?: Explanation | null;
-}
-
-interface ECGSessionCardProps {
-  session: ECGSession;
-  index: number;
-  styles: any;
-  onExpand?: (sessionId: string) => void;
-}
+import type {
+  ECGSessionCardProps,
+} from '@/types';
 
 export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({ 
   session, 

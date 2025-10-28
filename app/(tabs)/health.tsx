@@ -18,27 +18,13 @@ import {
   sexOptions
 } from '@/components/health';
 import { convertGMTToYYYYMMDD, validateAge } from '@/utils';
-
-interface UserData {
-  email: string;
-  id: number;
-  is_verified: boolean;
-  phonenumber: string;
-  role: string;
-  username: string;
-  created_at: string;
-  dob?: string;
-  cp?: number;
-  exang?: number;
-  sex?: number;
-  trestbps?: number;
-}
+import type { HealthUserData, HealthFormData } from '@/types';
 
 const HealthScreen: React.FC = () => {
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<HealthUserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<HealthFormData>({
     dob: '',
     cp: undefined as number | undefined,
     exang: undefined as number | undefined,
@@ -46,7 +32,7 @@ const HealthScreen: React.FC = () => {
     trestbps: ''
   });
 
-  const [originalData, setOriginalData] = useState({
+  const [originalData, setOriginalData] = useState<HealthFormData>({
     dob: '',
     cp: undefined as number | undefined,
     exang: undefined as number | undefined,
@@ -57,7 +43,7 @@ const HealthScreen: React.FC = () => {
   // Fetch user profile data
   const fetchUserProfile = async () => {
     // Mock user data
-    const mockUserData: UserData = {
+    const mockUserData: HealthUserData = {
       email: 'demo@heartify.com',
       id: 1,
       is_verified: true,

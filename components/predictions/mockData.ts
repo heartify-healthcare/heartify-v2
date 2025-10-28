@@ -1,4 +1,4 @@
-import { ECGSession } from './types';
+import { ECGSession } from '@/types';
 
 /**
  * Mock ECG Sessions Data

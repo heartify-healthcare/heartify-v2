@@ -94,3 +94,13 @@ export interface ECGSessionsResponse {
   first: boolean;
   empty: boolean;
 }
+
+/**
+ * Props interface for ECGSessionCard component
+ */
+export interface ECGSessionCardProps {
+  session: ECGSession;
+  index: number;
+  styles: any;
+  onExpand?: (sessionId: string) => void;
+}

@@ -12,36 +12,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/settings';
 import { formatDate } from '@/utils';
-
-interface UserData {
-  email: string;
-  id: number;
-  is_verified: boolean;
-  phonenumber: string | null;
-  role: string;
-  username: string;
-  created_at: string;
-  dob: string | null;
-  cp: number | null;
-  exang: number | null;
-  sex: number | null;
-  trestbps: number | null;
-}
+import type { SettingsUserData, SettingsFormData } from '@/types';
 
 const SettingsScreen: React.FC = () => {
   const router = useRouter();
 
   // State management
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<SettingsUserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SettingsFormData>({
     username: '',
     email: '',
     phonenumber: '',
     role: ''
   });
 
-  const [originalData, setOriginalData] = useState({
+  const [originalData, setOriginalData] = useState<SettingsFormData>({
     username: '',
     email: '',
     phonenumber: '',
@@ -51,7 +37,7 @@ const SettingsScreen: React.FC = () => {
   // Fetch user profile data
   const fetchUserProfile = async () => {
     // Mock user data
-    const mockUserData: UserData = {
+    const mockUserData: SettingsUserData = {
       email: 'demo@heartify.com',
       id: 1,
       is_verified: true,

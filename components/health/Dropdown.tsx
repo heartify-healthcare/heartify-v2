@@ -7,11 +7,7 @@ import {
 } from 'react-native';
 
 import { styles } from '@/styles/(tabs)/health';
-
-export interface DropdownOption {
-  label: string;
-  value: number;
-}
+import type { DropdownOption } from '@/types';
 
 interface DropdownProps {
   options: DropdownOption[];

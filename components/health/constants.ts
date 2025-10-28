@@ -1,4 +1,4 @@
-import { DropdownOption } from './Dropdown';
+import { DropdownOption } from '@/types';
 
 export const cpOptions: DropdownOption[] = [
   { label: "Typical angina", value: 1 },
