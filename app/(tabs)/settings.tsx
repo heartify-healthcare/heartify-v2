@@ -11,6 +11,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/settings';
+import { formatDate } from '@/utils';
 
 interface UserData {
   email: string;
@@ -182,19 +183,6 @@ const SettingsScreen: React.FC = () => {
 
   const getVerificationColor = () => {
     return userData?.is_verified ? '#27ae60' : '#e74c3c';
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return dateString;
-    }
   };
 
   if (!userData) {

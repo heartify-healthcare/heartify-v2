@@ -48,3 +48,21 @@ export const formatDateTime = (dateString: string): string => {
     return dateString;
   }
 };
+
+/**
+ * Format date string to localized long format
+ * @param dateString - ISO date string or any valid date string
+ * @returns Formatted date string in "Month Day, Year" format
+ */
+export const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  } catch {
+    return dateString;
+  }
+};

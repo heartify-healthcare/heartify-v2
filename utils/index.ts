@@ -3,7 +3,7 @@
  */
 
 // Date utilities
-export { convertGMTToYYYYMMDD, formatDateTime } from './dateUtils';
+export { convertGMTToYYYYMMDD, formatDateTime, formatDate } from './dateUtils';
 
 // Validation utilities
 export { validateAge } from './validationUtils';
