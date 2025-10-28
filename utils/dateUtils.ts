@@ -1,4 +1,8 @@
 /**
+ * Date utility functions
+ */
+
+/**
  * Helper function to convert GMT date string to YYYY-MM-DD format
  */
 export const convertGMTToYYYYMMDD = (gmtDateString: string): string => {
@@ -26,25 +30,21 @@ export const convertGMTToYYYYMMDD = (gmtDateString: string): string => {
 };
 
 /**
- * Validate age from date of birth
+ * Format date string to YYYY-MM-DD HH:mm format
+ * @param dateString - ISO date string or any valid date string
+ * @returns Formatted date string
  */
-export const validateAge = (dob: string): boolean => {
-  if (!dob) return false;
-
+export const formatDateTime = (dateString: string): string => {
   try {
-    const [year, month, day] = dob.split('-').map(Number);
-    const birthDate = new Date(year, month - 1, day);
-    const today = new Date();
-
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-
-    return age >= 10 && age <= 100;
-  } catch {
-    return false;
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  } catch (error) {
+    return dateString;
   }
 };

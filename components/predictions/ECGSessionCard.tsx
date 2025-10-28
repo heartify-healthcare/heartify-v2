@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { ECGChart } from './ECGChart';
-import { formatDateTime, formatFeatureName, formatProbability } from './utils';
+import { formatDateTime, formatFeatureName, formatProbability } from '@/utils';
 
 const { width } = Dimensions.get('window');
 
