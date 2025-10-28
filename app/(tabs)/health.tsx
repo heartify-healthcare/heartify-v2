@@ -15,10 +15,9 @@ import {
   DatePicker, 
   cpOptions, 
   exangOptions, 
-  sexOptions,
-  convertGMTToYYYYMMDD,
-  validateAge
+  sexOptions
 } from '@/components/health';
+import { convertGMTToYYYYMMDD, validateAge } from '@/utils';
 
 interface UserData {
   email: string;

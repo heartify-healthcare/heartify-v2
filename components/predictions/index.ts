@@ -1,6 +1,6 @@
 export { ECGChart } from './ECGChart';
 export { ECGSessionCard } from './ECGSessionCard';
-export { formatDateTime, formatFeatureName, formatProbability } from '@/utils';
+export { mockECGSessions, mockDetailedData } from './mockData';
 export type {
   ECGSignalData,
   ECGRecording,

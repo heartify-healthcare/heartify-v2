@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '@/styles/(tabs)/index';
-import { ECGSessionCard } from '@/components/predictions';
-import { mockECGSessions, mockDetailedData } from '@/components/predictions/mockData';
-import type { ECGSession } from '@/components/predictions';
+import { 
+  ECGSessionCard, 
+  mockECGSessions, 
+  mockDetailedData,
+  type ECGSession 
+} from '@/components/predictions';
 
 const PredictionsScreen: React.FC = () => {
   const [sessions, setSessions] = useState<ECGSession[]>(mockECGSessions);
