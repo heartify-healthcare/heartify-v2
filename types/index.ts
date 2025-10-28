@@ -25,5 +25,5 @@ export type {
   ECGSessionCardProps,
 } from './predictions';
 
-// ECG types - TODO: Add when needed
+// ECG types - Add when needed
 
