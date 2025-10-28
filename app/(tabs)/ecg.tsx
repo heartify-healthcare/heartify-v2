@@ -13,8 +13,7 @@ import { styles } from '@/styles/(tabs)/ecg';
 import { DeviceInput } from '@/components/ecg';
 import { ECGChart } from '@/components';
 import PolarEcgModule from '@/modules/polar-ecg-module';
-
-const MAX_DATA_POINTS = 500;
+import { MAX_DATA_POINTS } from '@/constants';
 
 const ECGScreen: React.FC = () => {
   // Device connection states

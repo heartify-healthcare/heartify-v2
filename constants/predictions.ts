@@ -1,0 +1,1 @@
+// Add PredictionsScreen-related constants if needed
