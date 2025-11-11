@@ -13,10 +13,13 @@ export interface ECGRecording {
 }
 
 export interface PredictionFeatures {
-  pr_interval: number;
-  heart_rate: number;
-  qrs_duration: number;
-  [key: string]: number; // Allow additional features
+  heart_rate?: number | null;
+  hrv_rmssd?: number | null;
+  qrs_duration?: number | null;
+  r_amplitude?: number | null;
+  signal_energy?: number | null;
+  r_peaks_count?: number | null;
+  [key: string]: number | null | undefined; // Allow additional features
 }
 
 export interface Prediction {

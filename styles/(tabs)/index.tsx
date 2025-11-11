@@ -136,8 +136,13 @@ export const styles = StyleSheet.create({
     textAlign: 'right',
   },
   diagnosisValue: {
-    color: '#27ae60',
     fontSize: width * 0.038,
+  },
+  diagnosisNormal: {
+    color: '#27ae60',
+  },
+  diagnosisAbnormal: {
+    color: '#e74c3c',
   },
   probabilityValue: {
     color: '#e74c3c',

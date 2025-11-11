@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { ECGChart } from '@/components';
-import { formatDateTime, formatFeatureName, formatProbability } from '@/utils';
+import { formatDateTime, formatFeatureName, formatProbability, formatFeatureValue } from '@/utils';
 import type {
   ECGSessionCardProps,
 } from '@/types';
@@ -73,29 +73,128 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
               <Text style={styles.sectionTitle}>Prediction Results</Text>
               
               <View style={styles.predictionContainer}>
+                {/* Model Version */}
+                <View style={styles.predictionRow}>
+                  <Text style={styles.predictionLabel}>Model Version:</Text>
+                  <Text style={styles.predictionValue}>
+                    v{session.prediction.modelVersion}
+                  </Text>
+                </View>
+
+                {/* Diagnosis */}
                 <View style={styles.predictionRow}>
                   <Text style={styles.predictionLabel}>Diagnosis:</Text>
-                  <Text style={[styles.predictionValue, styles.diagnosisValue]}>
+                  <Text style={[
+                    styles.predictionValue, 
+                    styles.diagnosisValue,
+                    session.prediction.diagnosis === 'Normal Sinus Rhythm' 
+                      ? styles.diagnosisNormal 
+                      : styles.diagnosisAbnormal
+                  ]}>
                     {session.prediction.diagnosis}
                   </Text>
                 </View>
 
+                {/* Probability */}
                 <View style={styles.predictionRow}>
-                  <Text style={styles.predictionLabel}>Probability:</Text>
+                  <Text style={styles.predictionLabel}>Confidence:</Text>
                   <Text style={[styles.predictionValue, styles.probabilityValue]}>
-                    {formatProbability(session.prediction.probability)}
+                    {formatProbability(session.prediction.probability, 2)}
                   </Text>
                 </View>
 
                 {/* Features */}
                 <View style={styles.featuresContainer}>
-                  <Text style={styles.featuresTitle}>Features:</Text>
-                  {Object.entries(session.prediction.features).map(([key, value]) => (
-                    <View key={key} style={styles.featureItem}>
-                      <Text style={styles.featureLabel}>{formatFeatureName(key)}:</Text>
-                      <Text style={styles.featureValue}>{value}</Text>
+                  <Text style={styles.featuresTitle}>Physiological Features:</Text>
+                  
+                  {/* Heart Rate */}
+                  {session.prediction.features.heart_rate !== null && 
+                   session.prediction.features.heart_rate !== undefined && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        {formatFeatureName('heart_rate')}:
+                      </Text>
+                      <Text style={styles.featureValue}>
+                        {formatFeatureValue('heart_rate', session.prediction.features.heart_rate)}
+                      </Text>
                     </View>
-                  ))}
+                  )}
+
+                  {/* HRV RMSSD */}
+                  {session.prediction.features.hrv_rmssd !== null && 
+                   session.prediction.features.hrv_rmssd !== undefined && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        {formatFeatureName('hrv_rmssd')}:
+                      </Text>
+                      <Text style={styles.featureValue}>
+                        {formatFeatureValue('hrv_rmssd', session.prediction.features.hrv_rmssd)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* QRS Duration */}
+                  {session.prediction.features.qrs_duration !== null && 
+                   session.prediction.features.qrs_duration !== undefined && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        {formatFeatureName('qrs_duration')}:
+                      </Text>
+                      <Text style={styles.featureValue}>
+                        {formatFeatureValue('qrs_duration', session.prediction.features.qrs_duration)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* R Amplitude */}
+                  {session.prediction.features.r_amplitude !== null && 
+                   session.prediction.features.r_amplitude !== undefined && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        {formatFeatureName('r_amplitude')}:
+                      </Text>
+                      <Text style={styles.featureValue}>
+                        {formatFeatureValue('r_amplitude', session.prediction.features.r_amplitude)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Signal Energy */}
+                  {session.prediction.features.signal_energy !== null && 
+                   session.prediction.features.signal_energy !== undefined && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        {formatFeatureName('signal_energy')}:
+                      </Text>
+                      <Text style={styles.featureValue}>
+                        {formatFeatureValue('signal_energy', session.prediction.features.signal_energy)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* R Peaks Count */}
+                  {session.prediction.features.r_peaks_count !== null && 
+                   session.prediction.features.r_peaks_count !== undefined && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        {formatFeatureName('r_peaks_count')}:
+                      </Text>
+                      <Text style={styles.featureValue}>
+                        {formatFeatureValue('r_peaks_count', session.prediction.features.r_peaks_count)}
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* No features available message */}
+                  {Object.entries(session.prediction.features).filter(([_, value]) => 
+                    value !== null && value !== undefined
+                  ).length === 0 && (
+                    <View style={styles.featureItem}>
+                      <Text style={styles.featureLabel}>
+                        No features available
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </View>
             </View>

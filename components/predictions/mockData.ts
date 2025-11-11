@@ -71,11 +71,14 @@ export const mockDetailedData: { [key: string]: any } = {
       id: "6df5aef2-6daf-447e-89d6-768e5a5b5124",
       modelVersion: 1,
       diagnosis: "Normal Sinus Rhythm",
-      probability: 0.95,
+      probability: 0.9542,
       features: {
-        pr_interval: 0.16,
-        heart_rate: 75,
-        qrs_duration: 0.08
+        heart_rate: 72.5,
+        hrv_rmssd: 42.3,
+        qrs_duration: 0.092,
+        r_amplitude: 1.234,
+        signal_energy: 156.7823,
+        r_peaks_count: 12
       },
       createdAt: "2025-10-27T02:07:45.856"
     },
@@ -84,11 +87,14 @@ export const mockDetailedData: { [key: string]: any } = {
       llmModelVersion: 1,
       prompt: {
         features: {
-          pr_interval: 0.16,
-          heart_rate: 75,
-          qrs_duration: 0.08
+          heart_rate: 72.5,
+          hrv_rmssd: 42.3,
+          qrs_duration: 0.092,
+          r_amplitude: 1.234,
+          signal_energy: 156.7823,
+          r_peaks_count: 12
         },
-        probability: 0.95,
+        probability: 0.9542,
         diagnosis: "Normal Sinus Rhythm"
       },
       explanation: {
@@ -118,12 +124,15 @@ export const mockDetailedData: { [key: string]: any } = {
     prediction: {
       id: "4f6d87ab-8fd6-4ca6-918d-492de5cccc71",
       modelVersion: 1,
-      diagnosis: "Atrial Fibrillation",
-      probability: 0.87,
+      diagnosis: "Abnormal ECG Pattern",
+      probability: 0.8734,
       features: {
-        pr_interval: 0.14,
-        heart_rate: 92,
-        qrs_duration: 0.09
+        heart_rate: 95.2,
+        hrv_rmssd: 28.7,
+        qrs_duration: 0.105,
+        r_amplitude: 1.567,
+        signal_energy: 203.4521,
+        r_peaks_count: 16
       },
       createdAt: "2025-10-27T02:07:44.290"
     },
@@ -132,17 +141,20 @@ export const mockDetailedData: { [key: string]: any } = {
       llmModelVersion: 1,
       prompt: {
         features: {
-          pr_interval: 0.14,
-          heart_rate: 92,
-          qrs_duration: 0.09
+          heart_rate: 95.2,
+          hrv_rmssd: 28.7,
+          qrs_duration: 0.105,
+          r_amplitude: 1.567,
+          signal_energy: 203.4521,
+          r_peaks_count: 16
         },
-        probability: 0.87,
-        diagnosis: "Atrial Fibrillation"
+        probability: 0.8734,
+        diagnosis: "Abnormal ECG Pattern"
       },
       explanation: {
-        summary: "Your ECG indicates irregular heart rhythm consistent with atrial fibrillation.",
+        summary: "Your ECG indicates irregular heart rhythm that requires attention.",
         recommendation: "Please consult with a cardiologist for proper evaluation and treatment options.",
-        details: "Irregular R-R intervals detected with absent P waves. Heart rate is elevated. This requires medical attention."
+        details: "Irregular R-R intervals detected. Heart rate is elevated. This requires medical attention."
       },
       createdAt: "2025-10-27T02:07:44.295"
     }
@@ -167,11 +179,14 @@ export const mockDetailedData: { [key: string]: any } = {
       id: "1b74188d-bfd2-4f55-81df-2f8bf8bd8d83",
       modelVersion: 1,
       diagnosis: "Normal Sinus Rhythm",
-      probability: 0.95,
+      probability: 0.9621,
       features: {
-        pr_interval: 0.16,
-        heart_rate: 75,
-        qrs_duration: 0.08
+        heart_rate: 68.3,
+        hrv_rmssd: 51.2,
+        qrs_duration: 0.088,
+        r_amplitude: 1.156,
+        signal_energy: 142.3345,
+        r_peaks_count: 11
       },
       createdAt: "2025-10-27T02:05:52.675"
     },
@@ -180,11 +195,14 @@ export const mockDetailedData: { [key: string]: any } = {
       llmModelVersion: 1,
       prompt: {
         features: {
-          pr_interval: 0.16,
-          heart_rate: 75,
-          qrs_duration: 0.08
+          heart_rate: 68.3,
+          hrv_rmssd: 51.2,
+          qrs_duration: 0.088,
+          r_amplitude: 1.156,
+          signal_energy: 142.3345,
+          r_peaks_count: 11
         },
-        probability: 0.95,
+        probability: 0.9621,
         diagnosis: "Normal Sinus Rhythm"
       },
       explanation: {
