@@ -8,11 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/signup';
+import { register, requestVerify } from '@/api';
 
 // Define navigation prop type
 interface SignUpScreenProps {
@@ -28,6 +30,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation function (placeholder)
@@ -63,19 +66,48 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    // Navigate to login immediately for UI demo
-    Alert.alert(
-      'Success',
-      'Account created successfully! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            router.push('/login');
-          }
-        }
-      ]
-    );
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Register user (backend automatically sends OTP email)
+      await register({
+        username: username.trim(),
+        email: email.trim(),
+        password: password,
+        phonenumber: phoneNumber.trim() || undefined, // lowercase 'n' to match backend
+      });
+
+      // Navigate to OTP verification screen
+      Alert.alert(
+        'Success',
+        'Registration successful! Please check your email for the OTP verification code.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.push({
+                pathname: '/verify-otp',
+                params: { email: email.trim() },
+              });
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Registration Failed',
+        error.message || 'An error occurred during registration. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -173,10 +205,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleSignUp}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>
-                  Sign Up
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>
+                    Sign Up
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>

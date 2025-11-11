@@ -6,11 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/change-password';
+import { changePassword } from '@/api';
 
 const ChangePasswordScreen: React.FC = () => {
   const router = useRouter();
@@ -22,31 +24,11 @@ const ChangePasswordScreen: React.FC = () => {
   });
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Single toggle function for all password fields
   const togglePasswordVisibility = (): void => {
     setShowPassword(!showPassword);
-  };
-
-  const changePassword = async () => {
-    // Show success immediately for UI demo
-    Alert.alert(
-      'Success',
-      'Password changed successfully! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setFormData({
-              currentPassword: '',
-              newPassword: '',
-              confirmPassword: ''
-            });
-            router.push("/(tabs)/settings");
-          }
-        }
-      ]
-    );
   };
 
   const handleSubmit = async () => {
@@ -66,8 +48,40 @@ const ChangePasswordScreen: React.FC = () => {
       return;
     }
 
-    // Call API
-    await changePassword();
+    setLoading(true);
+
+    try {
+      // Call change password API
+      await changePassword({
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      });
+
+      Alert.alert(
+        'Success',
+        'Password changed successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setFormData({
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: ''
+              });
+              router.push('/(tabs)/settings');
+            }
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Failed',
+        error.message || 'Failed to change password. Please check your current password and try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -167,13 +181,19 @@ const ChangePasswordScreen: React.FC = () => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleSubmit}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>Change Password</Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Change Password</Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={handleCancel}
+                disabled={loading}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
