@@ -8,7 +8,6 @@ export { API_BASE_URL, API_ENDPOINTS, STORAGE_KEYS } from './config';
 
 // Client
 export { apiClient } from './client';
-export type { ApiResponse, ApiError } from './client';
 
 // Auth
 export {
@@ -23,31 +22,10 @@ export {
   getToken,
 } from './auth';
 
-export type {
-  RegisterRequest,
-  RegisterResponse,
-  RequestVerifyRequest,
-  RequestVerifyResponse,
-  VerifyOtpRequest,
-  VerifyOtpResponse,
-  LoginRequest,
-  LoginResponse,
-  RecoverPasswordRequest,
-  RecoverPasswordResponse,
-  User,
-} from './auth';
-
 // User
 export {
   getProfile,
   updateProfile,
   updateHealth,
   changePassword,
-} from './user';
-
-export type {
-  ChangePasswordRequest,
-  ChangePasswordResponse,
-  UpdateProfileRequest,
-  UpdateHealthRequest,
 } from './user';

@@ -1,0 +1,71 @@
+/**
+ * Authentication related types
+ */
+
+// ==================== Request Types ====================
+
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  phonenumber?: string; // lowercase to match backend DTO
+}
+
+export interface RequestVerifyRequest {
+  email: string;
+}
+
+export interface VerifyOtpRequest {
+  email: string;
+  otpCode: string;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RecoverPasswordRequest {
+  username: string;
+  email: string;
+  phoneNumber: string; // lowercase to match backend DTO
+}
+
+// ==================== Response Types ====================
+
+export interface RegisterResponse {
+  message: string;
+}
+
+export interface RequestVerifyResponse {
+  message: string;
+}
+
+export interface VerifyOtpResponse {
+  message: string;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  userId: string;
+  username: string;
+  email: string;
+  role: string;
+}
+
+export interface RecoverPasswordResponse {
+  message: string;
+}
+
+// ==================== Entity Types ====================
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  phonenumber?: string; // lowercase to match backend DTO
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

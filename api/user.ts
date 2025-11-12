@@ -2,45 +2,15 @@
  * User API functions
  */
 
+import type {
+  User,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  UpdateProfileRequest,
+  UpdateHealthRequest,
+} from '../types';
 import { apiClient } from './client';
 import { API_ENDPOINTS } from './config';
-import type { User } from './auth';
-
-// ==================== Types ====================
-
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-export interface ChangePasswordResponse {
-  message: string;
-}
-
-export interface UpdateProfileRequest {
-  email?: string;
-  phonenumber?: string; // lowercase to match backend DTO
-  firstName?: string;
-  lastName?: string;
-  dateOfBirth?: string;
-  gender?: string;
-}
-
-export interface UpdateHealthRequest {
-  age?: number;
-  sex?: number;
-  cp?: number;
-  trestbps?: number;
-  chol?: number;
-  fbs?: number;
-  restecg?: number;
-  thalach?: number;
-  exang?: number;
-  oldpeak?: number;
-  slope?: number;
-  ca?: number;
-  thal?: number;
-}
 
 // ==================== API Functions ====================
 
