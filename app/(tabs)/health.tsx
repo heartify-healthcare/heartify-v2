@@ -25,6 +25,7 @@ import type { User } from '@/types';
 const HealthScreen: React.FC = () => {
   const [userData, setUserData] = useState<HealthUserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState<HealthFormData>({
     dob: '',
@@ -45,6 +46,7 @@ const HealthScreen: React.FC = () => {
   // Fetch user profile data
   const fetchUserProfile = async () => {
     try {
+      setIsLoading(true);
       const profile: User = await getProfile();
       
       // Map User to HealthUserData
@@ -77,15 +79,22 @@ const HealthScreen: React.FC = () => {
       setFormData(newFormData);
       setOriginalData(newFormData);
 
-      // Check if health data exists - if yes, set isEditing to false
-      const hasHealthData = profile.dob && profile.cp !== null && profile.cp !== undefined &&
-                           profile.exang !== null && profile.exang !== undefined &&
-                           profile.sex !== null && profile.sex !== undefined &&
-                           profile.trestbps !== null && profile.trestbps !== undefined;
+      // Check if health data exists
+      // If NO health data, enable editing mode automatically
+      // If HAS health data, disable editing (user can click Edit button)
+      const hasHealthData = !!(
+        profile.dob && 
+        profile.cp !== null && profile.cp !== undefined &&
+        profile.exang !== null && profile.exang !== undefined &&
+        profile.sex !== null && profile.sex !== undefined &&
+        profile.trestbps !== null && profile.trestbps !== undefined
+      );
       setIsEditing(!hasHealthData);
     } catch (error: any) {
       console.error('Error fetching user profile:', error);
       Alert.alert('Error', error.message || 'Failed to load profile');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -172,21 +181,42 @@ const HealthScreen: React.FC = () => {
     }
   };
 
-  if (!userData) {
+  // Show loading state
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#7f8c8d' }}>No user data available</Text>
+          <Text style={{ fontSize: 16, color: '#3498db' }}>Loading your profile...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const hasHealthData = formData.dob !== '' &&
+  // Show error state if no user data
+  if (!userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 16, color: '#e74c3c', marginBottom: 16 }}>Failed to load user data</Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={fetchUserProfile}
+          >
+            <Text style={styles.buttonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Check if user has completed health data
+  const hasHealthData = !!(
+    userData.dob && 
     userData.cp !== null && userData.cp !== undefined &&
     userData.exang !== null && userData.exang !== undefined &&
     userData.sex !== null && userData.sex !== undefined &&
-    userData.trestbps !== null && userData.trestbps !== undefined;
+    userData.trestbps !== null && userData.trestbps !== undefined
+  );
 
   const isFormDisabled = hasHealthData && !isEditing;
 
@@ -201,6 +231,31 @@ const HealthScreen: React.FC = () => {
               : 'Please provide your health information for cardiovascular risk assessment'
             }
           </Text>
+
+          {/* Info box for new users */}
+          {!hasHealthData && (
+            <View style={{
+              backgroundColor: '#e3f2fd',
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 20,
+              borderLeftWidth: 4,
+              borderLeftColor: '#2196f3'
+            }}>
+              <Text style={{ 
+                fontSize: 14, 
+                color: '#1976d2',
+                fontWeight: '600',
+                marginBottom: 8
+              }}>
+                📋 Complete Your Health Profile
+              </Text>
+              <Text style={{ fontSize: 13, color: '#424242', lineHeight: 20 }}>
+                To get accurate cardiovascular risk assessments, please fill in all required fields below. 
+                This information helps our AI model provide personalized health insights.
+              </Text>
+            </View>
+          )}
 
           <View style={styles.formContainer}>
             {/* Date of Birth Picker */}
