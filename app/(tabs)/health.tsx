@@ -19,6 +19,8 @@ import {
 } from '@/components/health';
 import { convertGMTToYYYYMMDD, validateAge } from '@/utils';
 import type { HealthUserData, HealthFormData } from '@/types';
+import { getProfile, updateHealth } from '@/api';
+import type { User } from '@/types';
 
 const HealthScreen: React.FC = () => {
   const [userData, setUserData] = useState<HealthUserData | null>(null);
@@ -42,41 +44,49 @@ const HealthScreen: React.FC = () => {
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
-    // Mock user data
-    const mockUserData: HealthUserData = {
-      email: 'demo@heartify.com',
-      id: 1,
-      is_verified: true,
-      phonenumber: '1234567890',
-      role: 'user',
-      username: 'demouser',
-      created_at: new Date().toISOString(),
-      dob: '1990-01-15',
-      cp: 2,
-      exang: 0,
-      sex: 1,
-      trestbps: 130
-    };
+    try {
+      const profile: User = await getProfile();
+      
+      // Map User to HealthUserData
+      const mappedUserData: HealthUserData = {
+        email: profile.email,
+        id: profile.id,
+        is_verified: profile.isVerified ?? false,
+        phonenumber: profile.phonenumber || '',
+        role: profile.role,
+        username: profile.username,
+        created_at: profile.createdAt,
+        dob: profile.dob,
+        cp: profile.cp,
+        exang: profile.exang,
+        sex: profile.sex,
+        trestbps: profile.trestbps
+      };
 
-    setUserData(mockUserData);
-    
-    const convertedDob = convertGMTToYYYYMMDD(mockUserData.dob || '');
-    const newFormData = {
-      dob: convertedDob,
-      cp: mockUserData.cp,
-      exang: mockUserData.exang,
-      sex: mockUserData.sex,
-      trestbps: mockUserData.trestbps?.toString() || ''
-    };
-    
-    setFormData(newFormData);
-    setOriginalData(newFormData);
+      setUserData(mappedUserData);
+      
+      const convertedDob = profile.dob ? convertGMTToYYYYMMDD(profile.dob) : '';
+      const newFormData = {
+        dob: convertedDob,
+        cp: profile.cp,
+        exang: profile.exang,
+        sex: profile.sex,
+        trestbps: profile.trestbps?.toString() || ''
+      };
+      
+      setFormData(newFormData);
+      setOriginalData(newFormData);
 
-    // Check if health data exists - if yes, set isEditing to false
-    const hasHealthData = mockUserData.dob && mockUserData.cp !== null && 
-                         mockUserData.exang !== null && mockUserData.sex !== null && 
-                         mockUserData.trestbps !== null;
-    setIsEditing(!hasHealthData);
+      // Check if health data exists - if yes, set isEditing to false
+      const hasHealthData = profile.dob && profile.cp !== null && profile.cp !== undefined &&
+                           profile.exang !== null && profile.exang !== undefined &&
+                           profile.sex !== null && profile.sex !== undefined &&
+                           profile.trestbps !== null && profile.trestbps !== undefined;
+      setIsEditing(!hasHealthData);
+    } catch (error: any) {
+      console.error('Error fetching user profile:', error);
+      Alert.alert('Error', error.message || 'Failed to load profile');
+    }
   };
 
   // Load user data on component mount
@@ -116,32 +126,50 @@ const HealthScreen: React.FC = () => {
       return;
     }
 
-    // Update local state
-    if (userData) {
-      const updatedUserData = {
-        ...userData,
+    try {
+      // Call API to update health data
+      const updatedProfile = await updateHealth({
         dob: formData.dob,
-        cp: formData.cp,
-        exang: formData.exang,
         sex: formData.sex,
-        trestbps: trestbps
-      };
-      setUserData(updatedUserData);
-    }
+        cp: formData.cp,
+        trestbps: trestbps,
+        exang: formData.exang
+      });
 
-    Alert.alert(
-      'Success',
-      userData?.dob ? 'Health data updated successfully! (UI Demo Mode)' : 'Health data submitted successfully! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setIsEditing(false);
-            setOriginalData({ ...formData });
+      // Update local state with response
+      const mappedUserData: HealthUserData = {
+        email: updatedProfile.email,
+        id: updatedProfile.id,
+        is_verified: updatedProfile.isVerified ?? false,
+        phonenumber: updatedProfile.phonenumber || '',
+        role: updatedProfile.role,
+        username: updatedProfile.username,
+        created_at: updatedProfile.createdAt,
+        dob: updatedProfile.dob,
+        cp: updatedProfile.cp,
+        exang: updatedProfile.exang,
+        sex: updatedProfile.sex,
+        trestbps: updatedProfile.trestbps
+      };
+      setUserData(mappedUserData);
+
+      Alert.alert(
+        'Success',
+        userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setIsEditing(false);
+              setOriginalData({ ...formData });
+            }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      console.error('Error updating health data:', error);
+      Alert.alert('Error', error.message || 'Failed to update health data');
+    }
   };
 
   if (!userData) {

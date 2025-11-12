@@ -3,17 +3,17 @@
  */
 export interface UserData {
   email: string;
-  id: number;
+  id: string; // UUID from backend
   is_verified: boolean;
-  phonenumber: string | null;
+  phonenumber?: string;
   role: string;
   username: string;
   created_at: string;
-  dob: string | null;
-  cp: number | null;
-  exang: number | null;
-  sex: number | null;
-  trestbps: number | null;
+  dob?: string;
+  cp?: number;
+  exang?: number;
+  sex?: number;
+  trestbps?: number;
 }
 
 /**

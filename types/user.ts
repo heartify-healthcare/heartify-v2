@@ -19,19 +19,11 @@ export interface UpdateProfileRequest {
 }
 
 export interface UpdateHealthRequest {
-  age?: number;
-  sex?: number;
-  cp?: number;
-  trestbps?: number;
-  chol?: number;
-  fbs?: number;
-  restecg?: number;
-  thalach?: number;
-  exang?: number;
-  oldpeak?: number;
-  slope?: number;
-  ca?: number;
-  thal?: number;
+  dob?: string; // ISO date string (YYYY-MM-DD)
+  sex?: number; // 0: Female, 1: Male
+  cp?: number; // Chest pain type (0-3)
+  trestbps?: number; // Resting blood pressure (mm Hg)
+  exang?: number; // Exercise induced angina (0: No, 1: Yes)
 }
 
 // ==================== Response Types ====================

@@ -65,7 +65,12 @@ export interface User {
   email: string;
   phonenumber?: string; // lowercase to match backend DTO
   role: string;
-  isActive: boolean;
+  isVerified?: boolean;
   createdAt: string;
-  updatedAt: string;
+  // Health fields
+  dob?: string; // ISO date string (YYYY-MM-DD)
+  sex?: number; // 0: Female, 1: Male
+  cp?: number; // Chest pain type (0-3)
+  trestbps?: number; // Resting blood pressure (mm Hg)
+  exang?: number; // Exercise induced angina (0: No, 1: Yes)
 }
