@@ -5,4 +5,4 @@ export { convertGMTToYYYYMMDD, formatDateTime, formatDate } from './dateUtils';
 export { validateAge } from './validationUtils';
 
 // Format utilities
-export { formatFeatureName, formatProbability, formatFeatureValue, getFeatureDescription } from './formatUtils';
+export { formatFeatureName, formatProbability, formatFeatureValue } from './formatUtils';

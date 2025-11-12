@@ -59,21 +59,3 @@ export const formatFeatureValue = (key: string, value: number | null | undefined
       return typeof value === 'number' ? value.toFixed(2) : String(value);
   }
 };
-
-/**
- * Get feature description for tooltip/info
- * @param key - Feature key
- * @returns Feature description
- */
-export const getFeatureDescription = (key: string): string => {
-  const descriptions: Record<string, string> = {
-    heart_rate: 'Number of heartbeats per minute',
-    hrv_rmssd: 'Heart Rate Variability - Root Mean Square of Successive Differences',
-    qrs_duration: 'Duration of QRS complex (ventricular depolarization)',
-    r_amplitude: 'Amplitude of R-wave peak',
-    signal_energy: 'Total energy of the ECG signal',
-    r_peaks_count: 'Number of detected R-peaks in the signal'
-  };
-  
-  return descriptions[key] || 'ECG feature measurement';
-};

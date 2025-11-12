@@ -76,34 +76,11 @@ export const styles = StyleSheet.create({
   cardHeaderCenter: {
     flex: 1,
   },
-  sessionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: height * 0.005,
-  },
   sessionId: {
     fontSize: width * 0.045,
     fontWeight: 'bold',
     color: '#2c3e50',
-    marginRight: width * 0.02,
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#d5f4e6',
-    paddingHorizontal: width * 0.02,
-    paddingVertical: height * 0.003,
-    borderRadius: 10,
-  },
-  statusDot: {
-    fontSize: width * 0.025,
-    color: '#27ae60',
-    marginRight: width * 0.01,
-  },
-  statusText: {
-    fontSize: width * 0.028,
-    color: '#27ae60',
-    fontWeight: '600',
+    marginBottom: height * 0.005,
   },
   sessionDateContainer: {
     flexDirection: 'row',
@@ -162,15 +139,6 @@ export const styles = StyleSheet.create({
     marginBottom: height * 0.015,
   },
   // ECG Recording Styles
-  chartContainer: {
-    marginBottom: height * 0.02,
-  },
-  chartLabel: {
-    fontSize: width * 0.035,
-    fontWeight: '600',
-    color: '#34495e',
-    marginBottom: height * 0.01,
-  },
   samplingRateContainer: {
     backgroundColor: '#ecf0f1',
     borderRadius: 5,
@@ -265,17 +233,6 @@ export const styles = StyleSheet.create({
     fontSize: width * 0.033,
     color: '#2c3e50',
     lineHeight: width * 0.045,
-  },
-  promptContainer: {
-    backgroundColor: '#ecf0f1',
-    borderRadius: 5,
-    padding: width * 0.025,
-    marginBottom: height * 0.01,
-  },
-  promptText: {
-    fontSize: width * 0.03,
-    color: '#7f8c8d',
-    fontFamily: 'monospace',
   },
   // Loading State
   loadingContainer: {
