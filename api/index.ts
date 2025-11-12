@@ -26,3 +26,11 @@ export {
   updateHealth,
   changePassword,
 } from './user';
+
+// Predictions
+export {
+  getECGSessions,
+  getECGRecording,
+  getPrediction,
+  getExplanation,
+} from './predictions';

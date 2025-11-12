@@ -202,6 +202,20 @@ export const styles = StyleSheet.create({
     color: '#7f8c8d',
     fontFamily: 'monospace',
   },
+  // Loading State
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: width * 0.05,
+    minHeight: height * 0.1,
+  },
+  loadingText: {
+    fontSize: width * 0.035,
+    color: '#7f8c8d',
+    marginTop: height * 0.01,
+    textAlign: 'center',
+  },
   // Empty State
   emptyContainer: {
     flex: 1,

@@ -24,6 +24,12 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: `${PREFIX}/users/profile`,
     UPDATE_HEALTH: `${PREFIX}/users/profile/health`,
   },
+
+  // ECG & Predictions endpoints
+  ECG_SESSIONS: `${PREFIX}/ecg-sessions`,
+  ECG_RECORDINGS: `${PREFIX}/ecg-recordings`,
+  PREDICTIONS: `${PREFIX}/predictions`,
+  EXPLANATIONS: `${PREFIX}/explanations`,
 };
 
 // Request timeout

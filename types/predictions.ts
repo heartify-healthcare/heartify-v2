@@ -39,8 +39,10 @@ export interface ExplanationPrompt {
 
 export interface ExplanationDetails {
   summary: string;
-  recommendation: string;
   details: string;
+  recommendations: string;
+  risk_level: string;
+  next_steps: string;
 }
 
 export interface Explanation {
@@ -62,6 +64,12 @@ export interface ECGSession {
   ecgRecording?: ECGRecording | null;
   prediction?: Prediction | null;
   explanation?: Explanation | null;
+  // Loading states for progressive data fetching
+  loadingState?: {
+    ecgRecording: 'idle' | 'loading' | 'loaded' | 'error';
+    prediction: 'idle' | 'loading' | 'loaded' | 'error';
+    explanation: 'idle' | 'loading' | 'loaded' | 'error';
+  };
 }
 
 export interface ECGSessionsResponse {

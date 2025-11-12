@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { ECGChart } from '@/components';
 import { formatDateTime, formatFeatureName, formatProbability, formatFeatureValue } from '@/utils';
 import type {
@@ -40,7 +40,17 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
       {isExpanded && (
         <View style={styles.expandedContent}>
           {/* ECG Recording Section */}
-          {session.ecgRecording && (
+          {session.loadingState?.ecgRecording === 'loading' && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>ECG Recording</Text>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#3498db" />
+                <Text style={styles.loadingText}>Loading ECG data...</Text>
+              </View>
+            </View>
+          )}
+          
+          {session.ecgRecording && session.loadingState?.ecgRecording === 'loaded' && (
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>ECG Recording</Text>
               
@@ -68,7 +78,17 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
           )}
 
           {/* Prediction Section */}
-          {session.prediction && (
+          {session.loadingState?.prediction === 'loading' && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Prediction Results</Text>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#27ae60" />
+                <Text style={styles.loadingText}>Loading prediction data...</Text>
+              </View>
+            </View>
+          )}
+          
+          {session.prediction && session.loadingState?.prediction === 'loaded' && (
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>Prediction Results</Text>
               
@@ -201,7 +221,17 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
           )}
 
           {/* Explanation Section */}
-          {session.explanation && (
+          {session.loadingState?.explanation === 'loading' && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>AI Explanation</Text>
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#9b59b6" />
+                <Text style={styles.loadingText}>Loading AI explanation...</Text>
+              </View>
+            </View>
+          )}
+          
+          {session.explanation && session.loadingState?.explanation === 'loaded' && (
             <View style={styles.sectionContainer}>
               <Text style={styles.sectionTitle}>AI Explanation</Text>
               
@@ -238,11 +268,34 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
                   </Text>
                 </View>
 
-                {/* Recommendation */}
+                {/* Recommendations */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Recommendation:</Text>
+                  <Text style={styles.explanationLabel}>Recommendations:</Text>
                   <Text style={styles.explanationText}>
-                    {session.explanation.explanation.recommendation}
+                    {session.explanation.explanation.recommendations}
+                  </Text>
+                </View>
+
+                {/* Risk Level */}
+                <View style={styles.explanationSection}>
+                  <Text style={styles.explanationLabel}>Risk Level:</Text>
+                  <Text style={[
+                    styles.explanationText,
+                    { 
+                      fontWeight: 'bold',
+                      color: session.explanation.explanation.risk_level === 'low' ? '#27ae60' :
+                             session.explanation.explanation.risk_level === 'medium' ? '#f39c12' : '#e74c3c'
+                    }
+                  ]}>
+                    {session.explanation.explanation.risk_level.toUpperCase()}
+                  </Text>
+                </View>
+
+                {/* Next Steps */}
+                <View style={styles.explanationSection}>
+                  <Text style={styles.explanationLabel}>Next Steps:</Text>
+                  <Text style={styles.explanationText}>
+                    {session.explanation.explanation.next_steps}
                   </Text>
                 </View>
               </View>
