@@ -26,9 +26,21 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
       {/* Card Header */}
       <TouchableOpacity onPress={handleExpand} activeOpacity={0.7}>
         <View style={styles.cardHeader}>
-          <View style={styles.cardHeaderLeft}>
-            <Text style={styles.sessionId}>Session #{index + 1}</Text>
-            <Text style={styles.sessionDate}>{formatDateTime(session.createdAt)}</Text>
+          <View style={styles.sessionNumberBadge}>
+            <Text style={styles.sessionNumberText}>#{index + 1}</Text>
+          </View>
+          <View style={styles.cardHeaderCenter}>
+            <Text style={styles.sessionId}>ECG Session</Text>
+            <View style={styles.sessionDateContainer}>
+              <Text style={styles.sessionDateIcon}>📅</Text>
+              <Text style={styles.sessionDate}>{formatDateTime(session.createdAt)}</Text>
+            </View>
+            {session.deviceId && (
+              <View style={styles.deviceContainer}>
+                <Text style={styles.deviceIcon}>📱</Text>
+                <Text style={styles.deviceText}>{session.deviceId}</Text>
+              </View>
+            )}
           </View>
           <View style={styles.expandButton}>
             <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
@@ -236,22 +248,6 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
               <Text style={styles.sectionTitle}>AI Explanation</Text>
               
               <View style={styles.explanationContainer}>
-                {/* Prompt Info */}
-                <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Analysis Input:</Text>
-                  <View style={styles.promptContainer}>
-                    <Text style={styles.promptText}>
-                      Diagnosis: {session.explanation.prompt.diagnosis}
-                    </Text>
-                    <Text style={styles.promptText}>
-                      Probability: {formatProbability(session.explanation.prompt.probability)}
-                    </Text>
-                    <Text style={styles.promptText}>
-                      Features: {JSON.stringify(session.explanation.prompt.features, null, 2)}
-                    </Text>
-                  </View>
-                </View>
-
                 {/* Summary */}
                 <View style={styles.explanationSection}>
                   <Text style={styles.explanationLabel}>Summary:</Text>
