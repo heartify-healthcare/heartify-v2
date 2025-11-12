@@ -17,9 +17,6 @@ export {
   login,
   logout,
   recoverPassword,
-  getCurrentUser,
-  isAuthenticated,
-  getToken,
 } from './auth';
 
 // User

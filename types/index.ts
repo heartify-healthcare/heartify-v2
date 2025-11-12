@@ -1,6 +1,3 @@
-// API types
-export type { ApiResponse, ApiError } from './api';
-
 // Auth types
 export type {
   RegisterRequest,
@@ -50,6 +47,4 @@ export type {
   ECGSessionsResponse,
   ECGSessionCardProps,
 } from './predictions';
-
-// ECG types - Add when needed
 

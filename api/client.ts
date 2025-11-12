@@ -4,8 +4,13 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { ApiError } from '../types';
 import { API_BASE_URL, REQUEST_TIMEOUT, STORAGE_KEYS } from './config';
+
+interface ApiError {
+  message: string;
+  status?: number;
+  details?: any;
+}
 
 class ApiClient {
   private baseUrl: string;
