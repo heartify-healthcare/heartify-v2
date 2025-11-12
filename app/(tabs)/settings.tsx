@@ -5,7 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +22,8 @@ const SettingsScreen: React.FC = () => {
 
   // State management
   const [userData, setUserData] = useState<SettingsUserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<SettingsFormData>({
     username: '',
@@ -39,6 +42,9 @@ const SettingsScreen: React.FC = () => {
   // Fetch user profile data
   const fetchUserProfile = async () => {
     try {
+      setIsLoading(true);
+      setLoadError(null);
+      
       const profile: User = await getProfile();
       
       // Map User to SettingsUserData
@@ -68,7 +74,9 @@ const SettingsScreen: React.FC = () => {
       setOriginalData(newFormData);
     } catch (error: any) {
       console.error('Error fetching user profile:', error);
-      Alert.alert('Error', error.message || 'Failed to load profile');
+      setLoadError(error.message || 'Failed to load profile');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -201,16 +209,36 @@ const SettingsScreen: React.FC = () => {
     return userData?.is_verified ? '#27ae60' : '#e74c3c';
   };
 
-  if (!userData) {
+  // Loading state
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ color: '#e74c3c', fontSize: 16 }}>Failed to load user data</Text>
+          <ActivityIndicator size="large" color="#4A90E2" />
+          <Text style={{ color: '#7f8c8d', fontSize: 16, marginTop: 16 }}>
+            Loading profile...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (loadError || !userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+          <Text style={{ color: '#e74c3c', fontSize: 18, fontWeight: '600', marginBottom: 8 }}>
+            Failed to load profile
+          </Text>
+          <Text style={{ color: '#7f8c8d', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
+            {loadError || 'Unable to retrieve your profile data'}
+          </Text>
           <TouchableOpacity
-            style={[styles.button, { marginTop: 20 }]}
+            style={[styles.button, { paddingHorizontal: 32 }]}
             onPress={fetchUserProfile}
           >
-            <Text style={styles.buttonText}>Retry</Text>
+            <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
