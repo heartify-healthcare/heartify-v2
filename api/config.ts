@@ -2,9 +2,16 @@
  * API Configuration
  */
 
+import { 
+  API_BASE_URL as ENV_API_BASE_URL, 
+  API_PREFIX as ENV_API_PREFIX, 
+  REQUEST_TIMEOUT as ENV_REQUEST_TIMEOUT,
+  STORAGE_PREFIX as ENV_STORAGE_PREFIX 
+} from '@env';
+
 // Base URLs for different services
-export const API_BASE_URL = 'http://192.168.1.13:8080'; // API Gateway URL
-export const PREFIX = '/api/v1';
+export const API_BASE_URL = ENV_API_BASE_URL; // API Gateway URL
+export const PREFIX = ENV_API_PREFIX;
 
 // API Endpoints
 export const API_ENDPOINTS = {
@@ -33,10 +40,11 @@ export const API_ENDPOINTS = {
 };
 
 // Request timeout
-export const REQUEST_TIMEOUT = 30000; // 30 seconds
+export const REQUEST_TIMEOUT = parseInt(ENV_REQUEST_TIMEOUT); // in millisecond
 
 // Storage keys
+const STORAGE_PREFIX_VALUE = ENV_STORAGE_PREFIX || '@heartify';
 export const STORAGE_KEYS = {
-  TOKEN: '@heartify:token',
-  USER: '@heartify:user',
+  TOKEN: `${STORAGE_PREFIX_VALUE}:token`,
+  USER: `${STORAGE_PREFIX_VALUE}:user`,
 };
