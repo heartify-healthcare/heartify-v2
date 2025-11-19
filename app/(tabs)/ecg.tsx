@@ -7,15 +7,22 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { styles } from '@/styles/(tabs)/ecg';
 import { DeviceInput } from '@/components/ecg';
 import { ECGChart } from '@/components';
 import PolarEcgModule from '@/modules/polar-ecg-module';
-import { MAX_DATA_POINTS } from '@/constants';
+import { MAX_DATA_POINTS, REQUIRED_ECG_SAMPLES, POLAR_SAMPLING_RATE, RECORDING_DURATION_SECONDS } from '@/constants';
+import { createECGSession } from '@/api';
+import type { CreateECGSessionRequest } from '@/types';
 
 const ECGScreen: React.FC = () => {
+  const router = useRouter();
+  
   // Device connection states
   const [deviceId, setDeviceId] = useState('');
   const [isConnected, setIsConnected] = useState(false);
@@ -31,6 +38,10 @@ const ECGScreen: React.FC = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedEcgData, setRecordedEcgData] = useState<number[]>([]);
   const isRecordingRef = useRef(false); // Ref to track recording state in listener
+
+  // Prediction states
+  const [isPredicting, setIsPredicting] = useState(false);
+  const [predictionProgress, setPredictionProgress] = useState('');
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -53,7 +64,32 @@ const ECGScreen: React.FC = () => {
 
       // If recording, save to recorded data (use ref to get current value)
       if (isRecordingRef.current) {
-        setRecordedEcgData((prev) => [...prev, ...voltages]);
+        setRecordedEcgData((prev) => {
+          const newData = [...prev, ...voltages];
+          
+          // Auto-stop recording when reaching required samples
+          if (newData.length >= REQUIRED_ECG_SAMPLES && isRecordingRef.current) {
+            // Stop recording
+            isRecordingRef.current = false;
+            setIsRecording(false);
+            
+            // Trim to exact sample count
+            const trimmedData = newData.slice(0, REQUIRED_ECG_SAMPLES);
+            
+            // Show alert
+            setTimeout(() => {
+              Alert.alert(
+                'Recording Complete',
+                `Successfully recorded ${REQUIRED_ECG_SAMPLES} samples!\n\nYou can now make a prediction.`,
+                [{ text: 'OK' }]
+              );
+            }, 100);
+            
+            return trimmedData;
+          }
+          
+          return newData;
+        });
       }
 
       // Simple heart rate estimation from ECG peaks
@@ -213,7 +249,10 @@ const ECGScreen: React.FC = () => {
     setIsRecording(true);
     isRecordingRef.current = true; // Update ref
     setRecordedEcgData([]);
-    Alert.alert('Recording Started', 'ECG data is being recorded');
+    Alert.alert(
+      'Recording Started',
+      `Recording will automatically stop after ${REQUIRED_ECG_SAMPLES} samples (${RECORDING_DURATION_SECONDS} seconds at ${POLAR_SAMPLING_RATE}Hz)`
+    );
   };
 
   const handleStopRecording = () => {
@@ -223,10 +262,19 @@ const ECGScreen: React.FC = () => {
     }
     setIsRecording(false);
     isRecordingRef.current = false; // Update ref
-    Alert.alert(
-      'Recording Stopped',
-      `Recorded ${recordedEcgData.length} data points`
-    );
+    
+    const sampleCount = recordedEcgData.length;
+    if (sampleCount < REQUIRED_ECG_SAMPLES) {
+      Alert.alert(
+        'Recording Stopped',
+        `Warning: Recorded only ${sampleCount} samples. ${REQUIRED_ECG_SAMPLES} samples required for prediction.`
+      );
+    } else {
+      Alert.alert(
+        'Recording Stopped',
+        `Successfully recorded ${sampleCount} samples`
+      );
+    }
   };
 
   const handleClearRecording = () => {
@@ -252,20 +300,104 @@ const ECGScreen: React.FC = () => {
     );
   };
 
-  const handleMakePrediction = () => {
+  const handleMakePrediction = async () => {
     if (recordedEcgData.length === 0) {
       Alert.alert('Error', 'No recorded data available for prediction');
       return;
     }
 
-    // TODO: IMPLEMENT API CALL TO SERVER FOR ECG PREDICTION
-    // SEND recordedEcgData TO YOUR BACKEND SERVER
-    // RECEIVE PREDICTION RESULT AND DISPLAY IT TO USER
+    // Validate sample count
+    if (recordedEcgData.length < REQUIRED_ECG_SAMPLES) {
+      Alert.alert(
+        'Insufficient Data',
+        `You need exactly ${REQUIRED_ECG_SAMPLES} samples for prediction.\n\nCurrent: ${recordedEcgData.length} samples\nRequired: ${REQUIRED_ECG_SAMPLES} samples\n\nPlease record again.`,
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
+    // Show confirmation dialog
     Alert.alert(
-      'Prediction',
-      'This feature will send ECG data to server for prediction.\n\n' +
-      'TO BE IMPLEMENTED: API call to server with recorded ECG data.'
+      'Submit for Prediction?',
+      `Ready to submit ${recordedEcgData.length} ECG samples for analysis.\n\nThis may take 30-60 seconds to process.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Submit',
+          onPress: () => submitECGForPrediction(),
+        },
+      ]
     );
+  };
+
+  const submitECGForPrediction = async () => {
+    try {
+      setIsPredicting(true);
+      setPredictionProgress('Preparing ECG data...');
+
+      // Prepare exactly 1300 samples
+      const ecgSamples = recordedEcgData.slice(0, REQUIRED_ECG_SAMPLES);
+      
+      // Calculate duration in seconds
+      const duration = ecgSamples.length / POLAR_SAMPLING_RATE;
+
+      // Prepare request body
+      const request: CreateECGSessionRequest = {
+        deviceId: deviceId,
+        rawData: {
+          signal: ecgSamples,
+          lead: 'Lead I',
+          duration: duration,
+        },
+        denoisedData: {
+          signal: ecgSamples,
+          lead: 'Lead I', 
+          duration: duration,
+        },
+        samplingRate: POLAR_SAMPLING_RATE,
+      };
+
+      setPredictionProgress('Uploading to server...');
+
+      // Call API to create ECG session (this will take time due to ML processing)
+      const response = await createECGSession(request);
+
+      setPredictionProgress('Analysis complete!');
+
+      // Success! Show result and navigate
+      Alert.alert(
+        'Prediction Complete!',
+        `Your ECG has been analyzed successfully.\n\nDiagnosis: ${response.prediction?.diagnosis || 'Unknown'}\nConfidence: ${response.prediction?.probability ? (response.prediction.probability * 100).toFixed(1) + '%' : 'N/A'}\n\nView full details in the Predictions tab.`,
+        [
+          {
+            text: 'View Now',
+            onPress: () => {
+              // Clear recorded data
+              setRecordedEcgData([]);
+              // Navigate to predictions tab
+              router.push('/(tabs)');
+            },
+          },
+          {
+            text: 'Stay Here',
+            onPress: () => {
+              // Clear recorded data
+              setRecordedEcgData([]);
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      console.error('Prediction error:', error);
+      Alert.alert(
+        'Prediction Failed',
+        error.message || 'Failed to process ECG data. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setIsPredicting(false);
+      setPredictionProgress('');
+    }
   };
 
   return (
@@ -429,7 +561,12 @@ const ECGScreen: React.FC = () => {
               {isRecording && (
                 <View style={styles.infoBox}>
                   <Text style={styles.infoText}>
-                    🔴 Recording in progress... {recordedEcgData.length} samples captured
+                    🔴 Recording: {recordedEcgData.length} / {REQUIRED_ECG_SAMPLES} samples
+                    {'\n'}
+                    {recordedEcgData.length < REQUIRED_ECG_SAMPLES 
+                      ? `${REQUIRED_ECG_SAMPLES - recordedEcgData.length} more samples needed...`
+                      : 'Target reached! Recording will stop automatically.'
+                    }
                   </Text>
                 </View>
               )}
@@ -456,23 +593,51 @@ const ECGScreen: React.FC = () => {
                   styles.button,
                   styles.predictionButton,
                   styles.fullWidthButton,
+                  (recordedEcgData.length < REQUIRED_ECG_SAMPLES || isPredicting) && styles.buttonDisabled,
                 ]}
                 onPress={handleMakePrediction}
+                disabled={recordedEcgData.length < REQUIRED_ECG_SAMPLES || isPredicting}
               >
-                <Text style={styles.buttonText}>Make Prediction</Text>
+                <Text style={styles.buttonText}>
+                  {isPredicting ? 'Processing...' : 'Make Prediction'}
+                </Text>
               </TouchableOpacity>
 
               <View style={styles.infoBox}>
                 <Text style={styles.infoText}>
-                  📊 Total recorded samples: {recordedEcgData.length}
-                  {'\n'}
-                  Tap "Make Prediction" to send this data for cardiovascular analysis.
+                  📊 Recorded samples: {recordedEcgData.length} / {REQUIRED_ECG_SAMPLES}
+                  {recordedEcgData.length >= REQUIRED_ECG_SAMPLES 
+                    ? '\n✅ Ready for prediction!' 
+                    : `\n⚠️ ${REQUIRED_ECG_SAMPLES - recordedEcgData.length} more samples needed`
+                  }
+                  {recordedEcgData.length >= REQUIRED_ECG_SAMPLES && 
+                    '\n\nTap "Make Prediction" to send data for cardiovascular analysis.'
+                  }
                 </Text>
               </View>
             </View>
           )}
         </View>
       </ScrollView>
+
+      {/* Prediction Loading Modal */}
+      <Modal
+        visible={isPredicting}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {}}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <ActivityIndicator size="large" color="#3498db" />
+            <Text style={styles.modalTitle}>Processing ECG Analysis</Text>
+            <Text style={styles.modalMessage}>{predictionProgress}</Text>
+            <Text style={styles.modalSubtext}>
+              This may take 30-60 seconds...{'\n'}Please do not close the app.
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };

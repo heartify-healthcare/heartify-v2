@@ -46,5 +46,7 @@ export type {
   ECGSession,
   ECGSessionsResponse,
   ECGSessionCardProps,
+  CreateECGSessionRequest,
+  CreateECGSessionResponse,
 } from './predictions';
 

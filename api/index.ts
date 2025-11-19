@@ -33,4 +33,5 @@ export {
   getECGRecording,
   getPrediction,
   getExplanation,
+  createECGSession,
 } from './predictions';

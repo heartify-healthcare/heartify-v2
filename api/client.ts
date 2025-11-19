@@ -150,17 +150,34 @@ class ApiClient {
   async post<T>(
     endpoint: string,
     data?: any,
-    customHeaders?: Record<string, string>
+    customHeaders?: Record<string, string>,
+    customTimeout?: number
   ): Promise<T> {
     try {
       const headers = await this.buildHeaders(customHeaders);
-      const response = await this.requestWithTimeout(`${this.baseUrl}${endpoint}`, {
-        method: 'POST',
-        headers,
-        body: data ? JSON.stringify(data) : undefined,
-      });
+      const timeoutDuration = customTimeout || this.timeout;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
 
-      return await this.handleResponse<T>(response);
+      try {
+        const response = await fetch(`${this.baseUrl}${endpoint}`, {
+          method: 'POST',
+          headers,
+          body: data ? JSON.stringify(data) : undefined,
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        return await this.handleResponse<T>(response);
+      } catch (error: any) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw {
+            message: 'Request timeout',
+            status: 408,
+          } as ApiError;
+        }
+        throw error;
+      }
     } catch (error: any) {
       console.error('POST request error:', error);
       throw error;

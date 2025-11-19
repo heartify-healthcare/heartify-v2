@@ -8,9 +8,11 @@ import type {
   ECGRecording,
   Prediction,
   Explanation,
+  CreateECGSessionRequest,
+  CreateECGSessionResponse,
 } from '../types';
 import { apiClient } from './client';
-import { API_ENDPOINTS } from './config';
+import { API_ENDPOINTS, EXTENDED_REQUEST_TIMEOUT } from './config';
 
 // ==================== API Functions ====================
 
@@ -83,6 +85,30 @@ export const getExplanation = async (explanationId: string): Promise<Explanation
   } catch (error: any) {
     throw {
       message: error.message || 'Failed to fetch explanation',
+      details: error.details,
+    };
+  }
+};
+
+/**
+ * Create a new ECG session with prediction and explanation
+ * This endpoint processes ECG data and returns full analysis
+ * Note: This may take 30-60 seconds due to ML model processing
+ */
+export const createECGSession = async (
+  request: CreateECGSessionRequest
+): Promise<CreateECGSessionResponse> => {
+  try {
+    const response = await apiClient.post<CreateECGSessionResponse>(
+      API_ENDPOINTS.ECG_SESSIONS,
+      request,
+      undefined,
+      EXTENDED_REQUEST_TIMEOUT // Use extended timeout for ML processing
+    );
+    return response;
+  } catch (error: any) {
+    throw {
+      message: error.message || 'Failed to create ECG session',
       details: error.details,
     };
   }

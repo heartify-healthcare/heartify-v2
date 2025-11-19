@@ -110,3 +110,30 @@ export interface ECGSessionCardProps {
   styles: any;
   onExpand?: (sessionId: string) => void;
 }
+
+/**
+ * Request body for creating a new ECG session
+ */
+export interface CreateECGSessionRequest {
+  deviceId: string;
+  rawData: {
+    signal: number[];
+    lead: string;
+    duration: number;
+  };
+  denoisedData: {
+    signal: number[];
+    lead: string;
+    duration: number;
+  };
+  samplingRate: number;
+}
+
+/**
+ * Response from creating an ECG session
+ */
+export interface CreateECGSessionResponse extends ECGSession {
+  ecgRecording: ECGRecording;
+  prediction: Prediction;
+  explanation: Explanation;
+}
