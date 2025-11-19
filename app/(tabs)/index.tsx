@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Alert } from 'react-native';
+import { View, Text, ScrollView, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '@/styles/(tabs)/index';
 import { ECGSessionCard } from '@/components/predictions';
@@ -9,6 +9,7 @@ import type { ECGSession } from '@/types';
 const PredictionsScreen: React.FC = () => {
   const [sessions, setSessions] = useState<ECGSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch ECG sessions on component mount
@@ -46,6 +47,12 @@ const PredictionsScreen: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchECGSessions();
+    setRefreshing(false);
   };
 
   // Handle session expansion - fetch detailed data progressively
@@ -200,7 +207,18 @@ const PredictionsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.scrollView} 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#e74c3c"
+            colors={['#e74c3c']}
+          />
+        }
+      >
         <View style={styles.contentContainer}>
           <Text style={styles.title}>Predictions</Text>
           <Text style={styles.description}>
