@@ -5,7 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,12 +14,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { styles } from '@/styles/(tabs)/settings';
 import { formatDate } from '@/utils';
 import type { SettingsUserData, SettingsFormData } from '@/types';
+import { getProfile, updateProfile, logout } from '@/api';
+import type { User } from '@/types';
 
 const SettingsScreen: React.FC = () => {
   const router = useRouter();
 
   // State management
   const [userData, setUserData] = useState<SettingsUserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<SettingsFormData>({
     username: '',
@@ -36,31 +41,43 @@ const SettingsScreen: React.FC = () => {
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
-    // Mock user data
-    const mockUserData: SettingsUserData = {
-      email: 'demo@heartify.com',
-      id: 1,
-      is_verified: true,
-      phonenumber: '1234567890',
-      role: 'user',
-      username: 'demouser',
-      created_at: new Date().toISOString(),
-      dob: null,
-      cp: null,
-      exang: null,
-      sex: null,
-      trestbps: null
-    };
+    try {
+      setIsLoading(true);
+      setLoadError(null);
+      
+      const profile: User = await getProfile();
+      
+      // Map User to SettingsUserData
+      const mappedUserData: SettingsUserData = {
+        email: profile.email,
+        id: profile.id,
+        is_verified: profile.isVerified ?? false,
+        phonenumber: profile.phonenumber,
+        role: profile.role,
+        username: profile.username,
+        created_at: profile.createdAt,
+        dob: profile.dob,
+        cp: profile.cp,
+        exang: profile.exang,
+        sex: profile.sex,
+        trestbps: profile.trestbps
+      };
 
-    setUserData(mockUserData);
-    const newFormData = {
-      username: mockUserData.username || '',
-      email: mockUserData.email || '',
-      phonenumber: mockUserData.phonenumber || '',
-      role: mockUserData.role || ''
-    };
-    setFormData(newFormData);
-    setOriginalData(newFormData);
+      setUserData(mappedUserData);
+      const newFormData = {
+        username: profile.username || '',
+        email: profile.email || '',
+        phonenumber: profile.phonenumber || '',
+        role: profile.role || ''
+      };
+      setFormData(newFormData);
+      setOriginalData(newFormData);
+    } catch (error: any) {
+      console.error('Error fetching user profile:', error);
+      setLoadError(error.message || 'Failed to load profile');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Update user profile
@@ -77,27 +94,48 @@ const SettingsScreen: React.FC = () => {
       return;
     }
 
-    // Update local state with new data
-    if (userData) {
-      const updatedUser = {
-        ...userData,
-        username: formData.username,
-        email: formData.email,
-        phonenumber: formData.phonenumber
+    try {
+      // Call API to update profile
+      const updatedProfile = await updateProfile(updateData);
+
+      // Map updated profile to SettingsUserData
+      const mappedUserData: SettingsUserData = {
+        email: updatedProfile.email,
+        id: updatedProfile.id,
+        is_verified: updatedProfile.isVerified ?? false,
+        phonenumber: updatedProfile.phonenumber,
+        role: updatedProfile.role,
+        username: updatedProfile.username,
+        created_at: updatedProfile.createdAt,
+        dob: updatedProfile.dob,
+        cp: updatedProfile.cp,
+        exang: updatedProfile.exang,
+        sex: updatedProfile.sex,
+        trestbps: updatedProfile.trestbps
       };
-      setUserData(updatedUser);
+      setUserData(mappedUserData);
+      
+      setOriginalData({ ...formData });
+      setIsEditing(false);
+      
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', error.message || 'Failed to update profile');
     }
-    
-    setOriginalData({ ...formData });
-    setIsEditing(false);
-    
-    Alert.alert('Success', 'Profile updated successfully! (UI Demo Mode)');
   };
 
   // Handle logout
   const handleLogout = async () => {
-    // Navigate to login screen
-    router.replace('/login');
+    try {
+      await logout();
+      // Navigate to login screen
+      router.replace('/login');
+    } catch (error: any) {
+      console.error('Error logging out:', error);
+      // Still navigate to login even if logout fails
+      router.replace('/login');
+    }
   };
 
   // Load user data on component mount
@@ -171,16 +209,36 @@ const SettingsScreen: React.FC = () => {
     return userData?.is_verified ? '#27ae60' : '#e74c3c';
   };
 
-  if (!userData) {
+  // Loading state
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ color: '#e74c3c', fontSize: 16 }}>Failed to load user data</Text>
+          <ActivityIndicator size="large" color="#4A90E2" />
+          <Text style={{ color: '#7f8c8d', fontSize: 16, marginTop: 16 }}>
+            Loading profile...
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (loadError || !userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+          <Text style={{ color: '#e74c3c', fontSize: 18, fontWeight: '600', marginBottom: 8 }}>
+            Failed to load profile
+          </Text>
+          <Text style={{ color: '#7f8c8d', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
+            {loadError || 'Unable to retrieve your profile data'}
+          </Text>
           <TouchableOpacity
-            style={[styles.button, { marginTop: 20 }]}
+            style={[styles.button, { paddingHorizontal: 32 }]}
             onPress={fetchUserProfile}
           >
-            <Text style={styles.buttonText}>Retry</Text>
+            <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

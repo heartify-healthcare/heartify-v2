@@ -8,11 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/forgot-password';
+import { recoverPassword } from '@/api';
 
 // Define navigation prop type
 interface ForgotPasswordScreenProps {
@@ -25,6 +27,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation function (placeholder)
@@ -47,22 +50,39 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       return;
     }
 
-    // Navigate immediately for UI demo
-    Alert.alert(
-      'Success',
-      'Password reset request submitted! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setUsername('');
-            setEmail('');
-            setPhoneNumber('');
-            router.push("/login");
+    setLoading(true);
+
+    try {
+      // Call recover password API
+      await recoverPassword({
+        username: username.trim(),
+        email: email.trim(),
+        phoneNumber: phoneNumber.trim(), // lowercase 'n' to match backend
+      });
+
+      Alert.alert(
+        'Success',
+        'Password recovery instructions have been sent to your email and phone number.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setUsername('');
+              setEmail('');
+              setPhoneNumber('');
+              router.push('/login');
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Recovery Failed',
+        error.message || 'Failed to recover password. Please verify your information and try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -118,8 +138,13 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleResetPassword}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>Reset Password</Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>Reset Password</Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>

@@ -8,11 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/login';
+import { login } from '@/api';
 
 // Define navigation prop type
 interface LoginScreenProps {
@@ -25,6 +27,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation functions (placeholders)
@@ -49,19 +52,36 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       return;
     }
 
-    // Navigate to main app immediately for UI demo
-    Alert.alert(
-      'Success',
-      'Login successful! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            router.replace('/(tabs)');
+    setLoading(true);
+
+    try {
+      // Call login API
+      const response = await login({
+        username: username.trim(),
+        password: password,
+      });
+
+      // Navigate to main app on success
+      Alert.alert(
+        'Success',
+        'Login successful!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.replace('/(tabs)');
+            }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Login Failed',
+        error.message || 'An error occurred during login. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -125,10 +145,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleLogin}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>
-                  Login
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>
+                    Login
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.signupContainer}>

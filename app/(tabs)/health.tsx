@@ -19,10 +19,13 @@ import {
 } from '@/components/health';
 import { convertGMTToYYYYMMDD, validateAge } from '@/utils';
 import type { HealthUserData, HealthFormData } from '@/types';
+import { getProfile, updateHealth } from '@/api';
+import type { User } from '@/types';
 
 const HealthScreen: React.FC = () => {
   const [userData, setUserData] = useState<HealthUserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [formData, setFormData] = useState<HealthFormData>({
     dob: '',
@@ -42,41 +45,57 @@ const HealthScreen: React.FC = () => {
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
-    // Mock user data
-    const mockUserData: HealthUserData = {
-      email: 'demo@heartify.com',
-      id: 1,
-      is_verified: true,
-      phonenumber: '1234567890',
-      role: 'user',
-      username: 'demouser',
-      created_at: new Date().toISOString(),
-      dob: '1990-01-15',
-      cp: 2,
-      exang: 0,
-      sex: 1,
-      trestbps: 130
-    };
+    try {
+      setIsLoading(true);
+      const profile: User = await getProfile();
+      
+      // Map User to HealthUserData
+      const mappedUserData: HealthUserData = {
+        email: profile.email,
+        id: profile.id,
+        is_verified: profile.isVerified ?? false,
+        phonenumber: profile.phonenumber || '',
+        role: profile.role,
+        username: profile.username,
+        created_at: profile.createdAt,
+        dob: profile.dob,
+        cp: profile.cp,
+        exang: profile.exang,
+        sex: profile.sex,
+        trestbps: profile.trestbps
+      };
 
-    setUserData(mockUserData);
-    
-    const convertedDob = convertGMTToYYYYMMDD(mockUserData.dob || '');
-    const newFormData = {
-      dob: convertedDob,
-      cp: mockUserData.cp,
-      exang: mockUserData.exang,
-      sex: mockUserData.sex,
-      trestbps: mockUserData.trestbps?.toString() || ''
-    };
-    
-    setFormData(newFormData);
-    setOriginalData(newFormData);
+      setUserData(mappedUserData);
+      
+      const convertedDob = profile.dob ? convertGMTToYYYYMMDD(profile.dob) : '';
+      const newFormData = {
+        dob: convertedDob,
+        cp: profile.cp,
+        exang: profile.exang,
+        sex: profile.sex,
+        trestbps: profile.trestbps?.toString() || ''
+      };
+      
+      setFormData(newFormData);
+      setOriginalData(newFormData);
 
-    // Check if health data exists - if yes, set isEditing to false
-    const hasHealthData = mockUserData.dob && mockUserData.cp !== null && 
-                         mockUserData.exang !== null && mockUserData.sex !== null && 
-                         mockUserData.trestbps !== null;
-    setIsEditing(!hasHealthData);
+      // Check if health data exists
+      // If NO health data, enable editing mode automatically
+      // If HAS health data, disable editing (user can click Edit button)
+      const hasHealthData = !!(
+        profile.dob && 
+        profile.cp !== null && profile.cp !== undefined &&
+        profile.exang !== null && profile.exang !== undefined &&
+        profile.sex !== null && profile.sex !== undefined &&
+        profile.trestbps !== null && profile.trestbps !== undefined
+      );
+      setIsEditing(!hasHealthData);
+    } catch (error: any) {
+      console.error('Error fetching user profile:', error);
+      Alert.alert('Error', error.message || 'Failed to load profile');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Load user data on component mount
@@ -116,49 +135,88 @@ const HealthScreen: React.FC = () => {
       return;
     }
 
-    // Update local state
-    if (userData) {
-      const updatedUserData = {
-        ...userData,
+    try {
+      // Call API to update health data
+      const updatedProfile = await updateHealth({
         dob: formData.dob,
-        cp: formData.cp,
-        exang: formData.exang,
         sex: formData.sex,
-        trestbps: trestbps
-      };
-      setUserData(updatedUserData);
-    }
+        cp: formData.cp,
+        trestbps: trestbps,
+        exang: formData.exang
+      });
 
-    Alert.alert(
-      'Success',
-      userData?.dob ? 'Health data updated successfully! (UI Demo Mode)' : 'Health data submitted successfully! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setIsEditing(false);
-            setOriginalData({ ...formData });
+      // Update local state with response
+      const mappedUserData: HealthUserData = {
+        email: updatedProfile.email,
+        id: updatedProfile.id,
+        is_verified: updatedProfile.isVerified ?? false,
+        phonenumber: updatedProfile.phonenumber || '',
+        role: updatedProfile.role,
+        username: updatedProfile.username,
+        created_at: updatedProfile.createdAt,
+        dob: updatedProfile.dob,
+        cp: updatedProfile.cp,
+        exang: updatedProfile.exang,
+        sex: updatedProfile.sex,
+        trestbps: updatedProfile.trestbps
+      };
+      setUserData(mappedUserData);
+
+      Alert.alert(
+        'Success',
+        userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setIsEditing(false);
+              setOriginalData({ ...formData });
+            }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      console.error('Error updating health data:', error);
+      Alert.alert('Error', error.message || 'Failed to update health data');
+    }
   };
 
-  if (!userData) {
+  // Show loading state
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#7f8c8d' }}>No user data available</Text>
+          <Text style={{ fontSize: 16, color: '#3498db' }}>Loading your profile...</Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  const hasHealthData = formData.dob !== '' &&
+  // Show error state if no user data
+  if (!userData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
+          <Text style={{ fontSize: 16, color: '#e74c3c', marginBottom: 16 }}>Failed to load user data</Text>
+          <TouchableOpacity 
+            style={styles.button} 
+            onPress={fetchUserProfile}
+          >
+            <Text style={styles.buttonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Check if user has completed health data
+  const hasHealthData = !!(
+    userData.dob && 
     userData.cp !== null && userData.cp !== undefined &&
     userData.exang !== null && userData.exang !== undefined &&
     userData.sex !== null && userData.sex !== undefined &&
-    userData.trestbps !== null && userData.trestbps !== undefined;
+    userData.trestbps !== null && userData.trestbps !== undefined
+  );
 
   const isFormDisabled = hasHealthData && !isEditing;
 
@@ -173,6 +231,31 @@ const HealthScreen: React.FC = () => {
               : 'Please provide your health information for cardiovascular risk assessment'
             }
           </Text>
+
+          {/* Info box for new users */}
+          {!hasHealthData && (
+            <View style={{
+              backgroundColor: '#e3f2fd',
+              padding: 16,
+              borderRadius: 8,
+              marginBottom: 20,
+              borderLeftWidth: 4,
+              borderLeftColor: '#2196f3'
+            }}>
+              <Text style={{ 
+                fontSize: 14, 
+                color: '#1976d2',
+                fontWeight: '600',
+                marginBottom: 8
+              }}>
+                📋 Complete Your Health Profile
+              </Text>
+              <Text style={{ fontSize: 13, color: '#424242', lineHeight: 20 }}>
+                To get accurate cardiovascular risk assessments, please fill in all required fields below. 
+                This information helps our AI model provide personalized health insights.
+              </Text>
+            </View>
+          )}
 
           <View style={styles.formContainer}>
             {/* Date of Birth Picker */}

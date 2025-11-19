@@ -3,7 +3,7 @@
  */
 export interface UserData {
   email: string;
-  id: number;
+  id: string; // UUID from backend
   is_verified: boolean;
   phonenumber: string;
   role: string;

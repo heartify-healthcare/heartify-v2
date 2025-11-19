@@ -1,3 +1,26 @@
+// Auth types
+export type {
+  RegisterRequest,
+  RegisterResponse,
+  RequestVerifyRequest,
+  RequestVerifyResponse,
+  VerifyOtpRequest,
+  VerifyOtpResponse,
+  LoginRequest,
+  LoginResponse,
+  RecoverPasswordRequest,
+  RecoverPasswordResponse,
+  User,
+} from './auth';
+
+// User types
+export type {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
+  UpdateProfileRequest,
+  UpdateHealthRequest,
+} from './user';
+
 // Health types
 export type {
   UserData as HealthUserData,
@@ -23,7 +46,7 @@ export type {
   ECGSession,
   ECGSessionsResponse,
   ECGSessionCardProps,
+  CreateECGSessionRequest,
+  CreateECGSessionResponse,
 } from './predictions';
-
-// ECG types - Add when needed
 

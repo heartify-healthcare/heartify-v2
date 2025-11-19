@@ -8,11 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/verify-otp';
+import { verifyOtp, requestVerify } from '@/api';
 
 // Define navigation prop type
 interface VerifyOtpScreenProps {
@@ -24,6 +26,7 @@ interface VerifyOtpScreenProps {
 const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   // State for the 6 OTP digits
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Create refs for each input field
   const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -79,19 +82,36 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    // Navigate immediately for UI demo
-    Alert.alert(
-      'Success',
-      'OTP verified successfully! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            router.push('/login');
+    setLoading(true);
+
+    try {
+      // Call verify OTP API
+      await verifyOtp({
+        email: email,
+        otpCode: otpString,
+      });
+
+      // Navigate to login on success
+      Alert.alert(
+        'Success',
+        'Email verified successfully! You can now login.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.push('/login');
+            }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Verification Failed',
+        error.message || 'Invalid OTP. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Resend OTP function
@@ -101,20 +121,35 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    // Show success immediately for UI demo
-    Alert.alert(
-      'Success',
-      'OTP has been resent to your email! (UI Demo Mode)',
-      [
-        {
-          text: 'OK',
-          onPress: () => {
-            setOtp(Array(6).fill(''));
-            inputRefs.current[0]?.focus();
+    setLoading(true);
+
+    try {
+      // Call request verify API
+      await requestVerify({
+        email: email,
+      });
+
+      Alert.alert(
+        'Success',
+        'OTP has been resent to your email!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setOtp(Array(6).fill(''));
+              inputRefs.current[0]?.focus();
+            }
           }
-        }
-      ]
-    );
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Failed',
+        error.message || 'Failed to resend OTP. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -159,14 +194,20 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleVerifyOtp}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>
-                  Verify OTP
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>
+                    Verify OTP
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleResendOtp}
+                disabled={loading}
               >
                 <Text style={styles.resendText}>
                   Didn't receive the code? Resend OTP

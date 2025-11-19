@@ -1,1 +1,0 @@
-// Add ECG types here when needed

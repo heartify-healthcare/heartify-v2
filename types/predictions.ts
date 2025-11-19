@@ -13,10 +13,13 @@ export interface ECGRecording {
 }
 
 export interface PredictionFeatures {
-  pr_interval: number;
-  heart_rate: number;
-  qrs_duration: number;
-  [key: string]: number; // Allow additional features
+  heart_rate?: number | null;
+  hrv_rmssd?: number | null;
+  qrs_duration?: number | null;
+  r_amplitude?: number | null;
+  signal_energy?: number | null;
+  r_peaks_count?: number | null;
+  [key: string]: number | null | undefined; // Allow additional features
 }
 
 export interface Prediction {
@@ -36,8 +39,10 @@ export interface ExplanationPrompt {
 
 export interface ExplanationDetails {
   summary: string;
-  recommendation: string;
   details: string;
+  recommendations: string;
+  risk_level: string;
+  next_steps: string;
 }
 
 export interface Explanation {
@@ -59,6 +64,12 @@ export interface ECGSession {
   ecgRecording?: ECGRecording | null;
   prediction?: Prediction | null;
   explanation?: Explanation | null;
+  // Loading states for progressive data fetching
+  loadingState?: {
+    ecgRecording: 'idle' | 'loading' | 'loaded' | 'error';
+    prediction: 'idle' | 'loading' | 'loaded' | 'error';
+    explanation: 'idle' | 'loading' | 'loaded' | 'error';
+  };
 }
 
 export interface ECGSessionsResponse {
@@ -98,4 +109,31 @@ export interface ECGSessionCardProps {
   index: number;
   styles: any;
   onExpand?: (sessionId: string) => void;
+}
+
+/**
+ * Request body for creating a new ECG session
+ */
+export interface CreateECGSessionRequest {
+  deviceId: string;
+  rawData: {
+    signal: number[];
+    lead: string;
+    duration: number;
+  };
+  denoisedData: {
+    signal: number[];
+    lead: string;
+    duration: number;
+  };
+  samplingRate: number;
+}
+
+/**
+ * Response from creating an ECG session
+ */
+export interface CreateECGSessionResponse extends ECGSession {
+  ecgRecording: ECGRecording;
+  prediction: Prediction;
+  explanation: Explanation;
 }
