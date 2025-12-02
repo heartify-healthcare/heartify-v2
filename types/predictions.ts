@@ -121,11 +121,6 @@ export interface CreateECGSessionRequest {
     lead: string;
     duration: number;
   };
-  denoisedData: {
-    signal: number[];
-    lead: string;
-    duration: number;
-  };
   samplingRate: number;
 }
 

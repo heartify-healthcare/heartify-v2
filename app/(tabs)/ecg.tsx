@@ -346,12 +346,7 @@ const ECGScreen: React.FC = () => {
         deviceId: deviceId,
         rawData: {
           signal: ecgSamples,
-          lead: 'Lead I',
-          duration: duration,
-        },
-        denoisedData: {
-          signal: ecgSamples,
-          lead: 'Lead I', 
+          lead: 'I',
           duration: duration,
         },
         samplingRate: POLAR_SAMPLING_RATE,
