@@ -1,0 +1,1 @@
+export { ECGChart } from './ECGChart';

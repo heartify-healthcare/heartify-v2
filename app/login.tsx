@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/login';
+import { login } from '@/api';
 
 // Define navigation prop type
 interface LoginScreenProps {
@@ -25,45 +26,9 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-
-  // Check for existing authentication on component mount
-  useEffect(() => {
-    checkExistingAuth();
-  }, []);
-
-  const checkExistingAuth = async (): Promise<void> => {
-    try {
-      setIsCheckingAuth(true);
-
-      // Get stored authentication data
-      const authData = await AsyncStorage.multiGet([
-        'access_token',
-        'token_type',
-        'user_data'
-      ]);
-
-      const accessToken = authData[0][1];
-      const tokenType = authData[1][1];
-      const userData = authData[2][1];
-
-      // Check if all required auth data exists
-      if (accessToken && tokenType && userData) {
-        // PUT YOUR API CALLING TO VERIFY TOKEN CODE HERE
-
-        // If token is valid, redirect to main app
-        // router.replace('/(tabs)');
-      }
-    } catch (error) {
-      console.error('Error checking existing auth:', error);
-      // If there's an error, just proceed to show login form
-    } finally {
-      setIsCheckingAuth(false);
-    }
-  };
 
   // Navigation functions (placeholders)
   const handleForgotPassword = (): void => {
@@ -87,38 +52,37 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO LOGIN CODE HERE
+      // Call login API
+      const response = await login({
+        username: username.trim(),
+        password: password,
+      });
 
-      // On successful login, store authentication data and navigate
-      // await AsyncStorage.multiSet([
-      //   ['access_token', access_token],
-      //   ['token_type', token_type],
-      //   ['user_data', JSON.stringify(user)]
-      // ]);
-      // router.replace('/(tabs)');
-
-    } catch (error) {
-      console.error('Login error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      // Navigate to main app on success
+      Alert.alert(
+        'Success',
+        'Login successful!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.replace('/(tabs)');
+            }
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Login Failed',
+        error.message || 'An error occurred during login. Please try again.'
+      );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
-
-  // Show loading screen while checking authentication
-  if (isCheckingAuth) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={styles.appName}>Heartify</Text>
-          <Text style={[styles.appDescription, { marginTop: 20 }]}>Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -146,7 +110,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -159,12 +122,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
-                    editable={!isLoading}
                   />
                   <TouchableOpacity
                     style={styles.eyeButton}
                     onPress={togglePasswordVisibility}
-                    disabled={isLoading}
                   >
                     <Text style={styles.eyeIcon}>
                       {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -175,27 +136,30 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
               <TouchableOpacity
                 onPress={handleForgotPassword}
-                disabled={isLoading}
               >
-                <Text style={[styles.forgotPassword, isLoading && { opacity: 0.6 }]}>
+                <Text style={styles.forgotPassword}>
                   Forgot password?
                 </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleLogin}
-                disabled={isLoading}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Logging in...' : 'Login'}
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>
+                    Login
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.signupContainer}>
                 <Text style={styles.signupText}>Don't have an account? </Text>
-                <TouchableOpacity onPress={handleSignUp} disabled={isLoading}>
-                  <Text style={[styles.signupLink, isLoading && { opacity: 0.6 }]}>
+                <TouchableOpacity onPress={handleSignUp}>
+                  <Text style={styles.signupLink}>
                     Sign Up
                   </Text>
                 </TouchableOpacity>

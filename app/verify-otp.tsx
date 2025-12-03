@@ -8,11 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/verify-otp';
+import { verifyOtp, requestVerify } from '@/api';
 
 // Define navigation prop type
 interface VerifyOtpScreenProps {
@@ -24,8 +26,7 @@ interface VerifyOtpScreenProps {
 const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   // State for the 6 OTP digits
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isResending, setIsResending] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Create refs for each input field
   const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -81,19 +82,35 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
+    setLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO VERIFY OTP CODE HERE
+      // Call verify OTP API
+      await verifyOtp({
+        email: email,
+        otpCode: otpString,
+      });
 
-      // On successful verification, navigate to login screen
-      // router.push('/login');
-
-    } catch (error) {
-      console.error('OTP verification error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      // Navigate to login on success
+      Alert.alert(
+        'Success',
+        'Email verified successfully! You can now login.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.push('/login');
+            }
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Verification Failed',
+        error.message || 'Invalid OTP. Please try again.'
+      );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -104,20 +121,34 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsResending(true);
+    setLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO RESEND OTP CODE HERE
+      // Call request verify API
+      await requestVerify({
+        email: email,
+      });
 
-      // On successful resend, clear OTP inputs
-      // setOtp(Array(6).fill(''));
-      // inputRefs.current[0]?.focus();
-
-    } catch (error) {
-      console.error('OTP resend error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      Alert.alert(
+        'Success',
+        'OTP has been resent to your email!',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setOtp(Array(6).fill(''));
+              inputRefs.current[0]?.focus();
+            }
+          }
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Failed',
+        error.message || 'Failed to resend OTP. Please try again.'
+      );
     } finally {
-      setIsResending(false);
+      setLoading(false);
     }
   };
 
@@ -156,27 +187,30 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                     maxLength={1}
                     selectTextOnFocus
                     autoCapitalize="none"
-                    editable={!isLoading}
                   />
                 ))}
               </View>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleVerifyOtp}
-                disabled={isLoading}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Verifying...' : 'Verify OTP'}
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>
+                    Verify OTP
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={handleResendOtp}
-                disabled={isResending || isLoading}
+                disabled={loading}
               >
-                <Text style={[styles.resendText, (isResending || isLoading) && { opacity: 0.6 }]}>
-                  {isResending ? 'Resending...' : "Didn't receive the code? Resend OTP"}
+                <Text style={styles.resendText}>
+                  Didn't receive the code? Resend OTP
                 </Text>
               </TouchableOpacity>
             </View>

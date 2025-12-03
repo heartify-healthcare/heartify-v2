@@ -8,11 +8,13 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/signup';
+import { register, requestVerify } from '@/api';
 
 // Define navigation prop type
 interface SignUpScreenProps {
@@ -27,8 +29,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   // Navigation function (placeholder)
@@ -64,22 +66,47 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       return;
     }
 
-    setIsLoading(true);
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Please enter a valid email address');
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      // PUT YOUR API CALLING TO REGISTER CODE HERE
+      // Register user (backend automatically sends OTP email)
+      await register({
+        username: username.trim(),
+        email: email.trim(),
+        password: password,
+        phonenumber: phoneNumber.trim() || undefined, // lowercase 'n' to match backend
+      });
 
-      // On successful registration, navigate to OTP verification screen
-      // router.push({
-      //   pathname: '/verify-otp',
-      //   params: { email: email.trim().toLowerCase() }
-      // });
-
-    } catch (error) {
-      console.error('Registration error:', error);
-      Alert.alert('Error', 'Network error. Please check your connection and try again.');
+      // Navigate to OTP verification screen
+      Alert.alert(
+        'Success',
+        'Registration successful! Please check your email for the OTP verification code.',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              router.push({
+                pathname: '/verify-otp',
+                params: { email: email.trim() },
+              });
+            },
+          },
+        ]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Registration Failed',
+        error.message || 'An error occurred during registration. Please try again.'
+      );
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -107,7 +134,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -120,7 +146,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -132,7 +157,6 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
-                  editable={!isLoading}
                 />
               </View>
 
@@ -145,12 +169,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
-                    editable={!isLoading}
                   />
                   <TouchableOpacity
                     style={styles.eyeButton}
                     onPress={togglePasswordVisibility}
-                    disabled={isLoading}
                   >
                     <Text style={styles.eyeIcon}>
                       {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -168,12 +190,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
-                    editable={!isLoading}
                   />
                   <TouchableOpacity
                     style={styles.eyeButton}
                     onPress={togglePasswordVisibility}
-                    disabled={isLoading}
                   >
                     <Text style={styles.eyeIcon}>
                       {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -183,18 +203,22 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </View>
 
               <TouchableOpacity
-                style={[styles.button, isLoading && { opacity: 0.6 }]}
+                style={styles.button}
                 onPress={handleSignUp}
-                disabled={isLoading}
+                disabled={loading}
               >
-                <Text style={styles.buttonText}>
-                  {isLoading ? 'Signing Up...' : 'Sign Up'}
-                </Text>
+                {loading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <Text style={styles.buttonText}>
+                    Sign Up
+                  </Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>
                 <Text style={styles.loginText}>Already have an account? </Text>
-                <TouchableOpacity onPress={handleLogin} disabled={isLoading}>
+                <TouchableOpacity onPress={handleLogin}>
                   <Text style={styles.loginLink}>Log In</Text>
                 </TouchableOpacity>
               </View>

@@ -9,82 +9,72 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { styles } from '@/styles/(tabs)/settings';
-
-interface UserData {
-  email: string;
-  id: number;
-  is_verified: boolean;
-  phonenumber: string | null;
-  role: string;
-  username: string;
-  created_at: string;
-  dob: string | null;
-  cp: number | null;
-  exang: number | null;
-  sex: number | null;
-  trestbps: number | null;
-}
+import { formatDate } from '@/utils';
+import type { SettingsUserData, SettingsFormData } from '@/types';
+import { getProfile, updateProfile, logout } from '@/api';
+import type { User } from '@/types';
 
 const SettingsScreen: React.FC = () => {
   const router = useRouter();
 
   // State management
-  const [userData, setUserData] = useState<UserData | null>(null);
+  const [userData, setUserData] = useState<SettingsUserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<SettingsFormData>({
     username: '',
     email: '',
     phonenumber: '',
     role: ''
   });
 
-  const [originalData, setOriginalData] = useState({
+  const [originalData, setOriginalData] = useState<SettingsFormData>({
     username: '',
     email: '',
     phonenumber: '',
     role: ''
   });
-
-  // Get authorization headers
-  const getAuthHeaders = async () => {
-    try {
-      const accessToken = await AsyncStorage.getItem('access_token');
-      const tokenType = await AsyncStorage.getItem('token_type');
-
-      if (!accessToken || !tokenType) {
-        throw new Error('No authentication token found');
-      }
-
-      return {
-        'Authorization': `${tokenType} ${accessToken}`,
-        'Content-Type': 'application/json',
-      };
-    } catch (error) {
-      console.error('Error getting auth headers:', error);
-      throw error;
-    }
-  };
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
     try {
       setIsLoading(true);
+      setLoadError(null);
+      
+      const profile: User = await getProfile();
+      
+      // Map User to SettingsUserData
+      const mappedUserData: SettingsUserData = {
+        email: profile.email,
+        id: profile.id,
+        is_verified: profile.isVerified ?? false,
+        phonenumber: profile.phonenumber,
+        role: profile.role,
+        username: profile.username,
+        created_at: profile.createdAt,
+        dob: profile.dob,
+        cp: profile.cp,
+        exang: profile.exang,
+        sex: profile.sex,
+        trestbps: profile.trestbps
+      };
 
-      // PUT YOUR API CALLING TO FETCH USER PROFILE CODE HERE
-      // After fetching data:
-      // setUserData(data);
-      // setFormData({ username: data.username || '', email: data.email || '', phonenumber: data.phonenumber || '', role: data.role || '' });
-      // setOriginalData(newFormData);
-
-    } catch (error) {
+      setUserData(mappedUserData);
+      const newFormData = {
+        username: profile.username || '',
+        email: profile.email || '',
+        phonenumber: profile.phonenumber || '',
+        role: profile.role || ''
+      };
+      setFormData(newFormData);
+      setOriginalData(newFormData);
+    } catch (error: any) {
       console.error('Error fetching user profile:', error);
-      Alert.alert('Error', 'Failed to load user profile. Please try again.');
+      setLoadError(error.message || 'Failed to load profile');
     } finally {
       setIsLoading(false);
     }
@@ -92,47 +82,59 @@ const SettingsScreen: React.FC = () => {
 
   // Update user profile
   const updateUserProfile = async () => {
+    // Prepare update data (only send changed fields)
+    const updateData: any = {};
+    if (formData.username !== originalData.username) updateData.username = formData.username;
+    if (formData.email !== originalData.email) updateData.email = formData.email;
+    if (formData.phonenumber !== originalData.phonenumber) updateData.phonenumber = formData.phonenumber;
+
+    // If no changes, just exit editing mode
+    if (Object.keys(updateData).length === 0) {
+      setIsEditing(false);
+      return;
+    }
+
     try {
-      setIsSaving(true);
+      // Call API to update profile
+      const updatedProfile = await updateProfile(updateData);
 
-      // Prepare update data (only send changed fields)
-      const updateData: any = {};
-      if (formData.username !== originalData.username) updateData.username = formData.username;
-      if (formData.email !== originalData.email) updateData.email = formData.email;
-      if (formData.phonenumber !== originalData.phonenumber) updateData.phonenumber = formData.phonenumber;
-
-      // If no changes, just exit editing mode
-      if (Object.keys(updateData).length === 0) {
-        setIsEditing(false);
-        return;
-      }
-
-      // PUT YOUR API CALLING TO UPDATE USER PROFILE CODE HERE
-      // After updating data:
-      // setUserData(updatedUser);
-      // setOriginalData({ ...formData });
-      // setIsEditing(false);
-
-    } catch (error) {
+      // Map updated profile to SettingsUserData
+      const mappedUserData: SettingsUserData = {
+        email: updatedProfile.email,
+        id: updatedProfile.id,
+        is_verified: updatedProfile.isVerified ?? false,
+        phonenumber: updatedProfile.phonenumber,
+        role: updatedProfile.role,
+        username: updatedProfile.username,
+        created_at: updatedProfile.createdAt,
+        dob: updatedProfile.dob,
+        cp: updatedProfile.cp,
+        exang: updatedProfile.exang,
+        sex: updatedProfile.sex,
+        trestbps: updatedProfile.trestbps
+      };
+      setUserData(mappedUserData);
+      
+      setOriginalData({ ...formData });
+      setIsEditing(false);
+      
+      Alert.alert('Success', 'Profile updated successfully!');
+    } catch (error: any) {
       console.error('Error updating profile:', error);
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to update profile');
-    } finally {
-      setIsSaving(false);
+      Alert.alert('Error', error.message || 'Failed to update profile');
     }
   };
 
   // Handle logout
   const handleLogout = async () => {
     try {
-      // Clear stored data
-      await AsyncStorage.multiRemove(['access_token', 'token_type', 'user_data']);
-
+      await logout();
       // Navigate to login screen
       router.replace('/login');
-
-    } catch (error) {
-      console.error('Error during logout:', error);
-      Alert.alert('Error', 'Failed to logout properly');
+    } catch (error: any) {
+      console.error('Error logging out:', error);
+      // Still navigate to login even if logout fails
+      router.replace('/login');
     }
   };
 
@@ -207,40 +209,36 @@ const SettingsScreen: React.FC = () => {
     return userData?.is_verified ? '#27ae60' : '#e74c3c';
   };
 
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
+  // Loading state
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size="large" color="#3498db" />
-          <Text style={{ marginTop: 10, color: '#7f8c8d' }}>Loading profile...</Text>
+          <ActivityIndicator size="large" color="#4A90E2" />
+          <Text style={{ color: '#7f8c8d', fontSize: 16, marginTop: 16 }}>
+            Loading profile...
+          </Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  if (!userData) {
+  // Error state
+  if (loadError || !userData) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ color: '#e74c3c', fontSize: 16 }}>Failed to load user data</Text>
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+          <Text style={{ color: '#e74c3c', fontSize: 18, fontWeight: '600', marginBottom: 8 }}>
+            Failed to load profile
+          </Text>
+          <Text style={{ color: '#7f8c8d', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
+            {loadError || 'Unable to retrieve your profile data'}
+          </Text>
           <TouchableOpacity
-            style={[styles.button, { marginTop: 20 }]}
+            style={[styles.button, { paddingHorizontal: 32 }]}
             onPress={fetchUserProfile}
           >
-            <Text style={styles.buttonText}>Retry</Text>
+            <Text style={styles.buttonText}>Try Again</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -335,21 +333,15 @@ const SettingsScreen: React.FC = () => {
               ) : (
                 <>
                   <TouchableOpacity
-                    style={[styles.button, isSaving && { opacity: 0.7 }]}
+                    style={styles.button}
                     onPress={handleSubmit}
-                    disabled={isSaving}
                   >
-                    {isSaving ? (
-                      <ActivityIndicator size="small" color="#ffffff" />
-                    ) : (
-                      <Text style={styles.buttonText}>Save Changes</Text>
-                    )}
+                    <Text style={styles.buttonText}>Save Changes</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[styles.cancelButton, isSaving && { opacity: 0.7 }]}
+                    style={styles.cancelButton}
                     onPress={handleCancel}
-                    disabled={isSaving}
                   >
                     <Text style={styles.cancelButtonText}>Cancel</Text>
                   </TouchableOpacity>
