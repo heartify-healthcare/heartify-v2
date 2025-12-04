@@ -50,7 +50,6 @@ jobs:
           APK_URL=$(jq -r '.[0].artifacts.buildUrl' build_output.json)
           echo "APK Download URL: $APK_URL"
           
-          # Tải file về và đặt tên là app-release.apk
           # Download file and name it app-release.apk
           curl -L -o app-release.apk "$APK_URL"
 
@@ -63,7 +62,7 @@ jobs:
           tag_name: v${{ steps.package-version.outputs.version }}-b${{ github.run_number }}
           name: Release v${{ steps.package-version.outputs.version }} (Build ${{ github.run_number }})
           body: |
-            Tự động build từ EAS.
+            Build automatically from EAS.
             Commit: ${{ github.sha }}
           files: app-release.apk
           draft: false
