@@ -1,19 +1,23 @@
-name: Build Android APK on Merge to Main
+name: Build Android APK & Release on Merge to Main
 
 on:
   push:
     branches:
       - main
 
+# Grant access for GITHUB_TOKEN to create a Release
+permissions:
+  contents: write
+
 jobs:
   build:
-    name: EAS Build Android APK
+    name: EAS Build & Release
     runs-on: ubuntu-latest
     steps:
       - name: Setup repo
         uses: actions/checkout@v3
 
-      - name: fv Setup Node
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
@@ -28,5 +32,41 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build APK
-        run: eas build --platform android --profile preview --non-interactive --no-wait
+      # This step take the version from package.json to name the Release
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Build APK and Parse JSON
+        id: eas_build
+        run: |
+          # Run build and save output JSON to file
+          eas build --platform android --profile preview --non-interactive --json > build_output.json
+          
+          # Print out to debug if needed
+          cat build_output.json
+          
+          # Use jq to take the URL for downloading .apk (build profile preview usually returns a .apk)
+          APK_URL=$(jq -r '.[0].artifacts.buildUrl' build_output.json)
+          echo "APK Download URL: $APK_URL"
+          
+          # Tải file về và đặt tên là app-release.apk
+          # Download file and name it app-release.apk
+          curl -L -o app-release.apk "$APK_URL"
+
+      # Create Release on GitHUb and upload APK
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        if: success() # Only run if build successfully
+        with:
+          # Name the tag following the format: v1.0.1-b<time_to_run_action> to ensure it's unique
+          tag_name: v${{ steps.package-version.outputs.version }}-b${{ github.run_number }}
+          name: Release v${{ steps.package-version.outputs.version }} (Build ${{ github.run_number }})
+          body: |
+            Tự động build từ EAS.
+            Commit: ${{ github.sha }}
+          files: app-release.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
