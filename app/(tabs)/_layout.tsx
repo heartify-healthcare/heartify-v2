@@ -1,8 +1,11 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+
   return (
     <Tabs
       screenOptions={{
@@ -15,7 +18,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Predictions',
+          title: t('tabs.predictions'),
           tabBarIcon: ({ color, focused }) => (
             <Image
               source={require('../../assets/images/predictions.png')}
@@ -27,7 +30,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="ecg"
         options={{
-          title: 'ECG',
+          title: t('tabs.ecg'),
           tabBarIcon: ({ color, focused }) => (
             <Image
               source={require('../../assets/images/ecg.png')}
@@ -39,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="health"
         options={{
-          title: 'Health',
+          title: t('tabs.health'),
           tabBarIcon: ({ color, focused }) => (
             <Image
               source={require('../../assets/images/health.png')}
@@ -51,7 +54,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings',
+          title: t('tabs.settings'),
           tabBarIcon: ({ color, focused }) => (
             <Image
               source={require('../../assets/images/settings.png')}

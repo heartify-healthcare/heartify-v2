@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { styles } from '@/styles/(tabs)/ecg';
 import { DeviceInput } from '@/components/ecg';
 import { ECGChart } from '@/components';
@@ -21,12 +22,13 @@ import { createECGSession } from '@/api';
 import type { CreateECGSessionRequest } from '@/types';
 
 const ECGScreen: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
   
   // Device connection states
   const [deviceId, setDeviceId] = useState('');
   const [isConnected, setIsConnected] = useState(false);
-  const [status, setStatus] = useState('Not initialized');
+  const [status, setStatus] = useState(t('ecg.status.notInitialized'));
 
   // Streaming states
   const [isStreaming, setIsStreaming] = useState(false);
@@ -76,12 +78,12 @@ const ECGScreen: React.FC = () => {
             // Trim to exact sample count
             const trimmedData = newData.slice(0, REQUIRED_ECG_SAMPLES);
             
-            // Show alert
+            // Show alert - Note: t() may not work inside listener, use state update pattern
             setTimeout(() => {
               Alert.alert(
-                'Recording Complete',
-                `Successfully recorded ${REQUIRED_ECG_SAMPLES} samples!\n\nYou can now make a prediction.`,
-                [{ text: 'OK' }]
+                t('ecg.recording.completeTitle'),
+                t('ecg.recording.completeMessage', { samples: REQUIRED_ECG_SAMPLES }),
+                [{ text: t('common.ok') }]
               );
             }, 100);
             
@@ -108,8 +110,8 @@ const ECGScreen: React.FC = () => {
       'onDeviceConnected',
       (data: any) => {
         setIsConnected(true);
-        setStatus(`Connected to ${data.name} (${data.deviceId})`);
-        Alert.alert('Success', `Connected to ${data.name}`);
+        setStatus(t('ecg.status.connectedTo', { name: data.name, deviceId: data.deviceId }));
+        Alert.alert(t('common.success'), t('ecg.alerts.connectedTo', { name: data.name }));
       }
     );
 
@@ -120,14 +122,14 @@ const ECGScreen: React.FC = () => {
         setIsStreaming(false);
         setIsRecording(false);
         isRecordingRef.current = false; // Update ref
-        setStatus('Disconnected');
-        Alert.alert('Info', 'Device disconnected');
+        setStatus(t('ecg.status.disconnected'));
+        Alert.alert(t('common.info'), t('ecg.alerts.deviceDisconnected'));
       }
     );
 
     const errorSubscription = PolarEcgModule.addListener('onError', (data: any) => {
-      Alert.alert('Error', data.message);
-      setStatus(`Error: ${data.message}`);
+      Alert.alert(t('common.error'), data.message);
+      setStatus(t('ecg.status.error', { message: data.message }));
     });
 
     return () => {
@@ -159,7 +161,7 @@ const ECGScreen: React.FC = () => {
         );
 
         if (!allGranted) {
-          Alert.alert('Error', 'Permissions required for Bluetooth');
+          Alert.alert(t('common.error'), t('ecg.alerts.permissionsRequired'));
         }
       } catch (err) {
         console.warn(err);
@@ -172,23 +174,23 @@ const ECGScreen: React.FC = () => {
       const result = await PolarEcgModule.initialize();
       setStatus(result);
     } catch (error) {
-      setStatus('Failed to initialize');
-      Alert.alert('Error', 'Failed to initialize Polar SDK');
+      setStatus(t('ecg.status.failedToInitialize'));
+      Alert.alert(t('common.error'), t('ecg.alerts.failedToInitialize'));
     }
   };
 
   const handleConnect = async () => {
     if (!deviceId.trim()) {
-      Alert.alert('Error', 'Please enter a device ID');
+      Alert.alert(t('common.error'), t('ecg.alerts.enterDeviceId'));
       return;
     }
 
     try {
-      setStatus('Connecting...');
+      setStatus(t('ecg.status.connecting'));
       await PolarEcgModule.connectToDevice(deviceId.trim());
     } catch (error: any) {
-      setStatus('Connection failed');
-      Alert.alert('Error', error.message || 'Failed to connect');
+      setStatus(t('ecg.status.connectionFailed'));
+      Alert.alert(t('common.error'), error.message || t('ecg.alerts.failedToConnect'));
     }
   };
 
@@ -204,25 +206,25 @@ const ECGScreen: React.FC = () => {
       }
       await PolarEcgModule.disconnectFromDevice(deviceId);
       setIsConnected(false);
-      setStatus('Disconnected');
+      setStatus(t('ecg.status.disconnected'));
       setLiveEcgValues([]);
       setHeartRate(0);
       setSampleCount(0);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to disconnect');
+      Alert.alert(t('common.error'), error.message || t('ecg.alerts.failedToDisconnect'));
     }
   };
 
   const handleStartStreaming = async () => {
     try {
-      setStatus('Starting ECG streaming...');
+      setStatus(t('ecg.status.startingStreaming'));
       await PolarEcgModule.startEcgStreaming(deviceId);
       setIsStreaming(true);
       setSampleCount(0);
-      setStatus('Streaming ECG data...');
+      setStatus(t('ecg.status.streaming'));
     } catch (error: any) {
-      setStatus('Failed to start streaming');
-      Alert.alert('Error', error.message || 'Failed to start ECG streaming');
+      setStatus(t('ecg.status.failedToStartStreaming'));
+      Alert.alert(t('common.error'), error.message || t('ecg.alerts.failedToStartStreaming'));
     }
   };
 
@@ -232,32 +234,32 @@ const ECGScreen: React.FC = () => {
       setIsStreaming(false);
       setIsRecording(false);
       isRecordingRef.current = false; // Update ref
-      setStatus('Streaming stopped');
+      setStatus(t('ecg.status.streamingStopped'));
       setLiveEcgValues([]);
       setHeartRate(0);
       setSampleCount(0);
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to stop streaming');
+      Alert.alert(t('common.error'), error.message || t('ecg.alerts.failedToStopStreaming'));
     }
   };
 
   const handleStartRecording = () => {
     if (!isStreaming) {
-      Alert.alert('Error', 'Please start streaming first');
+      Alert.alert(t('common.error'), t('ecg.alerts.startStreamingFirst'));
       return;
     }
     setIsRecording(true);
     isRecordingRef.current = true; // Update ref
     setRecordedEcgData([]);
     Alert.alert(
-      'Recording Started',
-      `Recording will automatically stop after ${REQUIRED_ECG_SAMPLES} samples (${RECORDING_DURATION_SECONDS} seconds at ${POLAR_SAMPLING_RATE}Hz)`
+      t('ecg.recording.startedTitle'),
+      t('ecg.recording.startedMessage', { samples: REQUIRED_ECG_SAMPLES, seconds: RECORDING_DURATION_SECONDS, rate: POLAR_SAMPLING_RATE })
     );
   };
 
   const handleStopRecording = () => {
     if (!isRecording) {
-      Alert.alert('Error', 'Recording is not active');
+      Alert.alert(t('common.error'), t('ecg.alerts.recordingNotActive'));
       return;
     }
     setIsRecording(false);
@@ -266,34 +268,34 @@ const ECGScreen: React.FC = () => {
     const sampleCount = recordedEcgData.length;
     if (sampleCount < REQUIRED_ECG_SAMPLES) {
       Alert.alert(
-        'Recording Stopped',
-        `Warning: Recorded only ${sampleCount} samples. ${REQUIRED_ECG_SAMPLES} samples required for prediction.`
+        t('ecg.recording.stoppedTitle'),
+        t('ecg.recording.stoppedWarning', { recorded: sampleCount, required: REQUIRED_ECG_SAMPLES })
       );
     } else {
       Alert.alert(
-        'Recording Stopped',
-        `Successfully recorded ${sampleCount} samples`
+        t('ecg.recording.stoppedTitle'),
+        t('ecg.recording.stoppedSuccess', { samples: sampleCount })
       );
     }
   };
 
   const handleClearRecording = () => {
     if (recordedEcgData.length === 0) {
-      Alert.alert('Info', 'No recorded data to clear');
+      Alert.alert(t('common.info'), t('ecg.alerts.noDataToClear'));
       return;
     }
 
     Alert.alert(
-      'Clear Recording',
-      'Are you sure you want to clear the recorded data?',
+      t('ecg.recording.clearTitle'),
+      t('ecg.recording.clearConfirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Clear',
+          text: t('ecg.recording.clearButton'),
           style: 'destructive',
           onPress: () => {
             setRecordedEcgData([]);
-            Alert.alert('Success', 'Recorded data cleared');
+            Alert.alert(t('common.success'), t('ecg.recording.clearSuccess'));
           },
         },
       ]
@@ -302,28 +304,28 @@ const ECGScreen: React.FC = () => {
 
   const handleMakePrediction = async () => {
     if (recordedEcgData.length === 0) {
-      Alert.alert('Error', 'No recorded data available for prediction');
+      Alert.alert(t('common.error'), t('ecg.prediction.noDataAvailable'));
       return;
     }
 
     // Validate sample count
     if (recordedEcgData.length < REQUIRED_ECG_SAMPLES) {
       Alert.alert(
-        'Insufficient Data',
-        `You need exactly ${REQUIRED_ECG_SAMPLES} samples for prediction.\n\nCurrent: ${recordedEcgData.length} samples\nRequired: ${REQUIRED_ECG_SAMPLES} samples\n\nPlease record again.`,
-        [{ text: 'OK' }]
+        t('ecg.prediction.insufficientDataTitle'),
+        t('ecg.prediction.insufficientDataMessage', { current: recordedEcgData.length, required: REQUIRED_ECG_SAMPLES }),
+        [{ text: t('common.ok') }]
       );
       return;
     }
 
     // Show confirmation dialog
     Alert.alert(
-      'Submit for Prediction?',
-      `Ready to submit ${recordedEcgData.length} ECG samples for analysis.\n\nThis may take 30-60 seconds to process.`,
+      t('ecg.prediction.confirmTitle'),
+      t('ecg.prediction.confirmMessage', { samples: recordedEcgData.length }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Submit',
+          text: t('ecg.prediction.submitButton'),
           onPress: () => submitECGForPrediction(),
         },
       ]
@@ -333,7 +335,7 @@ const ECGScreen: React.FC = () => {
   const submitECGForPrediction = async () => {
     try {
       setIsPredicting(true);
-      setPredictionProgress('Preparing ECG data...');
+      setPredictionProgress(t('ecg.prediction.progressPreparing'));
 
       // Prepare exactly 1300 samples
       const ecgSamples = recordedEcgData.slice(0, REQUIRED_ECG_SAMPLES);
@@ -352,20 +354,23 @@ const ECGScreen: React.FC = () => {
         samplingRate: POLAR_SAMPLING_RATE,
       };
 
-      setPredictionProgress('Uploading to server...');
+      setPredictionProgress(t('ecg.prediction.progressUploading'));
 
       // Call API to create ECG session (this will take time due to ML processing)
       const response = await createECGSession(request);
 
-      setPredictionProgress('Analysis complete!');
+      setPredictionProgress(t('ecg.prediction.progressComplete'));
 
       // Success! Show result and navigate
       Alert.alert(
-        'Prediction Complete!',
-        `Your ECG has been analyzed successfully.\n\nDiagnosis: ${response.prediction?.diagnosis || 'Unknown'}\nConfidence: ${response.prediction?.probability ? (response.prediction.probability * 100).toFixed(1) + '%' : 'N/A'}\n\nView full details in the Predictions tab.`,
+        t('ecg.prediction.completeTitle'),
+        t('ecg.prediction.completeMessage', { 
+          diagnosis: response.prediction?.diagnosis || t('common.unknown'),
+          confidence: response.prediction?.probability ? (response.prediction.probability * 100).toFixed(1) + '%' : t('common.na')
+        }),
         [
           {
-            text: 'View Now',
+            text: t('ecg.prediction.viewNow'),
             onPress: () => {
               // Clear recorded data
               setRecordedEcgData([]);
@@ -374,7 +379,7 @@ const ECGScreen: React.FC = () => {
             },
           },
           {
-            text: 'Stay Here',
+            text: t('ecg.prediction.stayHere'),
             onPress: () => {
               // Clear recorded data
               setRecordedEcgData([]);
@@ -385,9 +390,9 @@ const ECGScreen: React.FC = () => {
     } catch (error: any) {
       console.error('Prediction error:', error);
       Alert.alert(
-        'Prediction Failed',
-        error.message || 'Failed to process ECG data. Please try again.',
-        [{ text: 'OK' }]
+        t('ecg.prediction.failedTitle'),
+        error.message || t('ecg.prediction.failedMessage'),
+        [{ text: t('common.ok') }]
       );
     } finally {
       setIsPredicting(false);
@@ -403,9 +408,9 @@ const ECGScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>ECG Monitor</Text>
+          <Text style={styles.title}>{t('ecg.title')}</Text>
           <Text style={styles.description}>
-            Connect to Polar H10 to monitor and record your ECG signals
+            {t('ecg.description')}
           </Text>
 
           {/* Device Connection Card */}
@@ -420,33 +425,33 @@ const ECGScreen: React.FC = () => {
 
             {/* Status Display */}
             <View style={styles.statusContainer}>
-              <Text style={styles.statusLabel}>Status</Text>
+              <Text style={styles.statusLabel}>{t('ecg.statusLabel')}</Text>
               <Text style={styles.statusText}>{status}</Text>
             </View>
 
             {/* Stats Row */}
             <View style={styles.statsRow}>
               <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Heart Rate</Text>
+                <Text style={styles.statLabel}>{t('ecg.stats.heartRate')}</Text>
                 <Text style={styles.statValue}>
                   {heartRate > 0 ? heartRate : '--'}
                 </Text>
-                <Text style={styles.statUnit}>BPM</Text>
+                <Text style={styles.statUnit}>{t('ecg.stats.bpm')}</Text>
               </View>
 
               <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Samples</Text>
+                <Text style={styles.statLabel}>{t('ecg.stats.samples')}</Text>
                 <Text style={styles.statValue}>{sampleCount}</Text>
-                <Text style={styles.statUnit}>points</Text>
+                <Text style={styles.statUnit}>{t('ecg.stats.points')}</Text>
               </View>
 
               <View style={styles.statBox}>
-                <Text style={styles.statLabel}>Streaming</Text>
+                <Text style={styles.statLabel}>{t('ecg.stats.streaming')}</Text>
                 <Text style={[styles.statValue, { fontSize: 20 }]}>
                   {isStreaming ? '●' : '○'}
                 </Text>
                 <Text style={styles.statUnit}>
-                  {isStreaming ? 'Active' : 'Inactive'}
+                  {isStreaming ? t('ecg.stats.active') : t('ecg.stats.inactive')}
                 </Text>
               </View>
             </View>
@@ -462,7 +467,7 @@ const ECGScreen: React.FC = () => {
                 onPress={handleStartStreaming}
                 disabled={!isConnected || isStreaming}
               >
-                <Text style={styles.buttonText}>Start ECG</Text>
+                <Text style={styles.buttonText}>{t('ecg.buttons.startEcg')}</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -474,7 +479,7 @@ const ECGScreen: React.FC = () => {
                 onPress={handleStopStreaming}
                 disabled={!isStreaming}
               >
-                <Text style={styles.buttonText}>Stop ECG</Text>
+                <Text style={styles.buttonText}>{t('ecg.buttons.stopEcg')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -483,11 +488,11 @@ const ECGScreen: React.FC = () => {
           {isStreaming && (
             <View style={styles.card}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>Live ECG Waveform</Text>
+                <Text style={styles.sectionTitle}>{t('ecg.liveWaveform.title')}</Text>
                 {isStreaming && (
                   <View style={styles.liveIndicator}>
                     <View style={styles.liveDot} />
-                    <Text style={styles.liveText}>LIVE</Text>
+                    <Text style={styles.liveText}>{t('ecg.liveWaveform.live')}</Text>
                   </View>
                 )}
               </View>
@@ -503,7 +508,7 @@ const ECGScreen: React.FC = () => {
                   />
                 ) : (
                   <View style={styles.noDataContainer}>
-                    <Text style={styles.noDataText}>Waiting for ECG data...</Text>
+                    <Text style={styles.noDataText}>{t('ecg.liveWaveform.waiting')}</Text>
                   </View>
                 )}
               </View>
@@ -521,7 +526,7 @@ const ECGScreen: React.FC = () => {
                     onPress={handleStartRecording}
                     disabled={!isStreaming || isRecording}
                   >
-                    <Text style={styles.buttonText}>Start Recording</Text>
+                    <Text style={styles.buttonText}>{t('ecg.buttons.startRecording')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
@@ -534,7 +539,7 @@ const ECGScreen: React.FC = () => {
                     onPress={handleStopRecording}
                     disabled={!isRecording}
                   >
-                    <Text style={styles.buttonText}>Stop Recording</Text>
+                    <Text style={styles.buttonText}>{t('ecg.buttons.stopRecording')}</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -548,7 +553,7 @@ const ECGScreen: React.FC = () => {
                   onPress={handleClearRecording}
                   disabled={recordedEcgData.length === 0}
                 >
-                  <Text style={styles.buttonText}>Clear Recording</Text>
+                  <Text style={styles.buttonText}>{t('ecg.buttons.clearRecording')}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -556,11 +561,11 @@ const ECGScreen: React.FC = () => {
               {isRecording && (
                 <View style={styles.infoBox}>
                   <Text style={styles.infoText}>
-                    🔴 Recording: {recordedEcgData.length} / {REQUIRED_ECG_SAMPLES} samples
+                    🔴 {t('ecg.recording.inProgress', { current: recordedEcgData.length, required: REQUIRED_ECG_SAMPLES })}
                     {'\n'}
                     {recordedEcgData.length < REQUIRED_ECG_SAMPLES 
-                      ? `${REQUIRED_ECG_SAMPLES - recordedEcgData.length} more samples needed...`
-                      : 'Target reached! Recording will stop automatically.'
+                      ? t('ecg.recording.samplesNeeded', { needed: REQUIRED_ECG_SAMPLES - recordedEcgData.length })
+                      : t('ecg.recording.targetReached')
                     }
                   </Text>
                 </View>
@@ -571,7 +576,7 @@ const ECGScreen: React.FC = () => {
           {/* Recorded ECG Section */}
           {recordedEcgData.length > 0 && (
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>Recorded ECG Data</Text>
+              <Text style={styles.sectionTitle}>{t('ecg.recordedData.title')}</Text>
               
               <View style={styles.chartContainer}>
                 <ECGChart
@@ -594,19 +599,19 @@ const ECGScreen: React.FC = () => {
                 disabled={recordedEcgData.length < REQUIRED_ECG_SAMPLES || isPredicting}
               >
                 <Text style={styles.buttonText}>
-                  {isPredicting ? 'Processing...' : 'Make Prediction'}
+                  {isPredicting ? t('ecg.buttons.processing') : t('ecg.buttons.makePrediction')}
                 </Text>
               </TouchableOpacity>
 
               <View style={styles.infoBox}>
                 <Text style={styles.infoText}>
-                  📊 Recorded samples: {recordedEcgData.length} / {REQUIRED_ECG_SAMPLES}
+                  📊 {t('ecg.recordedData.samplesRecorded', { current: recordedEcgData.length, required: REQUIRED_ECG_SAMPLES })}
                   {recordedEcgData.length >= REQUIRED_ECG_SAMPLES 
-                    ? '\n✅ Ready for prediction!' 
-                    : `\n⚠️ ${REQUIRED_ECG_SAMPLES - recordedEcgData.length} more samples needed`
+                    ? '\n✅ ' + t('ecg.recordedData.readyForPrediction')
+                    : '\n⚠️ ' + t('ecg.recordedData.moreNeeded', { needed: REQUIRED_ECG_SAMPLES - recordedEcgData.length })
                   }
                   {recordedEcgData.length >= REQUIRED_ECG_SAMPLES && 
-                    '\n\nTap "Make Prediction" to send data for cardiovascular analysis.'
+                    '\n\n' + t('ecg.recordedData.tapToPredict')
                   }
                 </Text>
               </View>
@@ -625,10 +630,10 @@ const ECGScreen: React.FC = () => {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <ActivityIndicator size="large" color="#3498db" />
-            <Text style={styles.modalTitle}>Processing ECG Analysis</Text>
+            <Text style={styles.modalTitle}>{t('ecg.modal.title')}</Text>
             <Text style={styles.modalMessage}>{predictionProgress}</Text>
             <Text style={styles.modalSubtext}>
-              This may take 30-60 seconds...{'\n'}Please do not close the app.
+              {t('ecg.modal.subtitle')}
             </Text>
           </View>
         </View>

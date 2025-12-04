@@ -1,0 +1,377 @@
+{
+  "common": {
+    "appName": "Heartify",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "cancel": "Hủy",
+    "ok": "OK",
+    "edit": "Sửa",
+    "submit": "Gửi",
+    "update": "Cập nhật",
+    "retry": "Thử lại",
+    "tryAgain": "Thử lại",
+    "confirm": "Xác nhận",
+    "info": "Thông tin",
+    "unknown": "Không xác định",
+    "na": "N/A"
+  },
+  "auth": {
+    "login": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "logIn": "Đăng nhập",
+    "forgotPassword": "Quên mật khẩu?",
+    "resetPassword": "Đặt lại mật khẩu",
+    "changePassword": "Đổi mật khẩu",
+    "verifyOtp": "Xác thực OTP"
+  },
+  "login": {
+    "appDescription": "Ứng dụng di động dự đoán bệnh tim mạch",
+    "slogan": "\"Trái tim bạn, Tương lai bạn\"",
+    "title": "Đăng nhập",
+    "usernameLabel": "Tên đăng nhập",
+    "usernamePlaceholder": "Nhập tên đăng nhập",
+    "passwordLabel": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "noAccount": "Chưa có tài khoản? ",
+    "loginSuccess": "Đăng nhập thành công!",
+    "loginFailed": "Đăng nhập thất bại",
+    "loginError": "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.",
+    "validation": {
+      "usernamePasswordRequired": "Vui lòng nhập cả tên đăng nhập và mật khẩu"
+    }
+  },
+  "signup": {
+    "title": "Đăng ký",
+    "usernameLabel": "Tên đăng nhập *",
+    "usernamePlaceholder": "Tạo tên đăng nhập",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "Nhập email của bạn",
+    "phoneLabel": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "passwordLabel": "Mật khẩu *",
+    "passwordPlaceholder": "Tạo mật khẩu (tối thiểu 6 ký tự)",
+    "confirmPasswordLabel": "Xác nhận mật khẩu *",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu của bạn",
+    "hasAccount": "Đã có tài khoản? ",
+    "registrationSuccess": "Đăng ký thành công! Vui lòng kiểm tra email để nhận mã OTP xác thực.",
+    "registrationFailed": "Đăng ký thất bại",
+    "registrationError": "Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.",
+    "validation": {
+      "fillAllFields": "Vui lòng điền đầy đủ các trường bắt buộc",
+      "passwordsNotMatch": "Mật khẩu không khớp",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
+      "usernameMinLength": "Tên đăng nhập phải có ít nhất 3 ký tự",
+      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ"
+    }
+  },
+  "forgotPassword": {
+    "title": "Quên mật khẩu",
+    "usernameLabel": "Tên đăng nhập",
+    "usernamePlaceholder": "Nhập tên đăng nhập",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Nhập email của bạn",
+    "phoneLabel": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "rememberedPassword": "Đã nhớ mật khẩu? ",
+    "recoverySuccess": "Hướng dẫn khôi phục mật khẩu đã được gửi đến email và số điện thoại của bạn.",
+    "recoveryFailed": "Khôi phục thất bại",
+    "recoveryError": "Không thể khôi phục mật khẩu. Vui lòng kiểm tra thông tin và thử lại.",
+    "validation": {
+      "fillAllFields": "Vui lòng điền đầy đủ các trường",
+      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ"
+    }
+  },
+  "verifyOtp": {
+    "title": "Xác thực OTP",
+    "description": "Vui lòng nhập mã OTP 6 chữ số đã gửi đến {{email}} để tiếp tục.",
+    "descriptionNoEmail": "Vui lòng nhập mã OTP 6 chữ số đã gửi đến email của bạn để tiếp tục.",
+    "resendText": "Không nhận được mã? Gửi lại OTP",
+    "verificationSuccess": "Xác thực email thành công! Bạn có thể đăng nhập ngay.",
+    "verificationFailed": "Xác thực thất bại",
+    "verificationError": "Mã OTP không hợp lệ. Vui lòng thử lại.",
+    "resendSuccess": "Mã OTP đã được gửi lại đến email của bạn!",
+    "resendFailed": "Thất bại",
+    "resendError": "Không thể gửi lại OTP. Vui lòng thử lại.",
+    "validation": {
+      "incompleteOtp": "Vui lòng nhập đầy đủ mã OTP 6 chữ số",
+      "emailNotFound": "Không tìm thấy email. Vui lòng quay lại và thử lại."
+    }
+  },
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "description": "Nhập mật khẩu hiện tại và chọn mật khẩu mới an toàn",
+    "currentPasswordLabel": "Mật khẩu hiện tại *",
+    "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+    "newPasswordLabel": "Mật khẩu mới *",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới (tối thiểu 6 ký tự)",
+    "confirmPasswordLabel": "Xác nhận mật khẩu mới *",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu mới",
+    "requirements": {
+      "title": "Yêu cầu mật khẩu:",
+      "minLength": "Ít nhất 6 ký tự",
+      "mixCase": "Kết hợp chữ hoa và chữ thường",
+      "number": "Ít nhất một số",
+      "special": "Ít nhất một ký tự đặc biệt"
+    },
+    "success": "Đổi mật khẩu thành công!",
+    "failed": "Thất bại",
+    "error": "Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại và thử lại.",
+    "validation": {
+      "fillAllFields": "Vui lòng điền đầy đủ các trường",
+      "passwordMinLength": "Mật khẩu mới phải có ít nhất 6 ký tự",
+      "passwordsNotMatch": "Mật khẩu mới không khớp"
+    }
+  },
+  "tabs": {
+    "predictions": "Dự đoán",
+    "ecg": "ECG",
+    "health": "Sức khỏe",
+    "settings": "Cài đặt"
+  },
+  "predictions": {
+    "title": "Dự đoán",
+    "description": "Xem các dự đoán sức khỏe tim mạch và đánh giá nguy cơ",
+    "loading": "Đang tải phiên ECG...",
+    "noSessions": "Không tìm thấy phiên ECG nào. Bắt đầu ghi để xem dự đoán ở đây.",
+    "errorLoadingSessions": "Không thể tải phiên ECG",
+    "errorLoadingSessionsRetry": "Không thể tải phiên ECG. Vui lòng thử lại.",
+    "errorLoadingDetails": "Không thể tải chi tiết phiên. Vui lòng thử lại.",
+    "card": {
+      "ecgSession": "Phiên ECG",
+      "ecgRecording": "Bản ghi ECG",
+      "loadingEcg": "Đang tải dữ liệu ECG...",
+      "rawSignal": "Tín hiệu thô",
+      "denoisedSignal": "Tín hiệu đã lọc",
+      "lead": "Lead",
+      "samplingRate": "Tần số lấy mẫu",
+      "predictionResults": "Kết quả dự đoán",
+      "loadingPrediction": "Đang tải dữ liệu dự đoán...",
+      "modelVersion": "Phiên bản mô hình",
+      "diagnosis": "Chẩn đoán",
+      "confidence": "Độ tin cậy",
+      "physiologicalFeatures": "Đặc điểm sinh lý",
+      "noFeaturesAvailable": "Không có đặc điểm nào",
+      "aiExplanation": "Giải thích AI",
+      "loadingExplanation": "Đang tải giải thích AI...",
+      "summary": "Tóm tắt",
+      "details": "Chi tiết",
+      "recommendations": "Khuyến nghị",
+      "riskLevel": "Mức độ rủi ro",
+      "nextSteps": "Bước tiếp theo"
+    }
+  },
+  "ecg": {
+    "title": "Màn hình ECG",
+    "description": "Kết nối với Polar H10 để theo dõi và ghi tín hiệu ECG",
+    "statusLabel": "Trạng thái",
+    "deviceInput": {
+      "label": "ID thiết bị Polar H10",
+      "placeholder": "Nhập ID thiết bị (ví dụ: 05281231)",
+      "connect": "Kết nối",
+      "disconnect": "Ngắt kết nối"
+    },
+    "status": {
+      "notInitialized": "Chưa khởi tạo",
+      "connecting": "Đang kết nối...",
+      "connectedTo": "Đã kết nối với {{name}} ({{deviceId}})",
+      "disconnected": "Đã ngắt kết nối",
+      "startingStreaming": "Đang bắt đầu truyền ECG...",
+      "streaming": "Đang truyền dữ liệu ECG...",
+      "streamingStopped": "Đã dừng truyền",
+      "failedToStartStreaming": "Không thể bắt đầu truyền",
+      "connectionFailed": "Kết nối thất bại",
+      "failedToInitialize": "Khởi tạo thất bại",
+      "error": "Lỗi: {{message}}"
+    },
+    "stats": {
+      "heartRate": "Nhịp tim",
+      "samples": "Mẫu",
+      "streaming": "Truyền tải",
+      "bpm": "BPM",
+      "points": "điểm",
+      "active": "Hoạt động",
+      "inactive": "Không hoạt động"
+    },
+    "buttons": {
+      "startEcg": "Bắt đầu ECG",
+      "stopEcg": "Dừng ECG",
+      "startRecording": "Bắt đầu ghi",
+      "stopRecording": "Dừng ghi",
+      "clearRecording": "Xóa bản ghi",
+      "makePrediction": "Tạo dự đoán",
+      "processing": "Đang xử lý..."
+    },
+    "liveWaveform": {
+      "title": "Sóng ECG trực tiếp",
+      "live": "TRỰC TIẾP",
+      "waiting": "Đang chờ dữ liệu ECG..."
+    },
+    "recording": {
+      "startedTitle": "Đã bắt đầu ghi",
+      "startedMessage": "Ghi sẽ tự động dừng sau {{samples}} mẫu ({{seconds}} giây ở {{rate}}Hz)",
+      "stoppedTitle": "Đã dừng ghi",
+      "stoppedWarning": "Cảnh báo: Chỉ ghi được {{recorded}} mẫu. Cần {{required}} mẫu cho dự đoán.",
+      "stoppedSuccess": "Đã ghi thành công {{samples}} mẫu",
+      "completeTitle": "Hoàn thành ghi",
+      "completeMessage": "Đã ghi thành công {{samples}} mẫu!\n\nBây giờ bạn có thể tạo dự đoán.",
+      "inProgress": "Đang ghi: {{current}} / {{required}} mẫu",
+      "samplesNeeded": "Cần thêm {{needed}} mẫu...",
+      "targetReached": "Đã đạt mục tiêu! Ghi sẽ tự động dừng.",
+      "clearTitle": "Xóa bản ghi",
+      "clearConfirm": "Bạn có chắc chắn muốn xóa dữ liệu đã ghi?",
+      "clearButton": "Xóa",
+      "clearSuccess": "Đã xóa dữ liệu ghi"
+    },
+    "recordedData": {
+      "title": "Dữ liệu ECG đã ghi",
+      "samplesRecorded": "Mẫu đã ghi: {{current}} / {{required}}",
+      "readyForPrediction": "Sẵn sàng dự đoán!",
+      "moreNeeded": "Cần thêm {{needed}} mẫu",
+      "tapToPredict": "Nhấn \"Tạo dự đoán\" để gửi dữ liệu phân tích tim mạch."
+    },
+    "prediction": {
+      "noDataAvailable": "Không có dữ liệu để dự đoán",
+      "insufficientDataTitle": "Không đủ dữ liệu",
+      "insufficientDataMessage": "Bạn cần chính xác {{required}} mẫu để dự đoán.\n\nHiện tại: {{current}} mẫu\nYêu cầu: {{required}} mẫu\n\nVui lòng ghi lại.",
+      "confirmTitle": "Gửi để dự đoán?",
+      "confirmMessage": "Sẵn sàng gửi {{samples}} mẫu ECG để phân tích.\n\nQuá trình này có thể mất 30-60 giây.",
+      "submitButton": "Gửi",
+      "progressPreparing": "Đang chuẩn bị dữ liệu ECG...",
+      "progressUploading": "Đang tải lên máy chủ...",
+      "progressComplete": "Phân tích hoàn thành!",
+      "completeTitle": "Dự đoán hoàn thành!",
+      "completeMessage": "ECG của bạn đã được phân tích thành công.\n\nChẩn đoán: {{diagnosis}}\nĐộ tin cậy: {{confidence}}\n\nXem chi tiết đầy đủ trong tab Dự đoán.",
+      "viewNow": "Xem ngay",
+      "stayHere": "Ở lại đây",
+      "failedTitle": "Dự đoán thất bại",
+      "failedMessage": "Không thể xử lý dữ liệu ECG. Vui lòng thử lại."
+    },
+    "modal": {
+      "title": "Đang xử lý phân tích ECG",
+      "subtitle": "Quá trình này có thể mất 30-60 giây...\nVui lòng không đóng ứng dụng."
+    },
+    "alerts": {
+      "permissionsRequired": "Cần quyền Bluetooth",
+      "failedToInitialize": "Không thể khởi tạo Polar SDK",
+      "enterDeviceId": "Vui lòng nhập ID thiết bị",
+      "failedToConnect": "Kết nối thất bại",
+      "failedToDisconnect": "Ngắt kết nối thất bại",
+      "failedToStartStreaming": "Không thể bắt đầu truyền ECG",
+      "failedToStopStreaming": "Không thể dừng truyền",
+      "connectedTo": "Đã kết nối với {{name}}",
+      "deviceDisconnected": "Thiết bị đã ngắt kết nối",
+      "startStreamingFirst": "Vui lòng bắt đầu truyền trước",
+      "recordingNotActive": "Ghi đang không hoạt động",
+      "noDataToClear": "Không có dữ liệu để xóa"
+    }
+  },
+  "health": {
+    "title": "Thông tin sức khỏe",
+    "descriptionNew": "Vui lòng cung cấp thông tin sức khỏe để đánh giá nguy cơ tim mạch",
+    "descriptionExisting": "Xem lại và cập nhật thông tin sức khỏe của bạn",
+    "infoBox": {
+      "title": "📋 Hoàn thành hồ sơ sức khỏe",
+      "message": "Để có đánh giá nguy cơ tim mạch chính xác, vui lòng điền đầy đủ các trường bắt buộc bên dưới. Thông tin này giúp mô hình AI cung cấp phân tích sức khỏe cá nhân hóa."
+    },
+    "fields": {
+      "dobLabel": "Ngày sinh *",
+      "dobPlaceholder": "Chọn ngày sinh",
+      "sexLabel": "Giới tính *",
+      "sexPlaceholder": "Chọn giới tính",
+      "chestPainLabel": "Loại đau ngực *",
+      "chestPainPlaceholder": "Chọn loại đau ngực",
+      "exerciseAnginaLabel": "Đau thắt ngực do tập luyện *",
+      "exerciseAnginaPlaceholder": "Chọn đau thắt ngực do tập luyện",
+      "bloodPressureLabel": "Huyết áp nghỉ ngơi (mm Hg) *",
+      "bloodPressurePlaceholder": "Nhập huyết áp nghỉ ngơi"
+    },
+    "options": {
+      "sex": {
+        "male": "Nam",
+        "female": "Nữ"
+      },
+      "chestPain": {
+        "typicalAngina": "Đau thắt ngực điển hình",
+        "atypicalAngina": "Đau thắt ngực không điển hình",
+        "nonAnginalPain": "Đau không phải thắt ngực",
+        "asymptomatic": "Không triệu chứng"
+      },
+      "exerciseAngina": {
+        "yes": "Có",
+        "no": "Không"
+      }
+    },
+    "loading": "Đang tải hồ sơ...",
+    "failedToLoad": "Không thể tải dữ liệu người dùng",
+    "updateSuccess": "Cập nhật dữ liệu sức khỏe thành công!",
+    "submitSuccess": "Gửi dữ liệu sức khỏe thành công!",
+    "updateFailed": "Không thể cập nhật dữ liệu sức khỏe",
+    "validation": {
+      "fillAllFields": "Vui lòng điền đầy đủ các trường bắt buộc",
+      "invalidDob": "Vui lòng nhập ngày sinh hợp lệ (tuổi phải từ 10-100)",
+      "invalidBloodPressure": "Vui lòng nhập huyết áp hợp lệ (50-300 mm Hg)"
+    },
+    "datePicker": {
+      "title": "Chọn ngày sinh",
+      "year": "Năm",
+      "month": "Tháng",
+      "day": "Ngày"
+    },
+    "months": {
+      "january": "Tháng 1",
+      "february": "Tháng 2",
+      "march": "Tháng 3",
+      "april": "Tháng 4",
+      "may": "Tháng 5",
+      "june": "Tháng 6",
+      "july": "Tháng 7",
+      "august": "Tháng 8",
+      "september": "Tháng 9",
+      "october": "Tháng 10",
+      "november": "Tháng 11",
+      "december": "Tháng 12"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "description": "Quản lý tùy chọn tài khoản và thông tin hồ sơ",
+    "loadingProfile": "Đang tải hồ sơ...",
+    "failedToLoad": "Không thể tải hồ sơ",
+    "unableToRetrieve": "Không thể truy xuất dữ liệu hồ sơ",
+    "profileSection": "Thông tin hồ sơ",
+    "usernameLabel": "Tên đăng nhập *",
+    "usernamePlaceholder": "Nhập tên đăng nhập",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "Nhập email",
+    "phoneLabel": "Số điện thoại",
+    "phonePlaceholder": "Nhập số điện thoại",
+    "roleLabel": "Vai trò",
+    "accountStatusLabel": "Trạng thái tài khoản",
+    "verified": "Đã xác thực",
+    "notVerified": "Chưa xác thực",
+    "editProfile": "Sửa hồ sơ",
+    "saveChanges": "Lưu thay đổi",
+    "accountSection": "Thông tin tài khoản",
+    "userId": "ID người dùng:",
+    "memberSince": "Thành viên từ:",
+    "lastLogin": "Đăng nhập gần nhất:",
+    "currentSession": "Phiên hiện tại",
+    "updateSuccess": "Cập nhật hồ sơ thành công!",
+    "updateFailed": "Không thể cập nhật hồ sơ",
+    "logout": {
+      "title": "Đăng xuất",
+      "message": "Bạn có chắc chắn muốn đăng xuất?",
+      "button": "Đăng xuất"
+    },
+    "validation": {
+      "usernameEmailRequired": "Tên đăng nhập và email là bắt buộc",
+      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ",
+      "invalidPhone": "Vui lòng nhập số điện thoại hợp lệ"
+    },
+    "language": {
+      "title": "Ngôn ngữ",
+      "english": "English",
+      "vietnamese": "Tiếng Việt"
+    }
+  }
+}

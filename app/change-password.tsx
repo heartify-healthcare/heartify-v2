@@ -10,11 +10,13 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/change-password';
 import { changePassword } from '@/api';
 
 const ChangePasswordScreen: React.FC = () => {
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -34,17 +36,17 @@ const ChangePasswordScreen: React.FC = () => {
   const handleSubmit = async () => {
     // Validation
     if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('common.error'), t('changePassword.validation.fillAllFields'));
       return;
     }
 
     if (formData.newPassword.length < 6) {
-      Alert.alert('Error', 'New password must be at least 6 characters long');
+      Alert.alert(t('common.error'), t('changePassword.validation.passwordMinLength'));
       return;
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      Alert.alert('Error', 'New passwords do not match');
+      Alert.alert(t('common.error'), t('changePassword.validation.passwordsNotMatch'));
       return;
     }
 
@@ -58,11 +60,11 @@ const ChangePasswordScreen: React.FC = () => {
       });
 
       Alert.alert(
-        'Success',
-        'Password changed successfully!',
+        t('common.success'),
+        t('changePassword.success'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               setFormData({
                 currentPassword: '',
@@ -76,8 +78,8 @@ const ChangePasswordScreen: React.FC = () => {
       );
     } catch (error: any) {
       Alert.alert(
-        'Failed',
-        error.message || 'Failed to change password. Please check your current password and try again.'
+        t('changePassword.failed'),
+        error.message || t('changePassword.error')
       );
     } finally {
       setLoading(false);
@@ -92,21 +94,21 @@ const ChangePasswordScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Change Password</Text>
+          <Text style={styles.title}>{t('changePassword.title')}</Text>
           <Text style={styles.description}>
-            Enter your current password and choose a new secure password
+            {t('changePassword.description')}
           </Text>
 
           <View style={styles.formContainer}>
             {/* Current Password */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Current Password *</Text>
+              <Text style={styles.inputLabel}>{t('changePassword.currentPasswordLabel')}</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
                   value={formData.currentPassword}
                   onChangeText={(text) => setFormData({ ...formData, currentPassword: text })}
-                  placeholder="Enter current password"
+                  placeholder={t('changePassword.currentPasswordPlaceholder')}
                   secureTextEntry={!showPassword}
                   placeholderTextColor="#bdc3c7"
                 />
@@ -123,13 +125,13 @@ const ChangePasswordScreen: React.FC = () => {
 
             {/* New Password */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>New Password *</Text>
+              <Text style={styles.inputLabel}>{t('changePassword.newPasswordLabel')}</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
                   value={formData.newPassword}
                   onChangeText={(text) => setFormData({ ...formData, newPassword: text })}
-                  placeholder="Enter new password (min 6 characters)"
+                  placeholder={t('changePassword.newPasswordPlaceholder')}
                   secureTextEntry={!showPassword}
                   placeholderTextColor="#bdc3c7"
                 />
@@ -146,13 +148,13 @@ const ChangePasswordScreen: React.FC = () => {
 
             {/* Confirm New Password */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Confirm New Password *</Text>
+              <Text style={styles.inputLabel}>{t('changePassword.confirmPasswordLabel')}</Text>
               <View style={styles.passwordContainer}>
                 <TextInput
                   style={styles.passwordInput}
                   value={formData.confirmPassword}
                   onChangeText={(text) => setFormData({ ...formData, confirmPassword: text })}
-                  placeholder="Confirm new password"
+                  placeholder={t('changePassword.confirmPasswordPlaceholder')}
                   secureTextEntry={!showPassword}
                   placeholderTextColor="#bdc3c7"
                 />
@@ -169,11 +171,11 @@ const ChangePasswordScreen: React.FC = () => {
 
             {/* Password Requirements */}
             <View style={styles.requirementsContainer}>
-              <Text style={styles.requirementsTitle}>Password Requirements:</Text>
-              <Text style={styles.requirementText}>• At least 6 characters long</Text>
-              <Text style={styles.requirementText}>• Mix of uppercase and lowercase letters</Text>
-              <Text style={styles.requirementText}>• At least one number</Text>
-              <Text style={styles.requirementText}>• At least one special character</Text>
+              <Text style={styles.requirementsTitle}>{t('changePassword.requirements.title')}</Text>
+              <Text style={styles.requirementText}>• {t('changePassword.requirements.minLength')}</Text>
+              <Text style={styles.requirementText}>• {t('changePassword.requirements.mixCase')}</Text>
+              <Text style={styles.requirementText}>• {t('changePassword.requirements.number')}</Text>
+              <Text style={styles.requirementText}>• {t('changePassword.requirements.special')}</Text>
             </View>
 
             {/* Action Buttons */}
@@ -186,7 +188,7 @@ const ChangePasswordScreen: React.FC = () => {
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.buttonText}>Change Password</Text>
+                  <Text style={styles.buttonText}>{t('auth.changePassword')}</Text>
                 )}
               </TouchableOpacity>
 
@@ -195,7 +197,7 @@ const ChangePasswordScreen: React.FC = () => {
                 onPress={handleCancel}
                 disabled={loading}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Dimensions } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -20,15 +21,17 @@ export const DeviceInput: React.FC<DeviceInputProps> = ({
   isConnected,
   disabled = false,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Polar H10 Device ID</Text>
+      <Text style={styles.label}>{t('ecg.deviceInput.label')}</Text>
       <View style={styles.inputRow}>
         <TextInput
           style={[styles.input, disabled && styles.disabledInput]}
           value={deviceId}
           onChangeText={onDeviceIdChange}
-          placeholder="Enter device ID (e.g., 05281231)"
+          placeholder={t('ecg.deviceInput.placeholder')}
           placeholderTextColor="#bdc3c7"
           editable={!isConnected && !disabled}
         />
@@ -43,7 +46,7 @@ export const DeviceInput: React.FC<DeviceInputProps> = ({
           onPress={onConnect}
           disabled={isConnected || disabled}
         >
-          <Text style={styles.buttonText}>Connect</Text>
+          <Text style={styles.buttonText}>{t('ecg.deviceInput.connect')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -55,7 +58,7 @@ export const DeviceInput: React.FC<DeviceInputProps> = ({
           onPress={onDisconnect}
           disabled={!isConnected || disabled}
         >
-          <Text style={styles.buttonText}>Disconnect</Text>
+          <Text style={styles.buttonText}>{t('ecg.deviceInput.disconnect')}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -113,5 +116,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-

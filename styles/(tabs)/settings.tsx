@@ -175,4 +175,20 @@ export const styles = StyleSheet.create({
     fontSize: width * 0.045,
     fontWeight: 'bold',
   },
+  languageContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    paddingVertical: height * 0.01,
+  },
+  languageLabel: {
+    fontSize: width * 0.04,
+    color: '#7f8c8d',
+    fontWeight: '500',
+  },
+  languageActive: {
+    color: '#2c3e50',
+    fontWeight: 'bold',
+  },
 });

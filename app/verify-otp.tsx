@@ -12,6 +12,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/verify-otp';
 import { verifyOtp, requestVerify } from '@/api';
@@ -24,6 +25,8 @@ interface VerifyOtpScreenProps {
 }
 
 const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
+  
   // State for the 6 OTP digits
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [loading, setLoading] = useState<boolean>(false);
@@ -73,12 +76,12 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
 
     // Validate OTP
     if (otpString.length !== 6) {
-      Alert.alert('Error', 'Please enter a complete 6-digit OTP');
+      Alert.alert(t('common.error'), t('verifyOtp.validation.incompleteOtp'));
       return;
     }
 
     if (!email) {
-      Alert.alert('Error', 'Email not found. Please go back and try again.');
+      Alert.alert(t('common.error'), t('verifyOtp.validation.emailNotFound'));
       return;
     }
 
@@ -93,11 +96,11 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
 
       // Navigate to login on success
       Alert.alert(
-        'Success',
-        'Email verified successfully! You can now login.',
+        t('common.success'),
+        t('verifyOtp.verificationSuccess'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               router.push('/login');
             }
@@ -106,8 +109,8 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       );
     } catch (error: any) {
       Alert.alert(
-        'Verification Failed',
-        error.message || 'Invalid OTP. Please try again.'
+        t('verifyOtp.verificationFailed'),
+        error.message || t('verifyOtp.verificationError')
       );
     } finally {
       setLoading(false);
@@ -117,7 +120,7 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
   // Resend OTP function
   const handleResendOtp = async () => {
     if (!email) {
-      Alert.alert('Error', 'Email not found. Please go back and try again.');
+      Alert.alert(t('common.error'), t('verifyOtp.validation.emailNotFound'));
       return;
     }
 
@@ -130,11 +133,11 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       });
 
       Alert.alert(
-        'Success',
-        'OTP has been resent to your email!',
+        t('common.success'),
+        t('verifyOtp.resendSuccess'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               setOtp(Array(6).fill(''));
               inputRefs.current[0]?.focus();
@@ -144,8 +147,8 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
       );
     } catch (error: any) {
       Alert.alert(
-        'Failed',
-        error.message || 'Failed to resend OTP. Please try again.'
+        t('verifyOtp.resendFailed'),
+        error.message || t('verifyOtp.resendError')
       );
     } finally {
       setLoading(false);
@@ -163,13 +166,16 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
-            <Text style={styles.appName}>Heartify</Text>
+            <Text style={styles.appName}>{t('common.appName')}</Text>
 
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Verify OTP</Text>
+              <Text style={styles.title}>{t('verifyOtp.title')}</Text>
 
               <Text style={styles.description}>
-                Please enter the 6-digit OTP sent to {email ? email : 'your email'} to continue.
+                {email 
+                  ? t('verifyOtp.description', { email }) 
+                  : t('verifyOtp.descriptionNoEmail')
+                }
               </Text>
 
               <View style={styles.otpContainer}>
@@ -200,7 +206,7 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text style={styles.buttonText}>
-                    Verify OTP
+                    {t('auth.verifyOtp')}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -210,7 +216,7 @@ const VerifyOtpScreen: React.FC<VerifyOtpScreenProps> = ({ navigation }) => {
                 disabled={loading}
               >
                 <Text style={styles.resendText}>
-                  Didn't receive the code? Resend OTP
+                  {t('verifyOtp.resendText')}
                 </Text>
               </TouchableOpacity>
             </View>

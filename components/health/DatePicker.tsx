@@ -6,8 +6,10 @@ import {
   Modal,
   ScrollView,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/(tabs)/health';
+import { useMonthNames } from '@/hooks';
 
 interface DatePickerProps {
   selectedDate: string;
@@ -20,6 +22,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   onDateSelect, 
   disabled = false 
 }) => {
+  const { t } = useTranslation();
+  const months = useMonthNames();
+  
   const [isVisible, setIsVisible] = useState(false);
   const [tempDay, setTempDay] = useState<number>(1);
   const [tempMonth, setTempMonth] = useState<number>(1);
@@ -43,12 +48,8 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     if (!dateString) return '';
     try {
       const [year, month, day] = dateString.split('-').map(Number);
-      const date = new Date(year, month - 1, day);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
+      const monthName = months.find(m => m.value === month)?.label || '';
+      return `${monthName} ${day}, ${year}`;
     } catch {
       return dateString;
     }
@@ -65,14 +66,6 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       years.push(year);
     }
     return years.reverse();
-  };
-
-  const generateMonths = (): { label: string; value: number }[] => {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months.map((month, index) => ({ label: month, value: index + 1 }));
   };
 
   const generateDays = (): number[] => {
@@ -106,7 +99,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
           !selectedDate && styles.placeholderText,
           disabled && styles.disabledText
         ]}>
-          {selectedDate ? formatDisplayDate(selectedDate) : 'Select date of birth'}
+          {selectedDate ? formatDisplayDate(selectedDate) : t('health.fields.dobPlaceholder')}
         </Text>
         <Text style={[styles.dropdownArrow, disabled && styles.disabledText]}>📅</Text>
       </TouchableOpacity>
@@ -119,11 +112,11 @@ export const DatePicker: React.FC<DatePickerProps> = ({
       >
         <View style={styles.modalOverlay}>
           <View style={styles.datePickerModal}>
-            <Text style={styles.modalTitle}>Select Date of Birth</Text>
+            <Text style={styles.modalTitle}>{t('health.datePicker.title')}</Text>
 
             <View style={styles.datePickerContainer}>
               <View style={styles.datePickerColumn}>
-                <Text style={styles.datePickerLabel}>Year</Text>
+                <Text style={styles.datePickerLabel}>{t('health.datePicker.year')}</Text>
                 <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
                   {generateYears().map((year) => (
                     <TouchableOpacity
@@ -146,9 +139,9 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               </View>
 
               <View style={styles.datePickerColumn}>
-                <Text style={styles.datePickerLabel}>Month</Text>
+                <Text style={styles.datePickerLabel}>{t('health.datePicker.month')}</Text>
                 <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
-                  {generateMonths().map((month) => (
+                  {months.map((month) => (
                     <TouchableOpacity
                       key={month.value}
                       style={[
@@ -169,7 +162,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
               </View>
 
               <View style={styles.datePickerColumn}>
-                <Text style={styles.datePickerLabel}>Day</Text>
+                <Text style={styles.datePickerLabel}>{t('health.datePicker.day')}</Text>
                 <ScrollView style={styles.datePickerScroll} showsVerticalScrollIndicator={false}>
                   {generateDays().map((day) => (
                     <TouchableOpacity
@@ -194,10 +187,10 @@ export const DatePicker: React.FC<DatePickerProps> = ({
 
             <View style={styles.datePickerButtons}>
               <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.confirmButton} onPress={handleConfirm}>
-                <Text style={styles.confirmButtonText}>Confirm</Text>
+                <Text style={styles.confirmButtonText}>{t('common.confirm')}</Text>
               </TouchableOpacity>
             </View>
           </View>

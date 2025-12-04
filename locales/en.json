@@ -1,0 +1,377 @@
+{
+  "common": {
+    "appName": "Heartify",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "edit": "Edit",
+    "submit": "Submit",
+    "update": "Update",
+    "retry": "Retry",
+    "tryAgain": "Try Again",
+    "confirm": "Confirm",
+    "info": "Info",
+    "unknown": "Unknown",
+    "na": "N/A"
+  },
+  "auth": {
+    "login": "Login",
+    "signUp": "Sign Up",
+    "logIn": "Log In",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "verifyOtp": "Verify OTP"
+  },
+  "login": {
+    "appDescription": "A Mobile Application for Cardiovascular Disease Prediction",
+    "slogan": "\"Your Heart, Your Future\"",
+    "title": "Login",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "noAccount": "Don't have an account? ",
+    "loginSuccess": "Login successful!",
+    "loginFailed": "Login Failed",
+    "loginError": "An error occurred during login. Please try again.",
+    "validation": {
+      "usernamePasswordRequired": "Please enter both username and password"
+    }
+  },
+  "signup": {
+    "title": "Sign Up",
+    "usernameLabel": "Username *",
+    "usernamePlaceholder": "Create a username",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "Enter your email",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "passwordLabel": "Password *",
+    "passwordPlaceholder": "Create a password (min 6 characters)",
+    "confirmPasswordLabel": "Confirm Password *",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "hasAccount": "Already have an account? ",
+    "registrationSuccess": "Registration successful! Please check your email for the OTP verification code.",
+    "registrationFailed": "Registration Failed",
+    "registrationError": "An error occurred during registration. Please try again.",
+    "validation": {
+      "fillAllFields": "Please fill in all required fields",
+      "passwordsNotMatch": "Passwords do not match",
+      "passwordMinLength": "Password must be at least 6 characters long",
+      "usernameMinLength": "Username must be at least 3 characters long",
+      "invalidEmail": "Please enter a valid email address"
+    }
+  },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "usernameLabel": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "emailLabel": "Email",
+    "emailPlaceholder": "Enter your email",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "Enter your phone number",
+    "rememberedPassword": "Remembered password? ",
+    "recoverySuccess": "Password recovery instructions have been sent to your email and phone number.",
+    "recoveryFailed": "Recovery Failed",
+    "recoveryError": "Failed to recover password. Please verify your information and try again.",
+    "validation": {
+      "fillAllFields": "Please fill in all fields",
+      "invalidEmail": "Please enter a valid email address"
+    }
+  },
+  "verifyOtp": {
+    "title": "Verify OTP",
+    "description": "Please enter the 6-digit OTP sent to {{email}} to continue.",
+    "descriptionNoEmail": "Please enter the 6-digit OTP sent to your email to continue.",
+    "resendText": "Didn't receive the code? Resend OTP",
+    "verificationSuccess": "Email verified successfully! You can now login.",
+    "verificationFailed": "Verification Failed",
+    "verificationError": "Invalid OTP. Please try again.",
+    "resendSuccess": "OTP has been resent to your email!",
+    "resendFailed": "Failed",
+    "resendError": "Failed to resend OTP. Please try again.",
+    "validation": {
+      "incompleteOtp": "Please enter a complete 6-digit OTP",
+      "emailNotFound": "Email not found. Please go back and try again."
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "description": "Enter your current password and choose a new secure password",
+    "currentPasswordLabel": "Current Password *",
+    "currentPasswordPlaceholder": "Enter current password",
+    "newPasswordLabel": "New Password *",
+    "newPasswordPlaceholder": "Enter new password (min 6 characters)",
+    "confirmPasswordLabel": "Confirm New Password *",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "requirements": {
+      "title": "Password Requirements:",
+      "minLength": "At least 6 characters long",
+      "mixCase": "Mix of uppercase and lowercase letters",
+      "number": "At least one number",
+      "special": "At least one special character"
+    },
+    "success": "Password changed successfully!",
+    "failed": "Failed",
+    "error": "Failed to change password. Please check your current password and try again.",
+    "validation": {
+      "fillAllFields": "Please fill in all fields",
+      "passwordMinLength": "New password must be at least 6 characters long",
+      "passwordsNotMatch": "New passwords do not match"
+    }
+  },
+  "tabs": {
+    "predictions": "Predictions",
+    "ecg": "ECG",
+    "health": "Health",
+    "settings": "Settings"
+  },
+  "predictions": {
+    "title": "Predictions",
+    "description": "View your cardiovascular health predictions and risk assessments",
+    "loading": "Loading ECG sessions...",
+    "noSessions": "No ECG sessions found. Start a new recording to see predictions here.",
+    "errorLoadingSessions": "Failed to load ECG sessions",
+    "errorLoadingSessionsRetry": "Failed to load ECG sessions. Please try again.",
+    "errorLoadingDetails": "Failed to load session details. Please try again.",
+    "card": {
+      "ecgSession": "ECG Session",
+      "ecgRecording": "ECG Recording",
+      "loadingEcg": "Loading ECG data...",
+      "rawSignal": "Raw Signal",
+      "denoisedSignal": "Denoised Signal",
+      "lead": "Lead",
+      "samplingRate": "Sampling Rate",
+      "predictionResults": "Prediction Results",
+      "loadingPrediction": "Loading prediction data...",
+      "modelVersion": "Model Version",
+      "diagnosis": "Diagnosis",
+      "confidence": "Confidence",
+      "physiologicalFeatures": "Physiological Features",
+      "noFeaturesAvailable": "No features available",
+      "aiExplanation": "AI Explanation",
+      "loadingExplanation": "Loading AI explanation...",
+      "summary": "Summary",
+      "details": "Details",
+      "recommendations": "Recommendations",
+      "riskLevel": "Risk Level",
+      "nextSteps": "Next Steps"
+    }
+  },
+  "ecg": {
+    "title": "ECG Monitor",
+    "description": "Connect to Polar H10 to monitor and record your ECG signals",
+    "statusLabel": "Status",
+    "deviceInput": {
+      "label": "Polar H10 Device ID",
+      "placeholder": "Enter device ID (e.g., 05281231)",
+      "connect": "Connect",
+      "disconnect": "Disconnect"
+    },
+    "status": {
+      "notInitialized": "Not initialized",
+      "connecting": "Connecting...",
+      "connectedTo": "Connected to {{name}} ({{deviceId}})",
+      "disconnected": "Disconnected",
+      "startingStreaming": "Starting ECG streaming...",
+      "streaming": "Streaming ECG data...",
+      "streamingStopped": "Streaming stopped",
+      "failedToStartStreaming": "Failed to start streaming",
+      "connectionFailed": "Connection failed",
+      "failedToInitialize": "Failed to initialize",
+      "error": "Error: {{message}}"
+    },
+    "stats": {
+      "heartRate": "Heart Rate",
+      "samples": "Samples",
+      "streaming": "Streaming",
+      "bpm": "BPM",
+      "points": "points",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "buttons": {
+      "startEcg": "Start ECG",
+      "stopEcg": "Stop ECG",
+      "startRecording": "Start Recording",
+      "stopRecording": "Stop Recording",
+      "clearRecording": "Clear Recording",
+      "makePrediction": "Make Prediction",
+      "processing": "Processing..."
+    },
+    "liveWaveform": {
+      "title": "Live ECG Waveform",
+      "live": "LIVE",
+      "waiting": "Waiting for ECG data..."
+    },
+    "recording": {
+      "startedTitle": "Recording Started",
+      "startedMessage": "Recording will automatically stop after {{samples}} samples ({{seconds}} seconds at {{rate}}Hz)",
+      "stoppedTitle": "Recording Stopped",
+      "stoppedWarning": "Warning: Recorded only {{recorded}} samples. {{required}} samples required for prediction.",
+      "stoppedSuccess": "Successfully recorded {{samples}} samples",
+      "completeTitle": "Recording Complete",
+      "completeMessage": "Successfully recorded {{samples}} samples!\n\nYou can now make a prediction.",
+      "inProgress": "Recording: {{current}} / {{required}} samples",
+      "samplesNeeded": "{{needed}} more samples needed...",
+      "targetReached": "Target reached! Recording will stop automatically.",
+      "clearTitle": "Clear Recording",
+      "clearConfirm": "Are you sure you want to clear the recorded data?",
+      "clearButton": "Clear",
+      "clearSuccess": "Recorded data cleared"
+    },
+    "recordedData": {
+      "title": "Recorded ECG Data",
+      "samplesRecorded": "Recorded samples: {{current}} / {{required}}",
+      "readyForPrediction": "Ready for prediction!",
+      "moreNeeded": "{{needed}} more samples needed",
+      "tapToPredict": "Tap \"Make Prediction\" to send data for cardiovascular analysis."
+    },
+    "prediction": {
+      "noDataAvailable": "No recorded data available for prediction",
+      "insufficientDataTitle": "Insufficient Data",
+      "insufficientDataMessage": "You need exactly {{required}} samples for prediction.\n\nCurrent: {{current}} samples\nRequired: {{required}} samples\n\nPlease record again.",
+      "confirmTitle": "Submit for Prediction?",
+      "confirmMessage": "Ready to submit {{samples}} ECG samples for analysis.\n\nThis may take 30-60 seconds to process.",
+      "submitButton": "Submit",
+      "progressPreparing": "Preparing ECG data...",
+      "progressUploading": "Uploading to server...",
+      "progressComplete": "Analysis complete!",
+      "completeTitle": "Prediction Complete!",
+      "completeMessage": "Your ECG has been analyzed successfully.\n\nDiagnosis: {{diagnosis}}\nConfidence: {{confidence}}\n\nView full details in the Predictions tab.",
+      "viewNow": "View Now",
+      "stayHere": "Stay Here",
+      "failedTitle": "Prediction Failed",
+      "failedMessage": "Failed to process ECG data. Please try again."
+    },
+    "modal": {
+      "title": "Processing ECG Analysis",
+      "subtitle": "This may take 30-60 seconds...\nPlease do not close the app."
+    },
+    "alerts": {
+      "permissionsRequired": "Permissions required for Bluetooth",
+      "failedToInitialize": "Failed to initialize Polar SDK",
+      "enterDeviceId": "Please enter a device ID",
+      "failedToConnect": "Failed to connect",
+      "failedToDisconnect": "Failed to disconnect",
+      "failedToStartStreaming": "Failed to start ECG streaming",
+      "failedToStopStreaming": "Failed to stop streaming",
+      "connectedTo": "Connected to {{name}}",
+      "deviceDisconnected": "Device disconnected",
+      "startStreamingFirst": "Please start streaming first",
+      "recordingNotActive": "Recording is not active",
+      "noDataToClear": "No recorded data to clear"
+    }
+  },
+  "health": {
+    "title": "Health Information",
+    "descriptionNew": "Please provide your health information for cardiovascular risk assessment",
+    "descriptionExisting": "Review and update your health information",
+    "infoBox": {
+      "title": "📋 Complete Your Health Profile",
+      "message": "To get accurate cardiovascular risk assessments, please fill in all required fields below. This information helps our AI model provide personalized health insights."
+    },
+    "fields": {
+      "dobLabel": "Date of Birth *",
+      "dobPlaceholder": "Select date of birth",
+      "sexLabel": "Sex *",
+      "sexPlaceholder": "Select sex",
+      "chestPainLabel": "Chest Pain Type *",
+      "chestPainPlaceholder": "Select chest pain type",
+      "exerciseAnginaLabel": "Exercise Induced Angina *",
+      "exerciseAnginaPlaceholder": "Select exercise induced angina",
+      "bloodPressureLabel": "Resting Blood Pressure (mm Hg) *",
+      "bloodPressurePlaceholder": "Enter resting blood pressure"
+    },
+    "options": {
+      "sex": {
+        "male": "Male",
+        "female": "Female"
+      },
+      "chestPain": {
+        "typicalAngina": "Typical angina",
+        "atypicalAngina": "Atypical angina",
+        "nonAnginalPain": "Non-anginal pain",
+        "asymptomatic": "Asymptomatic"
+      },
+      "exerciseAngina": {
+        "yes": "Yes",
+        "no": "No"
+      }
+    },
+    "loading": "Loading your profile...",
+    "failedToLoad": "Failed to load user data",
+    "updateSuccess": "Health data updated successfully!",
+    "submitSuccess": "Health data submitted successfully!",
+    "updateFailed": "Failed to update health data",
+    "validation": {
+      "fillAllFields": "Please fill in all required fields",
+      "invalidDob": "Please enter a valid date of birth (age must be between 10-100 years)",
+      "invalidBloodPressure": "Please enter a valid blood pressure (50-300 mm Hg)"
+    },
+    "datePicker": {
+      "title": "Select Date of Birth",
+      "year": "Year",
+      "month": "Month",
+      "day": "Day"
+    },
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account preferences and profile information",
+    "loadingProfile": "Loading profile...",
+    "failedToLoad": "Failed to load profile",
+    "unableToRetrieve": "Unable to retrieve your profile data",
+    "profileSection": "Profile Information",
+    "usernameLabel": "Username *",
+    "usernamePlaceholder": "Enter username",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "Enter email",
+    "phoneLabel": "Phone Number",
+    "phonePlaceholder": "Enter phone number",
+    "roleLabel": "Role",
+    "accountStatusLabel": "Account Status",
+    "verified": "Verified",
+    "notVerified": "Not Verified",
+    "editProfile": "Edit Profile",
+    "saveChanges": "Save Changes",
+    "accountSection": "Account Information",
+    "userId": "User ID:",
+    "memberSince": "Member Since:",
+    "lastLogin": "Last Login:",
+    "currentSession": "Current Session",
+    "updateSuccess": "Profile updated successfully!",
+    "updateFailed": "Failed to update profile",
+    "logout": {
+      "title": "Logout",
+      "message": "Are you sure you want to logout?",
+      "button": "Logout"
+    },
+    "validation": {
+      "usernameEmailRequired": "Username and email are required",
+      "invalidEmail": "Please enter a valid email address",
+      "invalidPhone": "Please enter a valid phone number"
+    },
+    "language": {
+      "title": "Language",
+      "english": "English",
+      "vietnamese": "Tiếng Việt"
+    }
+  }
+}

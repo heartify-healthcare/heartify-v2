@@ -12,6 +12,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/login';
 import { login } from '@/api';
@@ -24,6 +25,7 @@ interface LoginScreenProps {
 }
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -48,7 +50,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleLogin = async (): Promise<void> => {
     // Basic validation
     if (!username || !password) {
-      Alert.alert('Error', 'Please enter both username and password');
+      Alert.alert(t('common.error'), t('login.validation.usernamePasswordRequired'));
       return;
     }
 
@@ -63,11 +65,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
       // Navigate to main app on success
       Alert.alert(
-        'Success',
-        'Login successful!',
+        t('common.success'),
+        t('login.loginSuccess'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               router.replace('/(tabs)');
             }
@@ -76,8 +78,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       );
     } catch (error: any) {
       Alert.alert(
-        'Login Failed',
-        error.message || 'An error occurred during login. Please try again.'
+        t('login.loginFailed'),
+        error.message || t('login.loginError')
       );
     } finally {
       setLoading(false);
@@ -95,18 +97,18 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
-            <Text style={styles.appName}>Heartify</Text>
-            <Text style={styles.appDescription}>A Mobile Application for Cardiovascular Disease Prediction</Text>
-            <Text style={styles.slogan}>"Your Heart, Your Future"</Text>
+            <Text style={styles.appName}>{t('common.appName')}</Text>
+            <Text style={styles.appDescription}>{t('login.appDescription')}</Text>
+            <Text style={styles.slogan}>{t('login.slogan')}</Text>
 
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Login</Text>
+              <Text style={styles.title}>{t('login.title')}</Text>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Username</Text>
+                <Text style={styles.inputLabel}>{t('login.usernameLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your username"
+                  placeholder={t('login.usernamePlaceholder')}
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
@@ -114,11 +116,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Password</Text>
+                <Text style={styles.inputLabel}>{t('login.passwordLabel')}</Text>
                 <View style={styles.passwordContainer}>
                   <TextInput
                     style={styles.passwordInput}
-                    placeholder="Enter your password"
+                    placeholder={t('login.passwordPlaceholder')}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
@@ -138,7 +140,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 onPress={handleForgotPassword}
               >
                 <Text style={styles.forgotPassword}>
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </Text>
               </TouchableOpacity>
 
@@ -151,16 +153,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text style={styles.buttonText}>
-                    Login
+                    {t('auth.login')}
                   </Text>
                 )}
               </TouchableOpacity>
 
               <View style={styles.signupContainer}>
-                <Text style={styles.signupText}>Don't have an account? </Text>
+                <Text style={styles.signupText}>{t('login.noAccount')}</Text>
                 <TouchableOpacity onPress={handleSignUp}>
                   <Text style={styles.signupLink}>
-                    Sign Up
+                    {t('auth.signUp')}
                   </Text>
                 </TouchableOpacity>
               </View>
