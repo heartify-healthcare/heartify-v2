@@ -15,6 +15,7 @@ import {
   Dropdown, 
   DatePicker
 } from '@/components/health';
+import { LoadingScreen, ErrorScreen } from '@/components';
 import { useHealthOptions } from '@/hooks';
 import { convertGMTToYYYYMMDD, validateAge } from '@/utils';
 import type { HealthUserData, HealthFormData } from '@/types';
@@ -185,29 +186,17 @@ const HealthScreen: React.FC = () => {
 
   // Show loading state
   if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#3498db' }}>{t('health.loading')}</Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <LoadingScreen message={t('health.loading')} />;
   }
 
   // Show error state if no user data
   if (!userData) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#e74c3c', marginBottom: 16 }}>{t('health.failedToLoad')}</Text>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={fetchUserProfile}
-          >
-            <Text style={styles.buttonText}>{t('common.retry')}</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <ErrorScreen
+        title={t('health.failedToLoad')}
+        onRetry={fetchUserProfile}
+        retryText={t('common.retry')}
+      />
     );
   }
 

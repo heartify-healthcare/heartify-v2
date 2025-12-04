@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  ActivityIndicator,
   Switch
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -19,6 +18,7 @@ import type { SettingsUserData, SettingsFormData } from '@/types';
 import { getProfile, updateProfile, logout } from '@/api';
 import type { User } from '@/types';
 import { changeLanguage, getCurrentLanguage } from '@/i18n';
+import { LoadingScreen, ErrorScreen } from '@/components';
 
 const SettingsScreen: React.FC = () => {
   const { t, i18n } = useTranslation();
@@ -230,37 +230,18 @@ const SettingsScreen: React.FC = () => {
 
   // Loading state
   if (isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
-          <ActivityIndicator size="large" color="#4A90E2" />
-          <Text style={{ color: '#7f8c8d', fontSize: 16, marginTop: 16 }}>
-            {t('settings.loadingProfile')}
-          </Text>
-        </View>
-      </SafeAreaView>
-    );
+    return <LoadingScreen message={t('settings.loadingProfile')} />;
   }
 
   // Error state
   if (loadError || !userData) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
-          <Text style={{ color: '#e74c3c', fontSize: 18, fontWeight: '600', marginBottom: 8 }}>
-            {t('settings.failedToLoad')}
-          </Text>
-          <Text style={{ color: '#7f8c8d', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
-            {loadError || t('settings.unableToRetrieve')}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { paddingHorizontal: 32 }]}
-            onPress={fetchUserProfile}
-          >
-            <Text style={styles.buttonText}>{t('common.tryAgain')}</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+      <ErrorScreen
+        title={t('settings.failedToLoad')}
+        message={loadError || t('settings.unableToRetrieve')}
+        onRetry={fetchUserProfile}
+        retryText={t('common.tryAgain')}
+      />
     );
   }
 

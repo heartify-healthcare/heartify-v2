@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { styles } from '@/styles/(tabs)/index';
 import { ECGSessionCard } from '@/components/predictions';
+import { LoadingScreen, ErrorScreen } from '@/components';
 import { getECGSessions, getECGRecording, getPrediction, getExplanation } from '@/api';
 import type { ECGSession } from '@/types';
 
@@ -207,6 +208,23 @@ const PredictionsScreen: React.FC = () => {
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return <LoadingScreen message={t('predictions.loading')} />;
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <ErrorScreen
+        title={t('common.error')}
+        message={error}
+        onRetry={fetchECGSessions}
+        retryText={t('common.tryAgain')}
+      />
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView 
@@ -227,15 +245,7 @@ const PredictionsScreen: React.FC = () => {
             {t('predictions.description')}
           </Text>
 
-          {isLoading ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{t('predictions.loading')}</Text>
-            </View>
-          ) : error ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>{error}</Text>
-            </View>
-          ) : sessions.length === 0 ? (
+          {sessions.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
                 {t('predictions.noSessions')}
