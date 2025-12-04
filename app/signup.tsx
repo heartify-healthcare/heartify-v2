@@ -12,6 +12,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/signup';
 import { register, requestVerify } from '@/api';
@@ -24,6 +25,7 @@ interface SignUpScreenProps {
 }
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -47,29 +49,29 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const handleSignUp = async (): Promise<void> => {
     // Basic validation
     if (!username || !email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert(t('common.error'), t('signup.validation.fillAllFields'));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(t('common.error'), t('signup.validation.passwordsNotMatch'));
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters long');
+      Alert.alert(t('common.error'), t('signup.validation.passwordMinLength'));
       return;
     }
 
     if (username.length < 3) {
-      Alert.alert('Error', 'Username must be at least 3 characters long');
+      Alert.alert(t('common.error'), t('signup.validation.usernameMinLength'));
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Alert.alert(t('common.error'), t('signup.validation.invalidEmail'));
       return;
     }
 
@@ -86,11 +88,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
 
       // Navigate to OTP verification screen
       Alert.alert(
-        'Success',
-        'Registration successful! Please check your email for the OTP verification code.',
+        t('common.success'),
+        t('signup.registrationSuccess'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               router.push({
                 pathname: '/verify-otp',
@@ -102,8 +104,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
       );
     } catch (error: any) {
       Alert.alert(
-        'Registration Failed',
-        error.message || 'An error occurred during registration. Please try again.'
+        t('signup.registrationFailed'),
+        error.message || t('signup.registrationError')
       );
     } finally {
       setLoading(false);
@@ -121,16 +123,16 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
-            <Text style={styles.appName}>Heartify</Text>
+            <Text style={styles.appName}>{t('common.appName')}</Text>
 
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Sign Up</Text>
+              <Text style={styles.title}>{t('signup.title')}</Text>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Username *</Text>
+                <Text style={styles.inputLabel}>{t('signup.usernameLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Create a username"
+                  placeholder={t('signup.usernamePlaceholder')}
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
@@ -138,10 +140,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Email *</Text>
+                <Text style={styles.inputLabel}>{t('signup.emailLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your email"
+                  placeholder={t('signup.emailPlaceholder')}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -150,10 +152,10 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Phone Number</Text>
+                <Text style={styles.inputLabel}>{t('signup.phoneLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your phone number"
+                  placeholder={t('signup.phonePlaceholder')}
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
@@ -161,11 +163,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Password *</Text>
+                <Text style={styles.inputLabel}>{t('signup.passwordLabel')}</Text>
                 <View style={styles.passwordContainer}>
                   <TextInput
                     style={styles.passwordInput}
-                    placeholder="Create a password (min 6 characters)"
+                    placeholder={t('signup.passwordPlaceholder')}
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={!showPassword}
@@ -182,11 +184,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Confirm Password *</Text>
+                <Text style={styles.inputLabel}>{t('signup.confirmPasswordLabel')}</Text>
                 <View style={styles.passwordContainer}>
                   <TextInput
                     style={styles.passwordInput}
-                    placeholder="Confirm your password"
+                    placeholder={t('signup.confirmPasswordPlaceholder')}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
@@ -211,15 +213,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                   <ActivityIndicator color="#fff" />
                 ) : (
                   <Text style={styles.buttonText}>
-                    Sign Up
+                    {t('auth.signUp')}
                   </Text>
                 )}
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Already have an account? </Text>
+                <Text style={styles.loginText}>{t('signup.hasAccount')}</Text>
                 <TouchableOpacity onPress={handleLogin}>
-                  <Text style={styles.loginLink}>Log In</Text>
+                  <Text style={styles.loginLink}>{t('auth.logIn')}</Text>
                 </TouchableOpacity>
               </View>
             </View>

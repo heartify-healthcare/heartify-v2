@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { ECGChart } from '@/components';
 import { formatDateTime, formatFeatureName, formatProbability, formatFeatureValue } from '@/utils';
 import type {
@@ -12,6 +13,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
   styles,
   onExpand 
 }) => {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleExpand = () => {
@@ -30,7 +32,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
             <Text style={styles.sessionNumberText}>#{index + 1}</Text>
           </View>
           <View style={styles.cardHeaderCenter}>
-            <Text style={styles.sessionId}>ECG Session</Text>
+            <Text style={styles.sessionId}>{t('predictions.card.ecgSession')}</Text>
             <View style={styles.sessionDateContainer}>
               <Text style={styles.sessionDateIcon}>📅</Text>
               <Text style={styles.sessionDate}>{formatDateTime(session.createdAt)}</Text>
@@ -54,36 +56,36 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
           {/* ECG Recording Section */}
           {session.loadingState?.ecgRecording === 'loading' && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>ECG Recording</Text>
+              <Text style={styles.sectionTitle}>{t('predictions.card.ecgRecording')}</Text>
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#3498db" />
-                <Text style={styles.loadingText}>Loading ECG data...</Text>
+                <Text style={styles.loadingText}>{t('predictions.card.loadingEcg')}</Text>
               </View>
             </View>
           )}
           
           {session.ecgRecording && session.loadingState?.ecgRecording === 'loaded' && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>ECG Recording</Text>
+              <Text style={styles.sectionTitle}>{t('predictions.card.ecgRecording')}</Text>
               
               {/* Raw Signal Chart */}
               <ECGChart
                 data={session.ecgRecording.rawData.signal}
-                label={`Raw Signal - Lead ${session.ecgRecording.rawData.lead}`}
+                label={`${t('predictions.card.rawSignal')} - ${t('predictions.card.lead')} ${session.ecgRecording.rawData.lead}`}
                 color="#3498db"
               />
 
               {/* Denoised Signal Chart */}
               <ECGChart
                 data={session.ecgRecording.denoisedData.signal}
-                label={`Denoised Signal - Lead ${session.ecgRecording.denoisedData.lead}`}
+                label={`${t('predictions.card.denoisedSignal')} - ${t('predictions.card.lead')} ${session.ecgRecording.denoisedData.lead}`}
                 color="#27ae60"
               />
 
               {/* Sampling Rate */}
               <View style={styles.samplingRateContainer}>
                 <Text style={styles.samplingRateText}>
-                  Sampling Rate: <Text style={styles.samplingRateValue}>{session.ecgRecording.samplingRate} Hz</Text>
+                  {t('predictions.card.samplingRate')}: <Text style={styles.samplingRateValue}>{session.ecgRecording.samplingRate} Hz</Text>
                 </Text>
               </View>
             </View>
@@ -92,30 +94,30 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
           {/* Prediction Section */}
           {session.loadingState?.prediction === 'loading' && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Prediction Results</Text>
+              <Text style={styles.sectionTitle}>{t('predictions.card.predictionResults')}</Text>
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#27ae60" />
-                <Text style={styles.loadingText}>Loading prediction data...</Text>
+                <Text style={styles.loadingText}>{t('predictions.card.loadingPrediction')}</Text>
               </View>
             </View>
           )}
           
           {session.prediction && session.loadingState?.prediction === 'loaded' && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Prediction Results</Text>
+              <Text style={styles.sectionTitle}>{t('predictions.card.predictionResults')}</Text>
               
               <View style={styles.predictionContainer}>
                 {/* Model Version */}
                 <View style={styles.predictionRow}>
-                  <Text style={styles.predictionLabel}>Model Version:</Text>
+                  <Text style={styles.predictionLabel}>{t('predictions.card.modelVersion')}:</Text>
                   <Text style={styles.predictionValue}>
                     v{session.prediction.modelVersion}
                   </Text>
                 </View>
 
-                {/* Diagnosis */}
+                {/* Diagnosis - Keep original value from backend */}
                 <View style={styles.predictionRow}>
-                  <Text style={styles.predictionLabel}>Diagnosis:</Text>
+                  <Text style={styles.predictionLabel}>{t('predictions.card.diagnosis')}:</Text>
                   <Text style={[
                     styles.predictionValue, 
                     styles.diagnosisValue,
@@ -129,7 +131,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
 
                 {/* Probability */}
                 <View style={styles.predictionRow}>
-                  <Text style={styles.predictionLabel}>Confidence:</Text>
+                  <Text style={styles.predictionLabel}>{t('predictions.card.confidence')}:</Text>
                   <Text style={[styles.predictionValue, styles.probabilityValue]}>
                     {formatProbability(session.prediction.probability, 2)}
                   </Text>
@@ -137,7 +139,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
 
                 {/* Features */}
                 <View style={styles.featuresContainer}>
-                  <Text style={styles.featuresTitle}>Physiological Features:</Text>
+                  <Text style={styles.featuresTitle}>{t('predictions.card.physiologicalFeatures')}:</Text>
                   
                   {/* Heart Rate */}
                   {session.prediction.features.heart_rate !== null && 
@@ -223,7 +225,7 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
                   ).length === 0 && (
                     <View style={styles.featureItem}>
                       <Text style={styles.featureLabel}>
-                        No features available
+                        {t('predictions.card.noFeaturesAvailable')}
                       </Text>
                     </View>
                   )}
@@ -235,46 +237,46 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
           {/* Explanation Section */}
           {session.loadingState?.explanation === 'loading' && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>AI Explanation</Text>
+              <Text style={styles.sectionTitle}>{t('predictions.card.aiExplanation')}</Text>
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#9b59b6" />
-                <Text style={styles.loadingText}>Loading AI explanation...</Text>
+                <Text style={styles.loadingText}>{t('predictions.card.loadingExplanation')}</Text>
               </View>
             </View>
           )}
           
           {session.explanation && session.loadingState?.explanation === 'loaded' && (
             <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>AI Explanation</Text>
+              <Text style={styles.sectionTitle}>{t('predictions.card.aiExplanation')}</Text>
               
               <View style={styles.explanationContainer}>
-                {/* Summary */}
+                {/* Summary - Keep original value from backend */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Summary:</Text>
+                  <Text style={styles.explanationLabel}>{t('predictions.card.summary')}:</Text>
                   <Text style={styles.explanationText}>
                     {session.explanation.explanation.summary}
                   </Text>
                 </View>
 
-                {/* Details */}
+                {/* Details - Keep original value from backend */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Details:</Text>
+                  <Text style={styles.explanationLabel}>{t('predictions.card.details')}:</Text>
                   <Text style={styles.explanationText}>
                     {session.explanation.explanation.details}
                   </Text>
                 </View>
 
-                {/* Recommendations */}
+                {/* Recommendations - Keep original value from backend */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Recommendations:</Text>
+                  <Text style={styles.explanationLabel}>{t('predictions.card.recommendations')}:</Text>
                   <Text style={styles.explanationText}>
                     {session.explanation.explanation.recommendations}
                   </Text>
                 </View>
 
-                {/* Risk Level */}
+                {/* Risk Level - Keep original value from backend */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Risk Level:</Text>
+                  <Text style={styles.explanationLabel}>{t('predictions.card.riskLevel')}:</Text>
                   <Text style={[
                     styles.explanationText,
                     { 
@@ -287,9 +289,9 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
                   </Text>
                 </View>
 
-                {/* Next Steps */}
+                {/* Next Steps - Keep original value from backend */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>Next Steps:</Text>
+                  <Text style={styles.explanationLabel}>{t('predictions.card.nextSteps')}:</Text>
                   <Text style={styles.explanationText}>
                     {session.explanation.explanation.next_steps}
                   </Text>

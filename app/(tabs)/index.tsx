@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, Alert, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { styles } from '@/styles/(tabs)/index';
 import { ECGSessionCard } from '@/components/predictions';
 import { getECGSessions, getECGRecording, getPrediction, getExplanation } from '@/api';
 import type { ECGSession } from '@/types';
 
 const PredictionsScreen: React.FC = () => {
+  const { t } = useTranslation();
   const [sessions, setSessions] = useState<ECGSession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -38,11 +40,11 @@ const PredictionsScreen: React.FC = () => {
       setSessions(initializedSessions);
     } catch (err: any) {
       console.error('Failed to fetch ECG sessions:', err);
-      setError(err.message || 'Failed to load ECG sessions');
+      setError(err.message || t('predictions.errorLoadingSessions'));
       Alert.alert(
-        'Error',
-        'Failed to load ECG sessions. Please try again.',
-        [{ text: 'OK' }]
+        t('common.error'),
+        t('predictions.errorLoadingSessionsRetry'),
+        [{ text: t('common.ok') }]
       );
     } finally {
       setIsLoading(false);
@@ -182,9 +184,9 @@ const PredictionsScreen: React.FC = () => {
     } catch (err: any) {
       console.error('Failed to fetch session details:', err);
       Alert.alert(
-        'Error',
-        'Failed to load session details. Please try again.',
-        [{ text: 'OK' }]
+        t('common.error'),
+        t('predictions.errorLoadingDetails'),
+        [{ text: t('common.ok') }]
       );
       
       // Set error state for the failed step
@@ -220,14 +222,14 @@ const PredictionsScreen: React.FC = () => {
         }
       >
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Predictions</Text>
+          <Text style={styles.title}>{t('predictions.title')}</Text>
           <Text style={styles.description}>
-            View your cardiovascular health predictions and risk assessments
+            {t('predictions.description')}
           </Text>
 
           {isLoading ? (
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>Loading ECG sessions...</Text>
+              <Text style={styles.emptyText}>{t('predictions.loading')}</Text>
             </View>
           ) : error ? (
             <View style={styles.emptyContainer}>
@@ -236,7 +238,7 @@ const PredictionsScreen: React.FC = () => {
           ) : sessions.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>
-                No ECG sessions found. Start a new recording to see predictions here.
+                {t('predictions.noSessions')}
               </Text>
             </View>
           ) : (

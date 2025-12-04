@@ -6,18 +6,22 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  Switch
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/(tabs)/settings';
 import { formatDate } from '@/utils';
 import type { SettingsUserData, SettingsFormData } from '@/types';
 import { getProfile, updateProfile, logout } from '@/api';
 import type { User } from '@/types';
+import { changeLanguage, getCurrentLanguage } from '@/i18n';
 
 const SettingsScreen: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
 
   // State management
@@ -38,6 +42,16 @@ const SettingsScreen: React.FC = () => {
     phonenumber: '',
     role: ''
   });
+
+  // Language state
+  const [isVietnamese, setIsVietnamese] = useState(getCurrentLanguage() === 'vi');
+
+  // Handle language toggle
+  const handleLanguageToggle = async (value: boolean) => {
+    setIsVietnamese(value);
+    const newLanguage = value ? 'vi' : 'en';
+    await changeLanguage(newLanguage);
+  };
 
   // Fetch user profile data
   const fetchUserProfile = async () => {
@@ -74,7 +88,7 @@ const SettingsScreen: React.FC = () => {
       setOriginalData(newFormData);
     } catch (error: any) {
       console.error('Error fetching user profile:', error);
-      setLoadError(error.message || 'Failed to load profile');
+      setLoadError(error.message || t('settings.updateFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -118,10 +132,10 @@ const SettingsScreen: React.FC = () => {
       setOriginalData({ ...formData });
       setIsEditing(false);
       
-      Alert.alert('Success', 'Profile updated successfully!');
+      Alert.alert(t('common.success'), t('settings.updateSuccess'));
     } catch (error: any) {
       console.error('Error updating profile:', error);
-      Alert.alert('Error', error.message || 'Failed to update profile');
+      Alert.alert(t('common.error'), error.message || t('settings.updateFailed'));
     }
   };
 
@@ -143,6 +157,11 @@ const SettingsScreen: React.FC = () => {
     fetchUserProfile();
   }, []);
 
+  // Update language state when i18n language changes
+  useEffect(() => {
+    setIsVietnamese(i18n.language === 'vi');
+  }, [i18n.language]);
+
   const handleEdit = () => {
     setIsEditing(true);
     setOriginalData({ ...formData });
@@ -156,14 +175,14 @@ const SettingsScreen: React.FC = () => {
   const handleSubmit = async () => {
     // Basic validation
     if (!formData.username.trim() || !formData.email.trim()) {
-      Alert.alert('Error', 'Username and email are required');
+      Alert.alert(t('common.error'), t('settings.validation.usernameEmailRequired'));
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Alert.alert(t('common.error'), t('settings.validation.invalidEmail'));
       return;
     }
 
@@ -171,7 +190,7 @@ const SettingsScreen: React.FC = () => {
     if (formData.phonenumber && formData.phonenumber.trim()) {
       const phoneRegex = /^[0-9]{10,15}$/;
       if (!phoneRegex.test(formData.phonenumber.replace(/\s/g, ''))) {
-        Alert.alert('Error', 'Please enter a valid phone number');
+        Alert.alert(t('common.error'), t('settings.validation.invalidPhone'));
         return;
       }
     }
@@ -185,15 +204,15 @@ const SettingsScreen: React.FC = () => {
 
   const confirmLogout = () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      t('settings.logout.title'),
+      t('settings.logout.message'),
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Logout',
+          text: t('settings.logout.button'),
           style: 'destructive',
           onPress: handleLogout,
         },
@@ -202,7 +221,7 @@ const SettingsScreen: React.FC = () => {
   };
 
   const getVerificationStatus = () => {
-    return userData?.is_verified ? 'Verified' : 'Not Verified';
+    return userData?.is_verified ? t('settings.verified') : t('settings.notVerified');
   };
 
   const getVerificationColor = () => {
@@ -216,7 +235,7 @@ const SettingsScreen: React.FC = () => {
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
           <ActivityIndicator size="large" color="#4A90E2" />
           <Text style={{ color: '#7f8c8d', fontSize: 16, marginTop: 16 }}>
-            Loading profile...
+            {t('settings.loadingProfile')}
           </Text>
         </View>
       </SafeAreaView>
@@ -229,16 +248,16 @@ const SettingsScreen: React.FC = () => {
       <SafeAreaView style={styles.container}>
         <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
           <Text style={{ color: '#e74c3c', fontSize: 18, fontWeight: '600', marginBottom: 8 }}>
-            Failed to load profile
+            {t('settings.failedToLoad')}
           </Text>
           <Text style={{ color: '#7f8c8d', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
-            {loadError || 'Unable to retrieve your profile data'}
+            {loadError || t('settings.unableToRetrieve')}
           </Text>
           <TouchableOpacity
             style={[styles.button, { paddingHorizontal: 32 }]}
             onPress={fetchUserProfile}
           >
-            <Text style={styles.buttonText}>Try Again</Text>
+            <Text style={styles.buttonText}>{t('common.tryAgain')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -249,23 +268,43 @@ const SettingsScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Settings</Text>
+          <Text style={styles.title}>{t('settings.title')}</Text>
           <Text style={styles.description}>
-            Manage your account preferences and profile information
+            {t('settings.description')}
           </Text>
+
+          {/* Language Settings Section */}
+          <View style={styles.formContainer}>
+            <Text style={styles.sectionTitle}>{t('settings.language.title')}</Text>
+            
+            <View style={styles.languageContainer}>
+              <Text style={[styles.languageLabel, !isVietnamese && styles.languageActive]}>
+                {t('settings.language.english')}
+              </Text>
+              <Switch
+                value={isVietnamese}
+                onValueChange={handleLanguageToggle}
+                trackColor={{ false: '#3498db', true: '#e74c3c' }}
+                thumbColor="#ffffff"
+              />
+              <Text style={[styles.languageLabel, isVietnamese && styles.languageActive]}>
+                {t('settings.language.vietnamese')}
+              </Text>
+            </View>
+          </View>
 
           {/* Profile Information Section */}
           <View style={styles.formContainer}>
-            <Text style={styles.sectionTitle}>Profile Information</Text>
+            <Text style={styles.sectionTitle}>{t('settings.profileSection')}</Text>
 
             {/* Username */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Username *</Text>
+              <Text style={styles.inputLabel}>{t('settings.usernameLabel')}</Text>
               <TextInput
                 style={[styles.input, !isEditing && styles.disabledInput]}
                 value={formData.username}
                 onChangeText={(text) => setFormData({ ...formData, username: text })}
-                placeholder="Enter username"
+                placeholder={t('settings.usernamePlaceholder')}
                 editable={isEditing}
                 placeholderTextColor="#bdc3c7"
               />
@@ -273,12 +312,12 @@ const SettingsScreen: React.FC = () => {
 
             {/* Email */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email *</Text>
+              <Text style={styles.inputLabel}>{t('settings.emailLabel')}</Text>
               <TextInput
                 style={[styles.input, !isEditing && styles.disabledInput]}
                 value={formData.email}
                 onChangeText={(text) => setFormData({ ...formData, email: text })}
-                placeholder="Enter email"
+                placeholder={t('settings.emailPlaceholder')}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 editable={isEditing}
@@ -288,12 +327,12 @@ const SettingsScreen: React.FC = () => {
 
             {/* Phone Number */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Phone Number</Text>
+              <Text style={styles.inputLabel}>{t('settings.phoneLabel')}</Text>
               <TextInput
                 style={[styles.input, !isEditing && styles.disabledInput]}
                 value={formData.phonenumber}
                 onChangeText={(text) => setFormData({ ...formData, phonenumber: text })}
-                placeholder="Enter phone number"
+                placeholder={t('settings.phonePlaceholder')}
                 keyboardType="phone-pad"
                 editable={isEditing}
                 placeholderTextColor="#bdc3c7"
@@ -302,7 +341,7 @@ const SettingsScreen: React.FC = () => {
 
             {/* Role (Read-only) */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Role</Text>
+              <Text style={styles.inputLabel}>{t('settings.roleLabel')}</Text>
               <View style={[styles.input, styles.disabledInput, styles.roleContainer]}>
                 <Text style={styles.roleText}>{formData.role}</Text>
               </View>
@@ -310,7 +349,7 @@ const SettingsScreen: React.FC = () => {
 
             {/* Account Status */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Account Status</Text>
+              <Text style={styles.inputLabel}>{t('settings.accountStatusLabel')}</Text>
               <View style={[styles.input, styles.disabledInput, styles.statusContainer]}>
                 <Text style={[styles.statusText, { color: getVerificationColor() }]}>
                   {getVerificationStatus()}
@@ -323,11 +362,11 @@ const SettingsScreen: React.FC = () => {
               {!isEditing ? (
                 <>
                   <TouchableOpacity style={styles.button} onPress={handleEdit}>
-                    <Text style={styles.buttonText}>Edit Profile</Text>
+                    <Text style={styles.buttonText}>{t('settings.editProfile')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity style={styles.secondaryButton} onPress={handleChangePassword}>
-                    <Text style={styles.secondaryButtonText}>Change Password</Text>
+                    <Text style={styles.secondaryButtonText}>{t('auth.changePassword')}</Text>
                   </TouchableOpacity>
                 </>
               ) : (
@@ -336,14 +375,14 @@ const SettingsScreen: React.FC = () => {
                     style={styles.button}
                     onPress={handleSubmit}
                   >
-                    <Text style={styles.buttonText}>Save Changes</Text>
+                    <Text style={styles.buttonText}>{t('settings.saveChanges')}</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity
                     style={styles.cancelButton}
                     onPress={handleCancel}
                   >
-                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                    <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -352,28 +391,28 @@ const SettingsScreen: React.FC = () => {
 
           {/* Account Information Section */}
           <View style={styles.infoContainer}>
-            <Text style={styles.sectionTitle}>Account Information</Text>
+            <Text style={styles.sectionTitle}>{t('settings.accountSection')}</Text>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>User ID:</Text>
+              <Text style={styles.infoLabel}>{t('settings.userId')}</Text>
               <Text style={styles.infoValue}>{userData.id}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Member Since:</Text>
+              <Text style={styles.infoLabel}>{t('settings.memberSince')}</Text>
               <Text style={styles.infoValue}>{formatDate(userData.created_at)}</Text>
             </View>
 
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Last Login:</Text>
-              <Text style={styles.infoValue}>Current Session</Text>
+              <Text style={styles.infoLabel}>{t('settings.lastLogin')}</Text>
+              <Text style={styles.infoValue}>{t('settings.currentSession')}</Text>
             </View>
           </View>
 
           {/* Logout Section */}
           <View style={styles.logoutContainer}>
             <TouchableOpacity style={styles.logoutButton} onPress={confirmLogout}>
-              <Text style={styles.logoutButtonText}>Logout</Text>
+              <Text style={styles.logoutButtonText}>{t('settings.logout.button')}</Text>
             </TouchableOpacity>
           </View>
         </View>

@@ -8,21 +8,23 @@ import {
   Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/(tabs)/health';
 import { 
   Dropdown, 
-  DatePicker, 
-  cpOptions, 
-  exangOptions, 
-  sexOptions
+  DatePicker
 } from '@/components/health';
+import { useHealthOptions } from '@/hooks';
 import { convertGMTToYYYYMMDD, validateAge } from '@/utils';
 import type { HealthUserData, HealthFormData } from '@/types';
 import { getProfile, updateHealth } from '@/api';
 import type { User } from '@/types';
 
 const HealthScreen: React.FC = () => {
+  const { t } = useTranslation();
+  const { cpOptions, exangOptions, sexOptions } = useHealthOptions();
+  
   const [userData, setUserData] = useState<HealthUserData | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -92,7 +94,7 @@ const HealthScreen: React.FC = () => {
       setIsEditing(!hasHealthData);
     } catch (error: any) {
       console.error('Error fetching user profile:', error);
-      Alert.alert('Error', error.message || 'Failed to load profile');
+      Alert.alert(t('common.error'), error.message || t('health.updateFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -117,13 +119,13 @@ const HealthScreen: React.FC = () => {
     // Validate required fields
     if (!formData.dob || !formData.trestbps ||
       formData.cp === undefined || formData.exang === undefined || formData.sex === undefined) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert(t('common.error'), t('health.validation.fillAllFields'));
       return;
     }
 
     // Validate date of birth
     if (!validateAge(formData.dob)) {
-      Alert.alert('Error', 'Please enter a valid date of birth (age must be between 10-100 years)');
+      Alert.alert(t('common.error'), t('health.validation.invalidDob'));
       return;
     }
 
@@ -131,7 +133,7 @@ const HealthScreen: React.FC = () => {
     const trestbps = parseInt(formData.trestbps);
 
     if (isNaN(trestbps) || trestbps < 50 || trestbps > 300) {
-      Alert.alert('Error', 'Please enter a valid blood pressure (50-300 mm Hg)');
+      Alert.alert(t('common.error'), t('health.validation.invalidBloodPressure'));
       return;
     }
 
@@ -163,11 +165,11 @@ const HealthScreen: React.FC = () => {
       setUserData(mappedUserData);
 
       Alert.alert(
-        'Success',
-        userData?.dob ? 'Health data updated successfully!' : 'Health data submitted successfully!',
+        t('common.success'),
+        userData?.dob ? t('health.updateSuccess') : t('health.submitSuccess'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               setIsEditing(false);
               setOriginalData({ ...formData });
@@ -177,7 +179,7 @@ const HealthScreen: React.FC = () => {
       );
     } catch (error: any) {
       console.error('Error updating health data:', error);
-      Alert.alert('Error', error.message || 'Failed to update health data');
+      Alert.alert(t('common.error'), error.message || t('health.updateFailed'));
     }
   };
 
@@ -186,7 +188,7 @@ const HealthScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#3498db' }}>Loading your profile...</Text>
+          <Text style={{ fontSize: 16, color: '#3498db' }}>{t('health.loading')}</Text>
         </View>
       </SafeAreaView>
     );
@@ -197,12 +199,12 @@ const HealthScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.contentContainer, { justifyContent: 'center', alignItems: 'center' }]}>
-          <Text style={{ fontSize: 16, color: '#e74c3c', marginBottom: 16 }}>Failed to load user data</Text>
+          <Text style={{ fontSize: 16, color: '#e74c3c', marginBottom: 16 }}>{t('health.failedToLoad')}</Text>
           <TouchableOpacity 
             style={styles.button} 
             onPress={fetchUserProfile}
           >
-            <Text style={styles.buttonText}>Retry</Text>
+            <Text style={styles.buttonText}>{t('common.retry')}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -224,11 +226,11 @@ const HealthScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
-          <Text style={styles.title}>Health Information</Text>
+          <Text style={styles.title}>{t('health.title')}</Text>
           <Text style={styles.description}>
             {hasHealthData
-              ? 'Review and update your health information'
-              : 'Please provide your health information for cardiovascular risk assessment'
+              ? t('health.descriptionExisting')
+              : t('health.descriptionNew')
             }
           </Text>
 
@@ -248,11 +250,10 @@ const HealthScreen: React.FC = () => {
                 fontWeight: '600',
                 marginBottom: 8
               }}>
-                📋 Complete Your Health Profile
+                {t('health.infoBox.title')}
               </Text>
               <Text style={{ fontSize: 13, color: '#424242', lineHeight: 20 }}>
-                To get accurate cardiovascular risk assessments, please fill in all required fields below. 
-                This information helps our AI model provide personalized health insights.
+                {t('health.infoBox.message')}
               </Text>
             </View>
           )}
@@ -260,7 +261,7 @@ const HealthScreen: React.FC = () => {
           <View style={styles.formContainer}>
             {/* Date of Birth Picker */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Date of Birth *</Text>
+              <Text style={styles.inputLabel}>{t('health.fields.dobLabel')}</Text>
               <DatePicker
                 selectedDate={formData.dob}
                 onDateSelect={(date) => setFormData({ ...formData, dob: date })}
@@ -270,48 +271,48 @@ const HealthScreen: React.FC = () => {
 
             {/* Sex Dropdown */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Sex *</Text>
+              <Text style={styles.inputLabel}>{t('health.fields.sexLabel')}</Text>
               <Dropdown
                 options={sexOptions}
                 selectedValue={formData.sex}
                 onSelect={(value) => setFormData({ ...formData, sex: value })}
-                placeholder="Select sex"
+                placeholder={t('health.fields.sexPlaceholder')}
                 disabled={isFormDisabled}
               />
             </View>
 
             {/* Chest Pain Type Dropdown */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Chest Pain Type *</Text>
+              <Text style={styles.inputLabel}>{t('health.fields.chestPainLabel')}</Text>
               <Dropdown
                 options={cpOptions}
                 selectedValue={formData.cp}
                 onSelect={(value) => setFormData({ ...formData, cp: value })}
-                placeholder="Select chest pain type"
+                placeholder={t('health.fields.chestPainPlaceholder')}
                 disabled={isFormDisabled}
               />
             </View>
 
             {/* Exercise Induced Angina Dropdown */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Exercise Induced Angina *</Text>
+              <Text style={styles.inputLabel}>{t('health.fields.exerciseAnginaLabel')}</Text>
               <Dropdown
                 options={exangOptions}
                 selectedValue={formData.exang}
                 onSelect={(value) => setFormData({ ...formData, exang: value })}
-                placeholder="Select exercise induced angina"
+                placeholder={t('health.fields.exerciseAnginaPlaceholder')}
                 disabled={isFormDisabled}
               />
             </View>
 
             {/* Resting Blood Pressure Input */}
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Resting Blood Pressure (mm Hg) *</Text>
+              <Text style={styles.inputLabel}>{t('health.fields.bloodPressureLabel')}</Text>
               <TextInput
                 style={[styles.input, isFormDisabled && styles.disabledInput]}
                 value={formData.trestbps}
                 onChangeText={(text) => setFormData({ ...formData, trestbps: text })}
-                placeholder="Enter resting blood pressure"
+                placeholder={t('health.fields.bloodPressurePlaceholder')}
                 keyboardType="numeric"
                 editable={!isFormDisabled}
                 placeholderTextColor="#bdc3c7"
@@ -322,7 +323,7 @@ const HealthScreen: React.FC = () => {
             <View style={styles.buttonContainer}>
               {hasHealthData && !isEditing ? (
                 <TouchableOpacity style={styles.button} onPress={handleEdit}>
-                  <Text style={styles.buttonText}>Edit</Text>
+                  <Text style={styles.buttonText}>{t('common.edit')}</Text>
                 </TouchableOpacity>
               ) : (
                 <>
@@ -331,7 +332,7 @@ const HealthScreen: React.FC = () => {
                     onPress={handleSubmit}
                   >
                     <Text style={styles.buttonText}>
-                      {hasHealthData ? 'Update' : 'Submit'}
+                      {hasHealthData ? t('common.update') : t('common.submit')}
                     </Text>
                   </TouchableOpacity>
 
@@ -340,7 +341,7 @@ const HealthScreen: React.FC = () => {
                       style={styles.cancelButton}
                       onPress={handleCancel}
                     >
-                      <Text style={styles.cancelButtonText}>Cancel</Text>
+                      <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
                     </TouchableOpacity>
                   )}
                 </>

@@ -12,6 +12,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { styles } from '@/styles/forgot-password';
 import { recoverPassword } from '@/api';
@@ -24,6 +25,7 @@ interface ForgotPasswordScreenProps {
 }
 
 const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
@@ -39,14 +41,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
   const handleResetPassword = async (): Promise<void> => {
     // Basic validation
     if (!username.trim() || !email.trim() || !phoneNumber.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('common.error'), t('forgotPassword.validation.fillAllFields'));
       return;
     }
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+      Alert.alert(t('common.error'), t('forgotPassword.validation.invalidEmail'));
       return;
     }
 
@@ -61,11 +63,11 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       });
 
       Alert.alert(
-        'Success',
-        'Password recovery instructions have been sent to your email and phone number.',
+        t('common.success'),
+        t('forgotPassword.recoverySuccess'),
         [
           {
-            text: 'OK',
+            text: t('common.ok'),
             onPress: () => {
               setUsername('');
               setEmail('');
@@ -77,8 +79,8 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
       );
     } catch (error: any) {
       Alert.alert(
-        'Recovery Failed',
-        error.message || 'Failed to recover password. Please verify your information and try again.'
+        t('forgotPassword.recoveryFailed'),
+        error.message || t('forgotPassword.recoveryError')
       );
     } finally {
       setLoading(false);
@@ -96,16 +98,16 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.contentContainer}>
-            <Text style={styles.appName}>Heartify</Text>
+            <Text style={styles.appName}>{t('common.appName')}</Text>
 
             <View style={styles.formContainer}>
-              <Text style={styles.title}>Forgot Password</Text>
+              <Text style={styles.title}>{t('forgotPassword.title')}</Text>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Username</Text>
+                <Text style={styles.inputLabel}>{t('forgotPassword.usernameLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your username"
+                  placeholder={t('forgotPassword.usernamePlaceholder')}
                   value={username}
                   onChangeText={setUsername}
                   autoCapitalize="none"
@@ -113,10 +115,10 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Email</Text>
+                <Text style={styles.inputLabel}>{t('forgotPassword.emailLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your email"
+                  placeholder={t('forgotPassword.emailPlaceholder')}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -125,10 +127,10 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
               </View>
 
               <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Phone Number</Text>
+                <Text style={styles.inputLabel}>{t('forgotPassword.phoneLabel')}</Text>
                 <TextInput
                   style={styles.input}
-                  placeholder="Enter your phone number"
+                  placeholder={t('forgotPassword.phonePlaceholder')}
                   value={phoneNumber}
                   onChangeText={setPhoneNumber}
                   keyboardType="phone-pad"
@@ -143,14 +145,14 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ navigation 
                 {loading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.buttonText}>Reset Password</Text>
+                  <Text style={styles.buttonText}>{t('auth.resetPassword')}</Text>
                 )}
               </TouchableOpacity>
 
               <View style={styles.loginContainer}>
-                <Text style={styles.loginText}>Remembered password? </Text>
+                <Text style={styles.loginText}>{t('forgotPassword.rememberedPassword')}</Text>
                 <TouchableOpacity onPress={handleLogin}>
-                  <Text style={styles.loginLink}>Log In</Text>
+                  <Text style={styles.loginLink}>{t('auth.logIn')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
