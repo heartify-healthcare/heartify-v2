@@ -1,39 +1,28 @@
 {
   "common": {
     "appName": "Heartify",
-    "loading": "Loading...",
     "error": "Error",
     "success": "Success",
     "cancel": "Cancel",
     "ok": "OK",
-    "save": "Save",
     "edit": "Edit",
-    "delete": "Delete",
     "submit": "Submit",
     "update": "Update",
     "retry": "Retry",
     "tryAgain": "Try Again",
-    "yes": "Yes",
-    "no": "No",
-    "back": "Back",
-    "next": "Next",
-    "done": "Done",
     "confirm": "Confirm",
-    "clear": "Clear",
     "info": "Info",
     "unknown": "Unknown",
     "na": "N/A"
   },
   "auth": {
     "login": "Login",
-    "logout": "Logout",
     "signUp": "Sign Up",
     "logIn": "Log In",
     "forgotPassword": "Forgot password?",
     "resetPassword": "Reset Password",
     "changePassword": "Change Password",
-    "verifyOtp": "Verify OTP",
-    "resendOtp": "Resend OTP"
+    "verifyOtp": "Verify OTP"
   },
   "login": {
     "appDescription": "A Mobile Application for Cardiovascular Disease Prediction",

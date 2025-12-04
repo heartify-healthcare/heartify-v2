@@ -1,39 +1,28 @@
 {
   "common": {
     "appName": "Heartify",
-    "loading": "Đang tải...",
     "error": "Lỗi",
     "success": "Thành công",
     "cancel": "Hủy",
     "ok": "OK",
-    "save": "Lưu",
     "edit": "Sửa",
-    "delete": "Xóa",
     "submit": "Gửi",
     "update": "Cập nhật",
     "retry": "Thử lại",
     "tryAgain": "Thử lại",
-    "yes": "Có",
-    "no": "Không",
-    "back": "Quay lại",
-    "next": "Tiếp theo",
-    "done": "Xong",
     "confirm": "Xác nhận",
-    "clear": "Xóa",
     "info": "Thông tin",
     "unknown": "Không xác định",
     "na": "N/A"
   },
   "auth": {
     "login": "Đăng nhập",
-    "logout": "Đăng xuất",
     "signUp": "Đăng ký",
     "logIn": "Đăng nhập",
     "forgotPassword": "Quên mật khẩu?",
     "resetPassword": "Đặt lại mật khẩu",
     "changePassword": "Đổi mật khẩu",
-    "verifyOtp": "Xác thực OTP",
-    "resendOtp": "Gửi lại OTP"
+    "verifyOtp": "Xác thực OTP"
   },
   "login": {
     "appDescription": "Ứng dụng di động dự đoán bệnh tim mạch",
