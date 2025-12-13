@@ -156,6 +156,7 @@
       "loadingExplanation": "Loading AI explanation...",
       "summary": "Summary",
       "details": "Details",
+      "ecgSignalComponents": "ECG Signal Components",
       "recommendations": "Recommendations",
       "riskLevel": "Risk Level",
       "nextSteps": "Next Steps"

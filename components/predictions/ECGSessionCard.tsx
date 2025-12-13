@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, Modal, Image, StyleSheet, Dimensions } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ECGChart } from '@/components';
 import { formatDateTime, formatFeatureName, formatProbability, formatFeatureValue } from '@/utils';
@@ -13,8 +13,9 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
   styles,
   onExpand 
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isImageModalVisible, setIsImageModalVisible] = useState(false);
 
   const handleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -260,7 +261,14 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
 
                 {/* Details - Keep original value from backend */}
                 <View style={styles.explanationSection}>
-                  <Text style={styles.explanationLabel}>{t('predictions.card.details')}:</Text>
+                  <View style={modalStyles.detailsHeader}>
+                    <Text style={styles.explanationLabel}>{t('predictions.card.details')}:</Text>
+                    <TouchableOpacity onPress={() => setIsImageModalVisible(true)}>
+                      <Text style={modalStyles.linkText}>
+                        {t('predictions.card.ecgSignalComponents')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                   <Text style={styles.explanationText}>
                     {session.explanation.explanation.details}
                   </Text>
@@ -301,6 +309,86 @@ export const ECGSessionCard: React.FC<ECGSessionCardProps> = ({
           )}
         </View>
       )}
+
+      {/* ECG Signal Components Image Modal */}
+      <Modal
+        visible={isImageModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsImageModalVisible(false)}
+      >
+        <View style={modalStyles.modalOverlay}>
+          <View style={modalStyles.modalContent}>
+            <TouchableOpacity 
+              style={modalStyles.closeButton}
+              onPress={() => setIsImageModalVisible(false)}
+            >
+              <Text style={modalStyles.closeButtonText}>✕</Text>
+            </TouchableOpacity>
+            
+            <Image
+              source={
+                i18n.language === 'vi'
+                  ? require('@/assets/sinus_rhythm_labels_vn.png')
+                  : require('@/assets/sinus_rhythm_labels_en.png')
+              }
+              style={modalStyles.image}
+              resizeMode="contain"
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
+
+// Modal Styles
+const modalStyles = StyleSheet.create({
+  detailsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  linkText: {
+    color: '#3498db',
+    textDecorationLine: 'underline',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 20,
+    width: Dimensions.get('window').width * 0.9,
+    maxHeight: Dimensions.get('window').height * 0.8,
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 10,
+    backgroundColor: '#e74c3c',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
+});

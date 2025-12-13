@@ -156,6 +156,7 @@
       "loadingExplanation": "Đang tải giải thích AI...",
       "summary": "Tóm tắt",
       "details": "Chi tiết",
+      "ecgSignalComponents": "Thành phần tín hiệu ECG",
       "recommendations": "Khuyến nghị",
       "riskLevel": "Mức độ rủi ro",
       "nextSteps": "Bước tiếp theo"
