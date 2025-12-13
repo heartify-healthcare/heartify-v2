@@ -28,6 +28,7 @@ const ECGScreen: React.FC = () => {
   // Device connection states
   const [deviceId, setDeviceId] = useState('');
   const [isConnected, setIsConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [status, setStatus] = useState(t('ecg.status.notInitialized'));
 
   // Streaming states
@@ -110,6 +111,7 @@ const ECGScreen: React.FC = () => {
       'onDeviceConnected',
       (data: any) => {
         setIsConnected(true);
+        setIsConnecting(false);
         setStatus(t('ecg.status.connectedTo', { name: data.name, deviceId: data.deviceId }));
         Alert.alert(t('common.success'), t('ecg.alerts.connectedTo', { name: data.name }));
       }
@@ -214,9 +216,11 @@ const ECGScreen: React.FC = () => {
     }
 
     try {
+      setIsConnecting(true);
       setStatus(t('ecg.status.connecting'));
       await PolarEcgModule.connectToDevice(deviceId.trim());
     } catch (error: any) {
+      setIsConnecting(false);
       setStatus(t('ecg.status.connectionFailed'));
       Alert.alert(t('common.error'), error.message || t('ecg.alerts.failedToConnect'));
     }
@@ -449,6 +453,7 @@ const ECGScreen: React.FC = () => {
               onConnect={handleConnect}
               onDisconnect={handleDisconnect}
               isConnected={isConnected}
+              disabled={isConnecting}
             />
 
             {/* Status Display */}
