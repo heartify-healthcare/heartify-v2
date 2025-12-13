@@ -132,6 +132,7 @@
     "title": "Predictions",
     "description": "View your cardiovascular health predictions and risk assessments",
     "loading": "Loading ECG sessions...",
+    "loadingMore": "Loading more...",
     "noSessions": "No ECG sessions found. Start a new recording to see predictions here.",
     "errorLoadingSessions": "Failed to load ECG sessions",
     "errorLoadingSessionsRetry": "Failed to load ECG sessions. Please try again.",

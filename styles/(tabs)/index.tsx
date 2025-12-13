@@ -255,9 +255,23 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     padding: width * 0.1,
   },
+  emptyContentContainer: {
+    flexGrow: 1,
+  },
   emptyText: {
     fontSize: width * 0.04,
     color: '#7f8c8d',
     textAlign: 'center',
+  },
+  // Footer Loader
+  footerLoader: {
+    paddingVertical: height * 0.02,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerText: {
+    marginTop: height * 0.01,
+    fontSize: width * 0.035,
+    color: '#7f8c8d',
   },
 });

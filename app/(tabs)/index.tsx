@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Alert, RefreshControl } from 'react-native';
+import { View, Text, FlatList, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { styles } from '@/styles/(tabs)/index';
@@ -14,19 +14,26 @@ const PredictionsScreen: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
   // Fetch ECG sessions on component mount
   useEffect(() => {
     fetchECGSessions();
   }, []);
 
-  const fetchECGSessions = async () => {
+  const fetchECGSessions = async (page: number = 0, append: boolean = false) => {
     try {
-      setIsLoading(true);
+      if (!append) {
+        setIsLoading(true);
+      } else {
+        setIsLoadingMore(true);
+      }
       setError(null);
       
       // Fetch ECG sessions list
-      const response = await getECGSessions(0, 10, 'createdAt', 'desc');
+      const response = await getECGSessions(page, 10, 'createdAt', 'desc');
       
       // Initialize sessions with loading states
       const initializedSessions = response.content.map(session => ({
@@ -38,25 +45,91 @@ const PredictionsScreen: React.FC = () => {
         }
       }));
       
-      setSessions(initializedSessions);
+      if (append) {
+        // Append new sessions to existing list
+        setSessions(prevSessions => [...prevSessions, ...initializedSessions]);
+      } else {
+        // Replace with new sessions (initial load or refresh)
+        setSessions(initializedSessions);
+      }
+      
+      // Update pagination state
+      setCurrentPage(response.number);
+      setHasMoreData(!response.last);
     } catch (err: any) {
       console.error('Failed to fetch ECG sessions:', err);
       setError(err.message || t('predictions.errorLoadingSessions'));
-      Alert.alert(
-        t('common.error'),
-        t('predictions.errorLoadingSessionsRetry'),
-        [{ text: t('common.ok') }]
-      );
+      if (!append) {
+        Alert.alert(
+          t('common.error'),
+          t('predictions.errorLoadingSessionsRetry'),
+          [{ text: t('common.ok') }]
+        );
+      }
     } finally {
       setIsLoading(false);
+      setIsLoadingMore(false);
     }
   };
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await fetchECGSessions();
+    setCurrentPage(0);
+    setHasMoreData(true);
+    await fetchECGSessions(0, false);
     setRefreshing(false);
   };
+
+  const loadMoreSessions = () => {
+    // Don't load more if:
+    // 1. Already loading
+    // 2. No more data available
+    // 3. Currently refreshing
+    if (isLoadingMore || !hasMoreData || refreshing || isLoading) {
+      return;
+    }
+
+    const nextPage = currentPage + 1;
+    fetchECGSessions(nextPage, true);
+  };
+
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+
+    return (
+      <View style={styles.footerLoader}>
+        <ActivityIndicator size="small" color="#e74c3c" />
+        <Text style={styles.footerText}>{t('predictions.loadingMore')}</Text>
+      </View>
+    );
+  };
+
+  const renderItem = ({ item, index }: { item: ECGSession; index: number }) => (
+    <ECGSessionCard
+      key={item.id}
+      session={item}
+      index={index}
+      styles={styles}
+      onExpand={handleExpand}
+    />
+  );
+
+  const renderListHeader = () => (
+    <View>
+      <Text style={styles.title}>{t('predictions.title')}</Text>
+      <Text style={styles.description}>
+        {t('predictions.description')}
+      </Text>
+    </View>
+  );
+
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>
+        {t('predictions.noSessions')}
+      </Text>
+    </View>
+  );
 
   // Handle session expansion - fetch detailed data progressively
   const handleExpand = async (sessionId: string) => {
@@ -227,8 +300,17 @@ const PredictionsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
-        style={styles.scrollView} 
+      <FlatList
+        data={sessions}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={renderEmpty}
+        ListFooterComponent={renderFooter}
+        contentContainerStyle={[
+          styles.contentContainer,
+          sessions.length === 0 && styles.emptyContentContainer
+        ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -238,32 +320,9 @@ const PredictionsScreen: React.FC = () => {
             colors={['#e74c3c']}
           />
         }
-      >
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>{t('predictions.title')}</Text>
-          <Text style={styles.description}>
-            {t('predictions.description')}
-          </Text>
-
-          {sessions.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>
-                {t('predictions.noSessions')}
-              </Text>
-            </View>
-          ) : (
-            sessions.map((session, index) => (
-              <ECGSessionCard
-                key={session.id}
-                session={session}
-                index={index}
-                styles={styles}
-                onExpand={handleExpand}
-              />
-            ))
-          )}
-        </View>
-      </ScrollView>
+        onEndReached={loadMoreSessions}
+        onEndReachedThreshold={0.5}
+      />
     </SafeAreaView>
   );
 };

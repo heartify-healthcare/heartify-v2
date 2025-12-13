@@ -132,6 +132,7 @@
     "title": "Dự đoán",
     "description": "Xem các dự đoán sức khỏe tim mạch và đánh giá nguy cơ",
     "loading": "Đang tải phiên ECG...",
+    "loadingMore": "Đang tải thêm...",
     "noSessions": "Không tìm thấy phiên ECG nào. Bắt đầu ghi để xem dự đoán ở đây.",
     "errorLoadingSessions": "Không thể tải phiên ECG",
     "errorLoadingSessionsRetry": "Không thể tải phiên ECG. Vui lòng thử lại.",
