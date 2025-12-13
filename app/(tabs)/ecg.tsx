@@ -185,6 +185,34 @@ const ECGScreen: React.FC = () => {
       return;
     }
 
+    if (Platform.OS === 'android') {
+      try {
+        // Check Bluetooth
+        const isBtOn = await PolarEcgModule.isBluetoothEnabled();
+        if (!isBtOn) {
+          Alert.alert(
+            t('common.attention'),
+            t('ecg.permissions.bluetoothRequired'),
+            [{ text: t('common.ok') }]
+          );
+          return;
+        }
+
+        // Check Location Services (GPS)
+        const isLocOn = await PolarEcgModule.isLocationEnabled();
+        if (!isLocOn) {
+          Alert.alert(
+            t('common.attention'),
+            t('ecg.permissions.locationRequired'),
+            [{ text: t('common.ok') }]
+          );
+          return;
+        }
+      } catch (err) {
+        console.warn(t('ecg.permissions.checkError'), err);
+      }
+    }
+
     try {
       setStatus(t('ecg.status.connecting'));
       await PolarEcgModule.connectToDevice(deviceId.trim());

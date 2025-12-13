@@ -12,6 +12,7 @@
     "tryAgain": "Thử lại",
     "confirm": "Xác nhận",
     "info": "Thông tin",
+    "attention": "Chú ý",
     "unknown": "Không xác định",
     "na": "N/A"
   },
@@ -247,6 +248,11 @@
       "stayHere": "Ở lại đây",
       "failedTitle": "Dự đoán thất bại",
       "failedMessage": "Không thể xử lý dữ liệu ECG. Vui lòng thử lại."
+    },
+    "permissions": {
+      "bluetoothRequired": "Vui lòng bật Bluetooth để kết nối với thiết bị.",
+      "locationRequired": "Vui lòng bật Dịch vụ vị trí (Location) để quét tìm thiết bị.",
+      "checkError": "Lỗi kiểm tra trạng thái thiết bị"
     },
     "modal": {
       "title": "Đang xử lý phân tích ECG",

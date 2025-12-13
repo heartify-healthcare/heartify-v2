@@ -6,6 +6,9 @@ declare class PolarEcgModule extends NativeModule<PolarEcgModuleEvents> {
   PI: number;
   hello(): string;
   setValueAsync(value: string): Promise<void>;
+
+  isBluetoothEnabled(): Promise<boolean>;
+  isLocationEnabled(): Promise<boolean>;
 }
 
 // This call loads the native module object from the JSI.

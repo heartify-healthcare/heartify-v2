@@ -13,6 +13,8 @@ import com.polar.sdk.api.errors.PolarInvalidArgument
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import android.util.Log
+import android.bluetooth.BluetoothManager
+import android.location.LocationManager
 
 class PolarEcgModule : Module() {
   private var api: PolarBleApi? = null
@@ -64,6 +66,21 @@ class PolarEcgModule : Module() {
       })
       
       "Polar SDK Initialized"
+    }
+
+    Function("isBluetoothEnabled") {
+      val context = appContext.reactContext as Context
+      val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+      val adapter = bluetoothManager?.adapter
+      return@Function adapter?.isEnabled == true
+    }
+
+    Function("isLocationEnabled") {
+      val context = appContext.reactContext as Context
+      val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as? LocationManager
+      val isGpsEnabled = locationManager?.isProviderEnabled(LocationManager.GPS_PROVIDER) == true
+      val isNetworkEnabled = locationManager?.isProviderEnabled(LocationManager.NETWORK_PROVIDER) == true
+      return@Function isGpsEnabled || isNetworkEnabled
     }
 
     AsyncFunction("connectToDevice") { deviceId: String ->

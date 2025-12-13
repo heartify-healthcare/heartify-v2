@@ -12,6 +12,7 @@
     "tryAgain": "Try Again",
     "confirm": "Confirm",
     "info": "Info",
+    "attention": "Attention",
     "unknown": "Unknown",
     "na": "N/A"
   },
@@ -247,6 +248,11 @@
       "stayHere": "Stay Here",
       "failedTitle": "Prediction Failed",
       "failedMessage": "Failed to process ECG data. Please try again."
+    },
+    "permissions": {
+      "bluetoothRequired": "Please enable Bluetooth to connect to the device.",
+      "locationRequired": "Please enable Location services to scan for devices.",
+      "checkError": "Error checking device status"
     },
     "modal": {
       "title": "Processing ECG Analysis",
