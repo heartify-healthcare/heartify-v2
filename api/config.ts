@@ -1,5 +1,5 @@
 // Base URLs for different services
-export const API_BASE_URL = 'http://192.168.1.8:8080'; // API Gateway URL
+export const API_BASE_URL = 'http://k8s-heartify-apigatew-c9e4853fd6-36c22647130c08e3.elb.ap-southeast-1.amazonaws.com'; // API Gateway URL
 export const PREFIX = '/api/v1';
 
 // API Endpoints
