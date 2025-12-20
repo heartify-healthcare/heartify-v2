@@ -2,7 +2,7 @@
   "expo": {
     "name": "Heartify",
     "slug": "heartify-v2",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -17,7 +17,9 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.anonymous.heartifyv2",
+      "usesCleartextTraffic": true,
       "permissions": [
+        "INTERNET",
         "BLUETOOTH",
         "BLUETOOTH_ADMIN",
         "BLUETOOTH_SCAN",
