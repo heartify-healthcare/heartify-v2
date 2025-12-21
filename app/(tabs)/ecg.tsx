@@ -152,11 +152,20 @@ const ECGScreen: React.FC = () => {
   const requestPermissions = async () => {
     if (Platform.OS === 'android') {
       try {
-        const granted = await PermissionsAndroid.requestMultiple([
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-          PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
-          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-        ]);
+        const apiLevel = parseInt(Platform.Version.toString(), 10);
+        let granted = {};
+
+        if (apiLevel >= 31) {
+          granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+            PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          ]);
+        } else {
+          granted = await PermissionsAndroid.requestMultiple([
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          ]);
+        }
 
         const allGranted = Object.values(granted).every(
           (status) => status === PermissionsAndroid.RESULTS.GRANTED
