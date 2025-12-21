@@ -87,10 +87,11 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
       data
     );
 
-    // Store token and user info
+    // Store token, user info, and login timestamp
     if (response.accessToken) {
       await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, response.accessToken);
       await AsyncStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response));
+      await AsyncStorage.setItem(STORAGE_KEYS.LOGIN_TIME, Date.now().toString());
     }
 
     return response;
@@ -109,8 +110,39 @@ export const logout = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(STORAGE_KEYS.TOKEN);
     await AsyncStorage.removeItem(STORAGE_KEYS.USER);
+    await AsyncStorage.removeItem(STORAGE_KEYS.LOGIN_TIME);
   } catch (error) {
     console.error('Logout error:', error);
+  }
+};
+
+/**
+ * Check if user is authenticated and token is still valid (within 24 hours)
+ */
+export const isAuthenticated = async (): Promise<boolean> => {
+  try {
+    const token = await AsyncStorage.getItem(STORAGE_KEYS.TOKEN);
+    const loginTimeStr = await AsyncStorage.getItem(STORAGE_KEYS.LOGIN_TIME);
+    
+    if (!token || !loginTimeStr) {
+      return false;
+    }
+    
+    const loginTime = parseInt(loginTimeStr, 10);
+    const currentTime = Date.now();
+    const twentyFourHoursInMs = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    
+    // Check if token is still valid (within 24 hours)
+    if (currentTime - loginTime > twentyFourHoursInMs) {
+      // Token expired, clear storage
+      await logout();
+      return false;
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error checking authentication:', error);
+    return false;
   }
 };
 

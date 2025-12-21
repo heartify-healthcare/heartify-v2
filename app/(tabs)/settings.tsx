@@ -246,7 +246,7 @@ const SettingsScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
           <Text style={styles.title}>{t('settings.title')}</Text>
@@ -373,11 +373,6 @@ const SettingsScreen: React.FC = () => {
           {/* Account Information Section */}
           <View style={styles.infoContainer}>
             <Text style={styles.sectionTitle}>{t('settings.accountSection')}</Text>
-
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>{t('settings.userId')}</Text>
-              <Text style={styles.infoValue}>{userData.id}</Text>
-            </View>
 
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>{t('settings.memberSince')}</Text>

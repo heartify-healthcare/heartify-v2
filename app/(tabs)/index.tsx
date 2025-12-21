@@ -299,7 +299,7 @@ const PredictionsScreen: React.FC = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <FlatList
         data={sessions}
         renderItem={renderItem}

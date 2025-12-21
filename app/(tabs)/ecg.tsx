@@ -433,7 +433,7 @@ const ECGScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <ScrollView
         ref={scrollViewRef}
         style={styles.scrollView}

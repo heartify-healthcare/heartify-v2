@@ -39,4 +39,5 @@ const STORAGE_PREFIX_VALUE = '@heartify';
 export const STORAGE_KEYS = {
   TOKEN: `${STORAGE_PREFIX_VALUE}:token`,
   USER: `${STORAGE_PREFIX_VALUE}:user`,
+  LOGIN_TIME: `${STORAGE_PREFIX_VALUE}:loginTime`,
 };

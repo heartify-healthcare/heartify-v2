@@ -17,6 +17,7 @@ export {
   login,
   logout,
   recoverPassword,
+  isAuthenticated,
 } from './auth';
 
 // User

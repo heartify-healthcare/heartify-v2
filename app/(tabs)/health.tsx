@@ -212,7 +212,7 @@ const HealthScreen: React.FC = () => {
   const isFormDisabled = hasHealthData && !isEditing;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
           <Text style={styles.title}>{t('health.title')}</Text>
