@@ -47,7 +47,7 @@ export default function TabLayout() {
           ),
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="health"
         options={{
           title: t('tabs.health'),
@@ -58,7 +58,7 @@ export default function TabLayout() {
             />
           ),
         }}
-      />
+      /> */}
       <Tabs.Screen
         name="settings"
         options={{

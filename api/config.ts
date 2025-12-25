@@ -1,5 +1,5 @@
 // Base URLs for different services
-export const API_BASE_URL = 'http://192.168.1.5:8080'; // API Gateway URL
+export const API_BASE_URL = 'http://10.186.253.131:8080'; // API Gateway URL
 export const PREFIX = '/api/v1';
 
 // API Endpoints
